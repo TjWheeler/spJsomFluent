@@ -15,7 +15,7 @@ export default class File {
         });
         return this.fluent;
     }
-    public checkInFile(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): Fluent {
+    public checkIn(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): Fluent {
         this.fluent.chainAction(`${this._helperName}.checkInFile`, () => {
             return this.listHelper.checkInFile(web, serverRelativeUrl, comment, checkInType);
         });
