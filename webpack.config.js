@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const version = 'v0.0.2';
+const version = 'v0.0.5';
 var banner = 'spJsomFluent ' + version + ' - https://github.com/TjWheeler/spJsomFluent';
 module.exports = {
     entry: { spJsomFluent: './src/fluent.ts'},
@@ -10,7 +10,7 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
-                exclude: /node_modules/
+                exclude: path.resolve(__dirname, '/node_modules')
             }
         ]
     },
