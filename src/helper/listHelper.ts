@@ -5,13 +5,34 @@ export default class ListHelper {
         this.context = context;
     }
     private context: SP.ClientContext;
-    public createList(web: SP.Web, listName: string, template: string): JQueryPromise<SP.List> {
+
+    public createList(web: SP.Web, listName: string, templateId: number): JQueryPromise<SP.List> {
         var deferred = $.Deferred();
         var list = null as SP.List;
-        //TODO:
-        common.reject(deferred, "Not implemented");
-        deferred.resolve(list);
+        var info = new SP.ListCreationInformation();
+        info.set_title(listName);
+        info.set_templateType(templateId);
+        var list = web.get_lists().add(info);
+        this.context.load(list);
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                deferred.resolve(list);
+            });
         return deferred.promise() as JQueryPromise<SP.List>;
+    }
+    public setAlerts(web: SP.Web, listName: string, enabled:boolean): JQueryPromise<any> {
+        var deferred = $.Deferred();
+        var list = web.get_lists().getByTitle(listName);
+        this.context.load(list);
+        (<any>list).set_enableAssignToEmail(enabled); //Not in typescript definitions currently.  //TODO: test 
+        list.update();
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                deferred.resolve();
+            });
+        return deferred.promise() as JQueryPromise<any>;
     }
     public setListItemProperties(listItem: SP.ListItem, properties: any): JQueryPromise<SP.ListItem> {
         var deferred = $.Deferred();

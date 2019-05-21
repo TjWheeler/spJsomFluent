@@ -1,52 +1,75 @@
-// Type definitions for SharePoint 2010 and 2013
-// Project: https://github.com/gandjustas/sptypescript
-// Definitions by: Stanislav Vyshchepan <http://blog.gandjustas.ru>, Andrey Markeev <http://markeev.com>
+// Type definitions for Microsoft SharePoint: 2016.1
+// Project: https://msdn.microsoft.com/en-us/library/office/jj193034.aspx
+// Definitions by: Stanislav Vyshchepan <https://github.com/gandjustas>
+//                 Andrey Markeev <https://github.com/andrei-markeev>
+//                 Vincent Biret <https://github.com/baywet>
+//                 Tero Arvola <https://github.com/teroarvola>
+//                 Dennis George <https://github.com/dennispg>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+// TypeScript Version: 2.5
 
-/// <reference path="../microsoft-ajax/index.d.ts" />
-declare var _spBodyOnLoadFunctions: Function[];
+/// <reference types="microsoft-ajax" />
+
+declare var _spBodyOnLoadFunctions: Array<() => void>;
 declare var _spBodyOnLoadFunctionNames: string[];
 declare var _spBodyOnLoadCalled: boolean;
 declare function ExecuteOrDelayUntilBodyLoaded(initFunc: () => void): void;
 declare function ExecuteOrDelayUntilScriptLoaded(func: () => void, depScriptFileName: string): boolean;
-declare function ExecuteOrDelayUntilEventNotified(func: Function, eventName: string): boolean;
-declare var Strings:any;
-
+declare function ExecuteOrDelayUntilEventNotified(func: (...args: any[]) => void, eventName: string): boolean;
+declare var Strings: any;
+declare const enum Sods {
+    missing =  1,
+    loading = 2,
+    pending = 3,
+    loaded = 4,
+    error = 5
+}
+interface Sod {
+    url: string;
+    key: string;
+    loaded: boolean;
+    depkeys?: string[];
+    state: Sods;
+    qfn?: any[];
+    reset?: boolean;
+}
+declare var _v_dictSod: { [address: string]: Sod };
 declare namespace SP {
-    export class SOD {
-        static execute(fileName: string, functionName: string, ...args: any[]): void;
-        static executeFunc(fileName: string, typeName: string, fn: () => void): void;
-        static executeOrDelayUntilEventNotified(func: Function, eventName: string): boolean;
-        static executeOrDelayUntilScriptLoaded(func: () => void, depScriptFileName: string): boolean;
-        static notifyScriptLoadedAndExecuteWaitingJobs(scriptFileName: string): void;
-        static notifyEventAndExecuteWaitingJobs(eventName: string, args?: any[]): void;
-        static registerSod(fileName: string, url: string): void;
-        static registerSodDep(fileName: string, dependentFileName: string): void;
-        static loadMultiple(keys: string[], fn: () => void, bSync?: boolean): void;
-        static delayUntilEventNotified(func: Function, eventName: string): void;
+    interface SOD {
+        execute(fileName: string, functionName: string, ...args: any[]): void;
+        executeFunc(fileName: string, typeName: string, fn: () => void): void;
+        executeOrDelayUntilEventNotified(func: (...args: any[]) => void, eventName: string): boolean;
+        executeOrDelayUntilScriptLoaded(func: () => void, depScriptFileName: string): boolean;
+        notifyScriptLoadedAndExecuteWaitingJobs(scriptFileName: string): void;
+        notifyEventAndExecuteWaitingJobs(eventName: string, args?: any[]): void;
+        registerSod(fileName: string, url: string): void;
+        registerSodDep(fileName: string, dependentFileName: string): void;
+        loadMultiple(keys: string[], fn: () => void, bSync?: boolean): void;
+        delayUntilEventNotified(func: (...args: any[]) => void, eventName: string): void;
 
-        static get_prefetch(): boolean;
-        static set_prefetch(value: boolean): void;
+        get_prefetch(): boolean;
+        set_prefetch(value: boolean): void;
 
-        static get_ribbonImagePrefetchEnabled(): boolean;
-        static set_ribbonImagePrefetchEnabled(value: boolean): void;
+        get_ribbonImagePrefetchEnabled(): boolean;
+        set_ribbonImagePrefetchEnabled(value: boolean): void;
+    }
+    let SOD: SOD;
+
+    enum ListLevelPermissionMask {
+        viewListItems, // : 1,
+        insertListItems, // : 2,
+        editListItems, // : 4,
+        deleteListItems, // : 8,
+        approveItems, // : 16,
+        openItems, // : 32,
+        viewVersions, // : 64,
+        deleteVersions, // : 128,
+        breakCheckout, // : 256,
+        managePersonalViews, // : 512,
+        manageLists // : 2048
     }
 
-    export enum ListLevelPermissionMask {
-        viewListItems,//: 1,
-        insertListItems,//: 2,
-        editListItems,//: 4,
-        deleteListItems,//: 8,
-        approveItems,//: 16,
-        openItems,//: 32,
-        viewVersions,//: 64,
-        deleteVersions,//: 128,
-        breakCheckout,//: 256,
-        managePersonalViews,//: 512,
-        manageLists//: 2048
-    }
-
-    export class HtmlBuilder {
+    class HtmlBuilder {
         constructor();
         addAttribute(name: string, value: string): void;
         addCssClass(cssClassName: string): void;
@@ -58,7 +81,7 @@ declare namespace SP {
         toString(): string;
     }
 
-    export class ScriptHelpers {
+    class ScriptHelpers {
         static disableWebpartSelection(context: SPClientTemplates.RenderContext): void;
         static getDocumentQueryPairs(): { [index: string]: string; };
         static getFieldFromSchema(schema: SPClientTemplates.ListSchema, fieldName: string): SPClientTemplates.FieldSchema;
@@ -83,8 +106,8 @@ declare namespace SP {
         static resizeImageToSquareLength(imgElement: HTMLImageElement, squareLength: number): void;
     }
 
-
-    export class PageContextInfo {
+    class PageContextInfo {
+        constructor();
         static get_siteServerRelativeUrl(): string;
         static get_webServerRelativeUrl(): string;
         static get_webAbsoluteUrl(): string;
@@ -92,6 +115,7 @@ declare namespace SP {
         static get_siteAbsoluteUrl(): string;
         static get_webTitle(): string;
         static get_tenantAppVersion(): string;
+        static get_isAppWeb(): boolean;
         static get_webLogoUrl(): string;
         static get_webLanguage(): number;
         static get_currentLanguage(): number;
@@ -103,35 +127,32 @@ declare namespace SP {
         static get_clientServerTimeDelta(): number;
         static get_userLoginName(): string;
         static get_webTemplate(): string;
-        get_pagePersonalizationScope(): string;
+        static get_pagePersonalizationScope(): string;
     }
-
-    export class ContextPermissions {
+    class ContextPermissions {
         has(perm: number): boolean;
         hasPermissions(high: number, low: number): boolean;
         fromJson(json: { High: number; Low: number; }): void;
     }
 
-    export module ListOperation {
-        export module ViewOperation {
-            export function getSelectedView(): string;
-            export function navigateUp(viewId: string): void;
-            export function refreshView(viewId: string): void;
+    namespace ListOperation {
+        namespace ViewOperation {
+            function getSelectedView(): string;
+            function navigateUp(viewId: string): void;
+            function refreshView(viewId: string): void;
         }
-        export module Selection {
-            export function selectListItem(iid: string, bSelect: boolean): void;
-            export function getSelectedItems(): { id: number; fsObjType: FileSystemObjectType; }[];
-            export function getSelectedList(): string;
-            export function getSelectedView(): string;
-            export function navigateUp(viewId: string): void;
-            export function deselectAllListItems(iid: string): void;
+        namespace Selection {
+            function selectListItem(iid: string, bSelect: boolean): void;
+            function getSelectedItems(): Array<{ id: number; fsObjType: FileSystemObjectType; }>;
+            function getSelectedList(): string;
+            function getSelectedView(): string;
+            function navigateUp(viewId: string): void;
+            function deselectAllListItems(iid: string): void;
         }
-        export module Overrides {
-            export function overrideDeleteConfirmation(listId: string, overrideText: string): void;
+        namespace Overrides {
+            function overrideDeleteConfirmation(listId: string, overrideText: string): void;
         }
     }
-
-
 }
 
 /** Register function to rerun on partial update in MDS-enabled site.*/
@@ -152,34 +173,99 @@ declare class JSRequest {
     static PathName: string;
 }
 
-declare class _spPageContextInfo {
-    static alertsEnabled: boolean; //true
-    static allowSilverlightPrompt: string; //"True"
-    static clientServerTimeDelta: number; //-182
-    static crossDomainPhotosEnabled: boolean; //true
-    static currentCultureName: string; //"ru-RU"
-    static currentLanguage: number; //1049
-    static currentUICultureName: string; //"ru-RU"
-    static layoutsUrl: string;  //"_layouts/15"
-    static pageListId: string;  //"{06ee6d96-f27f-4160-b6bb-c18f187b18a7}"
-    static pageItemId: number;
-    static pagePersonalizationScope: string; //1
-    static serverRequestPath: string; //"/SPTypeScript/Lists/ConditionalFormattingTasksList/AllItems.aspx"
-    static siteAbsoluteUrl: string; // "https://gandjustas-7b20d3715e8ed4.sharepoint.com"
-    static siteClientTag: string; //"0$$15.0.4454.1021"
-    static siteServerRelativeUrl: string; // "/"
-    static systemUserKey: string; //"i:0h.f|membership|10033fff84e7cb2b@live.com"
-    static tenantAppVersion: string; //"0"
-    static userId: number; //12
-    static webAbsoluteUrl: string; //"https://gandjustas-7b20d3715e8ed4.sharepoint.com/SPTypeScript"
-    static webLanguage: number; //1049
-    static webLogoUrl: string; //"/_layouts/15/images/siteIcon.png?rev=23"
-    static webPermMasks: { High: number; Low: number; };
-    static webServerRelativeUrl: string; //"/SPTypeScript"
-    static webTemplate: string; //"17"
-    static webTitle: string; //"SPTypeScript"
-    static webUIVersion: number; //15
+interface _spPageContextInfo {
+    alertsEnabled: boolean; // true
+    allowSilverlightPrompt: string; // "True"
+    blockDownloadsExperienceEnabled: boolean; // true
+    canUserCreateMicrosoftForm: boolean; // true
+    cdnPrefix: string; // "static.sharepointonline.com/bld"
+    clientServerTimeDelta: number; // -182
+    CorrelationId: string; // "6161f99d-10e5-4000-ad30-1016270fe31d"
+    crossDomainPhotosEnabled: boolean; // true
+    currentCultureName: string; // "ru-RU"
+    currentLanguage: number; // 1049
+    currentUICultureName: string; // "ru-RU"
+    disableAppViews: boolean; // true
+    disableFlows: boolean; // true
+    env: string; // "prod"
+    farmLabel: string; // "US_4_Content"
+    formDigestValue: string; // "0x5F3FE84E7EE9089C7D11DCDAFFB9E69CF8241E68B9EF071FA92CD419E878AC4F7C16E34696EFA667EFD0712FC1DF4945DDC0D09B5D23153A698A727AF076B5DE,07 Jun 2017 18:55:22 -0000"
+    formDigestTimeoutSeconds: number; // 1800
+    groupColor: string; // "#d40ac7"
+    groupHasHomepage: boolean; // true
+    groupId: string; //
+    guestsEnabled: boolean; // true
+    hasManageWebPermissions: boolean; // true
+    isAnonymousGuestUser: boolean; // true
+    isAppWeb: boolean; // true
+    isExternalGuestUser: boolean; // true
+    isNoScriptEnabled: boolean; // true
+    isSiteAdmin: boolean; // true
+    isSPO: boolean; // true
+    isTenantDevSite: boolean; // true
+    isWebWelcomePage: boolean; // true
+    layoutsUrl: string;  // "_layouts/15"
+    listBaseTemplate: number; // 119
+    listId: string; // "{06ee6d96-f27f-4160-b6bb-c18f187b18a7}"
+    listPermsMask: { High: number; Low: number; };
+    listTitle: string; // "Site Pages"
+    listUrl: string; // "/sites/site/list"
+    maximumFileSize: number; // 15360
+    openInClient: boolean; // true
+    pageListId: string;  // "{06ee6d96-f27f-4160-b6bb-c18f187b18a7}"
+    pageItemId: number;
+    pagePermsMask: { High: number; Low: number; };
+    pagePersonalizationScope: string; // 1
+    PreviewFeaturesEnabled: boolean; // true
+    preferUserTimeZone: boolean; // false
+    ProfileUrl: string; // "https://tenant-my.sharepoint.com/person.aspx"
+    PublishingFeatureOn: boolean; // true
+    RecycleBinItemCount: number; // -1
+    serverRedirectedUrl: string;
+    serverRequestPath: string; // "/SPTypeScript/Lists/ConditionalFormattingTasksList/AllItems.aspx"
+    serverTime: string; // "2017-06-07T18:55:22.3499459Z"
+    siteAbsoluteUrl: string; // "https:// gandjustas-7b20d3715e8ed4.sharepoint.com"
+    siteClassification: string; //
+    siteClientTag: string; // "0$$15.0.4454.1021"
+    siteColor: string; // "#d40ac7"
+    siteId: string; // "{3e09a056-f68f-44a3-8e0f-ff2c123b82cb}"
+    sitePagesEnabled: boolean; // true
+    siteServerRelativeUrl: string; // "/"
+    siteSubscriptionId: string; // 4eedf5f3-f71f-4e73-82ee-e19081363c8c
+    supportPoundStorePath: boolean; // true
+    supportPercentStorePath: boolean; // true
+    systemUserKey: string; // "i:0h.f|membership|10033fff84e7cb2b@live.com"
+    tenantAppVersion: string; // "0"
+    themeCacheToken: string; // "/sites/site::0:16.0.6525.1206"
+    themedCssFolderUrl: string;
+    themedImageFileNames: string;
+    updateFormDigestPageLoaded: string; // "2017-06-07T18:55:25.821Z"
+    userDisplayName: string; // "John Doe"
+    userEmail: string; // "john.doe@fabrikam.onmicrosoft.com"
+    userId: number; // 12
+    userLoginName: string; // "john.doe@fabrikam.onmicrosoft.com"
+    viewOnlyExperienceEnabled: boolean; // true
+    viewId: string; // "{06ee6d96-f27f-4160-b6bb-c18f187b18a7}"
+    webAbsoluteUrl: string; // "https:// gandjustas-7b20d3715e8ed4.sharepoint.com/SPTypeScript"
+    webDescription: string; // "Some description"
+    webId: string; // "{06ee6d96-f27f-4160-b6bb-c18f187b18a7}"
+    webLanguage: number; // 1049
+    webLogoUrl: string; // "/_layouts/15/images/siteIcon.png?rev=23"
+    webPermMasks: { High: number; Low: number; };
+    webServerRelativeUrl: string; // "/SPTypeScript"
+    webTemplate: string; // "17"
+    webTitle: string; // "SPTypeScript"
+    webUIVersion: number; // 15
 }
+declare var _spPageContextInfo: _spPageContextInfo;
+
+interface _spFriendlyUrlPageContextInfo {
+    termId: string;
+    termSetId: string;
+    termStoreId: string;
+    title: string;
+}
+declare var _spFriendlyUrlPageContextInfo: _spFriendlyUrlPageContextInfo;
 
 declare function STSHtmlEncode(value: string): string;
 declare function STSHtmlDecode(value: string): string;
@@ -190,9 +276,9 @@ declare function AddEvtHandler(element: HTMLElement, event: string, func: EventL
 declare function GetUrlKeyValue(key: string): string;
 
 declare class AjaxNavigate {
-    update(url: string, updateParts: Object, fullNavigate: boolean, anchorName: string): void;
-    add_navigate(handler: Function): void;
-    remove_navigate(handler: Function): void;
+    update(url: string, updateParts: { [name: string]: string | number }, fullNavigate: boolean, anchorName: string): void;
+    add_navigate(handler: (obj: any, eventArgs: any) => void): void;
+    remove_navigate(handler: (obj: any, eventArgs: any) => void): void;
     submit(formToSubmit: HTMLFormElement): void;
     getParam(paramName: string): string;
     getSavedFormAction(): string;
@@ -245,7 +331,7 @@ declare class Browseris {
     win32: boolean;
     win64bit: boolean;
     winnt: boolean;
-    armProcessor: boolean
+    armProcessor: boolean;
 }
 
 declare var browseris: Browseris;
@@ -258,6 +344,7 @@ interface ContextInfo extends SPClientTemplates.RenderContext {
     ContentTypesEnabled: boolean;
     CurrentSelectedItems: boolean;
     CurrentUserId: number;
+    CurrentUserIsSiteAdmin: boolean;
     EnableMinorVersions: boolean;
     ExternalDataList: boolean;
     HasRelatedCascadeLists: boolean;
@@ -267,7 +354,8 @@ interface ContextInfo extends SPClientTemplates.RenderContext {
     LastSelectedItemIID: number;
     LastRowIndexSelected: number;
     RowFocusTimerID: number;
-    ListData: any;// SPClientTemplates.ListData_InView | SPClientTemplates.ListData_InForm
+    ListTitle: string;
+    ListData: any; // SPClientTemplates.ListData_InView | SPClientTemplates.ListData_InForm
     ListSchema: SPClientTemplates.ListSchema;
     ModerationStatus: number;
     PortalUrl: string;
@@ -275,9 +363,10 @@ interface ContextInfo extends SPClientTemplates.RenderContext {
     SelectAllCbx: HTMLElement;
     SendToLocationName: string;
     SendToLocationUrl: string;
+    SiteTitle: string;
     StateInitDone: boolean;
-    TableCbxFocusHandler: Function;
-    TableMouseoverHandler: Function;
+    TableCbxFocusHandler(instance: any, eventArgs: any): void;
+    TableMouseoverHandler(instance: any, eventArgs: any): void;
     TotalListItems: number;
     WorkflowsAssociated: boolean;
     clvp: any;
@@ -301,7 +390,7 @@ interface ContextInfo extends SPClientTemplates.RenderContext {
     listTemplate: string;
     listUrlDir: string;
     newFormUrl: string;
-    onRefreshFailed: Function;
+    onRefreshFailed(context: any, requrest: any, response: any): void;
     overrideDeleteConfirmation: string;
     overrideFilterQstring: string;
     recursiveView: boolean;
@@ -321,13 +410,12 @@ interface ContextInfo extends SPClientTemplates.RenderContext {
     noGroupCollapse: boolean;
     SiteTemplateId: number;
     ExcludeFromOfflineClient: boolean;
-
 }
 
 declare function GetCurrentCtx(): ContextInfo;
 declare function SetFullScreenMode(fullscreen: boolean): void;
 declare namespace SP {
-    export enum RequestExecutorErrors {
+    enum RequestExecutorErrors {
         requestAbortedOrTimedout,
         unexpectedResponse,
         httpError,
@@ -337,7 +425,7 @@ declare namespace SP {
         iFrameLoadError
     }
 
-    export class RequestExecutor {
+    class RequestExecutor {
         constructor(url: string, options?: any);
         get_formDigestHandlingEnabled(): boolean;
         set_formDigestHandlingEnabled(value: boolean): void;
@@ -347,7 +435,7 @@ declare namespace SP {
         attemptLogin(returnUrl: string, success: (response: ResponseInfo) => void, error?: (response: ResponseInfo, error: RequestExecutorErrors, statusText: string) => void): void;
     }
 
-    export interface RequestInfo {
+    interface RequestInfo {
         url: string;
         method?: string;
         headers?: { [key: string]: string; };
@@ -355,15 +443,15 @@ declare namespace SP {
         body?: string | Uint8Array;
         binaryStringRequestBody?: boolean;
 
-        /** Currently need fix to get ginary response. Details: http://techmikael.blogspot.ru/2013/07/how-to-copy-files-between-sites-using.html */
+        /** Currently need fix to get ginary response. Details: http:// techmikael.blogspot.ru/2013/07/how-to-copy-files-between-sites-using.html */
         binaryStringResponseBody?: boolean;
         timeout?: number;
-        success?: (response: ResponseInfo) => void;
-        error?: (response: ResponseInfo, error: RequestExecutorErrors, statusText: string) => void;
+        success?(response: ResponseInfo): void;
+        error?(response: ResponseInfo, error: RequestExecutorErrors, statusText: string): void;
         state?: any;
     }
 
-    export interface ResponseInfo {
+    interface ResponseInfo {
         statusCode?: number;
         statusText?: string;
         responseAvailable: boolean;
@@ -375,29 +463,25 @@ declare namespace SP {
         state?: any;
     }
 
-    export class ProxyWebRequestExecutor extends Sys.Net.WebRequestExecutor {
+    class ProxyWebRequestExecutor extends Sys.Net.WebRequestExecutor {
         constructor(url: string, options?: any);
     }
 
-    export class ProxyWebRequestExecutorFactory implements SP.IWebRequestExecutorFactory {
+    class ProxyWebRequestExecutorFactory implements SP.IWebRequestExecutorFactory {
         constructor(url: string, options?: any);
         createWebRequestExecutor(): ProxyWebRequestExecutor;
     }
 }
+
 interface MQuery {
     (selector: string, context?: any): MQueryResultSetElements;
-    (element: HTMLElement): MQueryResultSetElements;
-    (object: MQueryResultSetElements): MQueryResultSetElements;
-    <T>(object: MQueryResultSet<T>): MQueryResultSet<T>;
-    <T>(object: T): MQueryResultSet<T>;
-    (elementArray: HTMLElement[]): MQueryResultSetElements;
-    <T>(array: T[]): MQueryResultSet<T>;
-    <T>(): MQueryResultSet<T>;
+    (objectOrElement: MQueryResultSetElements | HTMLElement | HTMLElement[]): MQueryResultSetElements;
+    <T>(object?: MQueryResultSet<T> | T | T[]): MQueryResultSet<T>;
 
-    throttle(fn: Function, interval: number, shouldOverrideThrottle: boolean): Function;
+    throttle<T extends (...args: any[]) => any>(fn: T, interval: number, shouldOverrideThrottle: boolean): T;
 
-    extend(target: any, ...objs: any[]): Object;
-    extend(deep: boolean, target: any, ...objs: any[]): Object;
+    extend(target: any, ...objs: any[]): any;
+    extend(deep: boolean, target: any, ...objs: any[]): any;
 
     makeArray<T>(obj: any): any[];
 
@@ -421,49 +505,31 @@ interface MQuery {
     ready(callback: () => void): void;
     contains(container: HTMLElement, contained: HTMLElement): boolean;
 
-    proxy(fn: (...args: any[]) => any, context: any, ...args: any[]): Function;
+    proxy(fn: (...args: any[]) => any, context: any, ...args: any[]): (...args: any[]) => any;
     proxy(context: any, name: string, ...args: any[]): any;
 
-    every<T>(obj: T[], fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): boolean;
-    every<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): boolean;
-    every<T>(obj: T[], fn: (elementOfArray: T) => boolean, context?: any): boolean;
-    every<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: any) => boolean, context?: any): boolean;
+    every<T>(obj: T[] | MQueryResultSet<T>, fn: (elementOfArray: T, indexInArray?: number) => boolean, context?: any): boolean;
+    some<T>(obj: T[] | MQueryResultSet<T>, fn: (elementOfArray: T, indexInArray?: number) => boolean, context?: any): boolean;
 
-    some<T>(obj: T[], fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): boolean;
-    some<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): boolean;
-    some<T>(obj: T[], fn: (elementOfArray: T) => boolean, context?: any): boolean;
-    some<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: T) => boolean, context?: any): boolean;
+    filter<T>(obj: T[], fn: (elementOfArray: T, indexInArray?: number) => boolean, context?: any): T[];
+    filter<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: T, indexInArray?: number) => boolean, context?: any): MQueryResultSet<T>;
 
-    filter<T>(obj: T[], fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): T[];
-    filter<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): MQueryResultSet<T>;
-    filter<T>(obj: T[], fn: (elementOfArray: T) => boolean, context?: any): T[];
-    filter<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: T) => boolean, context?: any): MQueryResultSet<T>;
+    forEach<T>(obj: T[] | MQueryResultSet<T>, fn: (elementOfArray: T, indexInArray?: number) => void, context?: any): void;
 
-    forEach<T>(obj: T[], fn: (elementOfArray: T, indexInArray: number) => void, context?: any): void;
-    forEach<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: T, indexInArray: number) => void, context?: any): void;
-    forEach<T>(obj: T[], fn: (elementOfArray: T) => void, context?: any): void;
-    forEach<T>(obj: MQueryResultSet<T>, fn: (elementOfArray: T) => void, context?: any): void;
-
-    map<T, U>(array: T[], callback: (elementOfArray: T, indexInArray: number) => U): U[];
-    map<T, U>(array: MQueryResultSet<T>, callback: (elementOfArray: T, indexInArray: number) => U): MQueryResultSet<U>;
-    map<T, U>(array: T[], callback: (elementOfArray: T) => U): U[];
-    map<T, U>(array: MQueryResultSet<T>, callback: (elementOfArray: T) => U): MQueryResultSet<U>;
+    map<T, U>(array: T[], callback: (elementOfArray: T, indexInArray?: number) => U): U[];
+    map<T, U>(array: MQueryResultSet<T>, callback: (elementOfArray: T, indexInArray?: number) => U): MQueryResultSet<U>;
 
     indexOf<T>(obj: T[], object: T, startIndex?: number): number;
     lastIndexOf<T>(obj: T[], object: T, startIndex?: number): number;
 
-    data(element: HTMLElement, key: string, value: any): any;
-    data(element: HTMLElement, key: string): any;
-    data(element: HTMLElement): any;
+    data(element: HTMLElement, key?: string, value?: any): any;
 
     removeData(element: HTMLElement, name?: string): MQueryResultSetElements;
     hasData(element: HTMLElement): boolean;
 }
 
 interface MQueryResultSetElements extends MQueryResultSet<HTMLElement> {
-    append(node: HTMLElement): MQueryResultSetElements;
-    append(mQuerySet: MQueryResultSetElements): MQueryResultSetElements;
-    append(html: string): MQueryResultSetElements;
+    append(node: HTMLElement | MQueryResultSetElements | string): MQueryResultSetElements;
 
     bind(eventType: string, handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
     unbind(eventType: string, handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
@@ -478,8 +544,7 @@ interface MQueryResultSetElements extends MQueryResultSet<HTMLElement> {
     offset(coordinates: { left: any; top: any; }): MQueryResultSetElements;
 
     filter(selector: string): MQueryResultSetElements;
-    filter(fn: (elementOfArray: HTMLElement, indexInArray: number) => boolean, context?: any): MQueryResultSetElements;
-    filter(fn: (elementOfArray: HTMLElement) => boolean, context?: any): MQueryResultSetElements;
+    filter(fn: (elementOfArray: HTMLElement, indexInArray?: number) => boolean, context?: any): MQueryResultSetElements;
 
     not(selector: string): MQueryResultSetElements;
 
@@ -488,24 +553,22 @@ interface MQueryResultSetElements extends MQueryResultSet<HTMLElement> {
     offsetParent(selector?: string): MQueryResultSetElements;
 
     parents(selector?: string): MQueryResultSetElements;
-    parentsUntil(selector?: string, filter?: string): MQueryResultSetElements;
-    parentsUntil(element?: HTMLElement, filter?: string): MQueryResultSetElements;
+    parentsUntil(selectorOrElement?: string | HTMLElement, filter?: string): MQueryResultSetElements;
 
     position(): { top: number; left: number; };
 
     attr(attributeName: string): string;
-    attr(attributeName: string, value: any): MQueryResultSetElements;
+    attr(attributeName: string, valueOrDelegate: any): MQueryResultSetElements;
     attr(map: { [key: string]: any; }): MQueryResultSetElements;
+    // tslint:disable-next-line: unified-signatures
     attr(attributeName: string, func: (index: number, attr: any) => any): MQueryResultSetElements;
 
     addClass(classNames: string): MQueryResultSetElements;
     removeClass(classNames: string): MQueryResultSetElements;
 
-    css(propertyName: string): string;
-    css(propertyNames: string[]): string;
+    css(propertyName: string | string[]): string;
     css(properties: any): MQueryResultSetElements;
-    css(propertyName: string, value: any): MQueryResultSetElements;
-    css(propertyName: any, value: any): MQueryResultSetElements;
+    css(propertyName: any | string, value: any): MQueryResultSetElements;
 
     remove(selector?: string): MQueryResultSetElements;
     children(selector?: string): MQueryResultSetElements;
@@ -518,82 +581,45 @@ interface MQueryResultSetElements extends MQueryResultSet<HTMLElement> {
 
     removeData(key: string): MQueryResultSetElements;
 
-    map(callback: (elementOfArray: HTMLElement, indexInArray: number) => any): MQueryResultSetElements;
-    map(callback: (elementOfArray: HTMLElement) => any): MQueryResultSetElements;
+    map(callback?: (elementOfArray: HTMLElement, indexInArray: number) => any): MQueryResultSetElements;
 
-    blur(): MQueryResultSetElements;
-    blur(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    change(): MQueryResultSetElements;
-    change(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    click(): MQueryResultSetElements;
-    click(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    dblclick(): MQueryResultSetElements;
-    dblclick(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    error(): MQueryResultSetElements;
-    error(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    focus(): MQueryResultSetElements;
+    blur(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    change(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    click(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    dblclick(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    error(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
     focus(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    focusin(): MQueryResultSetElements;
-    focusin(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    focusout(): MQueryResultSetElements;
-    focusout(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    keydown(): MQueryResultSetElements;
-    keydown(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    keypress(): MQueryResultSetElements;
-    keypress(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    keyup(): MQueryResultSetElements;
-    keyup(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    load(): MQueryResultSetElements;
-    load(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    mousedown(): MQueryResultSetElements;
-    mousedown(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    mouseenter(): MQueryResultSetElements;
-    mouseenter(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    mouseleave(): MQueryResultSetElements;
-    mouseleave(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    mousemove(): MQueryResultSetElements;
-    mousemove(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    mouseout(): MQueryResultSetElements;
-    mouseout(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    mouseover(): MQueryResultSetElements;
-    mouseover(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    mouseup(): MQueryResultSetElements;
-    mouseup(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    resize(): MQueryResultSetElements;
-    resize(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    scroll(): MQueryResultSetElements;
-    scroll(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    select(): MQueryResultSetElements;
-    select(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    submit(): MQueryResultSetElements;
-    submit(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-    unload(): MQueryResultSetElements;
-    unload(handler: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
-
+    focusin(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    focusout(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    keydown(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    keypress(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    keyup(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    load(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    mousedown(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    mouseenter(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    mouseleave(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    mousemove(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    mouseout(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    mouseover(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    mouseup(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    resize(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    scroll(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    select(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    submit(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
+    unload(handler?: (eventObject: MQueryEvent) => any): MQueryResultSetElements;
 }
 
 interface MQueryResultSet<T> {
     [index: number]: T;
     contains(contained: T): boolean;
 
-    filter(fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): MQueryResultSet<T>;
-    filter(fn: (elementOfArray: T) => boolean, context?: any): MQueryResultSet<T>;
-
-    every(fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): boolean;
-    every(fn: (elementOfArray: T) => boolean, context?: any): boolean;
-
-    some(fn: (elementOfArray: T, indexInArray: number) => boolean, context?: any): boolean;
-    some(fn: (elementOfArray: T) => boolean, context?: any): boolean;
-
-    map(callback: (elementOfArray: T, indexInArray: number) => any): MQueryResultSet<T>;
-    map(callback: (elementOfArray: T) => any): MQueryResultSet<T>;
-
-    forEach(fn: (elementOfArray: T, indexInArray: number) => void, context?: any): void;
-    forEach(fn: (elementOfArray: T) => void, context?: any): void;
-
+    filter(fn: (elementOfArray: T, indexInArray?: number) => boolean, context?: any): MQueryResultSet<T>;
+    every(fn: (elementOfArray: T, indexInArray?: number) => boolean, context?: any): boolean;
+    some(fn: (elementOfArray: T, indexInArray?: number) => boolean, context?: any): boolean;
+    map(callback: (elementOfArray: T, indexInArray?: number) => any): MQueryResultSet<T>;
+    forEach(fn: (elementOfArray: T, indexInArray?: number) => void, context?: any): void;
     indexOf(object: any, startIndex?: number): number;
     lastIndexOf(object: any, startIndex?: number): number;
-
 }
 
 interface MQueryEvent extends Event {
@@ -652,7 +678,6 @@ declare class CalloutActionMenuEntry {
         wzDesc: string);
 }
 
-
 declare class CalloutActionMenu {
     constructor(actionsId: any);
     addAction(action: CalloutAction): void;
@@ -661,7 +686,6 @@ declare class CalloutActionMenu {
     refreshActions(): void;
     calculateActionWidth(): void;
 }
-
 
 declare class CalloutAction {
     constructor(options: CalloutActionOptions);
@@ -771,7 +795,6 @@ declare class CalloutOptions {
     positionAlgorithm: (callout: Callout) => void;
 }
 
-
 declare class CalloutManager {
     /** Creates a new callout */
     static createNew(options: CalloutOptions): Callout;
@@ -798,21 +821,19 @@ declare class CalloutManager {
     static isAtLeastOneCalloutOn(): boolean;
 }
 
-
 declare namespace SPClientTemplates {
-
-    export enum FileSystemObjectType {
+    enum FileSystemObjectType {
         Invalid,
         File,
         Folder,
         Web
     }
-    export enum ChoiceFormatType {
+    enum ChoiceFormatType {
         Dropdown,
         Radio
     }
 
-    export enum ClientControlMode {
+    enum ClientControlMode {
         Invalid,
         DisplayForm,
         EditForm,
@@ -820,24 +841,24 @@ declare namespace SPClientTemplates {
         View
     }
 
-    export enum RichTextMode {
+    enum RichTextMode {
         Compatible,
         FullHtml,
         HtmlAsXml,
         ThemeHtml
     }
-    export enum UrlFormatType {
+    enum UrlFormatType {
         Hyperlink,
         Image
     }
 
-    export enum DateTimeDisplayFormat {
+    enum DateTimeDisplayFormat {
         DateOnly,
         DateTime,
         TimeOnly
     }
 
-    export enum DateTimeCalendarType {
+    enum DateTimeCalendarType {
         None,
         Gregorian,
         Japan,
@@ -855,23 +876,23 @@ declare namespace SPClientTemplates {
         SakaEra,
         UmAlQura
     }
-    export enum UserSelectionMode {
+    enum UserSelectionMode {
         PeopleOnly,
         PeopleAndGroups
     }
 
     /** Represents schema for a Choice field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_Choice extends FieldSchema_InForm {
+    interface FieldSchema_InForm_Choice extends FieldSchema_InForm {
         /** List of choices for this field. */
         Choices: string[];
         /** Display format for the choice field */
         FormatType: ChoiceFormatType;
     }
     /** Represents schema for a Lookup field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_Lookup extends FieldSchema_InForm {
+    interface FieldSchema_InForm_Lookup extends FieldSchema_InForm {
         /** Specifies if the field allows multiple values */
         AllowMultipleValues: boolean;
-        /** Returns base url for a list display form, e.g. "http://portal/web/_layouts/15/listform.aspx?PageType=4"
+        /** Returns base url for a list display form, e.g. "http:// portal/web/_layouts/15/listform.aspx?PageType=4"
             You must add "ListId" (Guid of the list) and "ID" (integer Id of the item) parameters in order to use this Url */
         BaseDisplayFormUrl: string;
         /** Indicates if the field is a dependent lookup */
@@ -882,15 +903,14 @@ declare namespace SPClientTemplates {
             Only appears if Throttled property is true, i.e. the target lookup list is throttled. */
         MaxQueryResult: string;
         /** List of choices for this field. */
-        Choices: { LookupId: number; LookupValue: string; }[];
+        Choices: Array<{ LookupId: number; LookupValue: string; }>;
         /** Number of choices. Appears only for Lookup field. */
         ChoiceCount: number;
 
         LookupListId: string;
-
     }
     /** Represents schema for a DateTime field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_DateTime extends FieldSchema_InForm {
+    interface FieldSchema_InForm_DateTime extends FieldSchema_InForm {
         /** Type of calendar to use */
         CalendarType: DateTimeCalendarType;
         /** Display format for DateTime field. */
@@ -912,19 +932,19 @@ declare namespace SPClientTemplates {
         HoursOptions: string[];
     }
     /** Represents schema for a DateTime field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_Geolocation extends FieldSchema_InForm {
+    interface FieldSchema_InForm_Geolocation extends FieldSchema_InForm {
         BingMapsKey: string;
         IsBingMapBlockedInCurrentRegion: boolean;
     }
     /** Represents schema for a Choice field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_MultiChoice extends FieldSchema_InForm {
+    interface FieldSchema_InForm_MultiChoice extends FieldSchema_InForm {
         /** List of choices for this field. */
         MultiChoices: string[];
         /** Indicates wherever fill-in choice is allowed */
         FillInChoice: boolean;
     }
     /** Represents schema for a Choice field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_MultiLineText extends FieldSchema_InForm {
+    interface FieldSchema_InForm_MultiLineText extends FieldSchema_InForm {
         /** Specifies whether rich text formatting can be used in the field */
         RichText: boolean;
         /** Changes are appended to the existing text. */
@@ -939,19 +959,19 @@ declare namespace SPClientTemplates {
         ScriptEditorAdderId: string;
     }
     /** Represents schema for a Number field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_Number extends FieldSchema_InForm {
+    interface FieldSchema_InForm_Number extends FieldSchema_InForm {
         ShowAsPercentage: boolean;
     }
     /** Represents schema for a Number field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_Text extends FieldSchema_InForm {
+    interface FieldSchema_InForm_Text extends FieldSchema_InForm {
         MaxLength: number;
     }
     /** Represents schema for a Number field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_Url extends FieldSchema_InForm {
+    interface FieldSchema_InForm_Url extends FieldSchema_InForm {
         DisplayFormat: UrlFormatType;
     }
     /** Represents schema for a Number field in list form or in list view in grid mode */
-    export interface FieldSchema_InForm_User extends FieldSchema_InForm {
+    interface FieldSchema_InForm_User extends FieldSchema_InForm {
         Presence: boolean;
         WithPicture: boolean;
         DefaultRender: boolean;
@@ -965,7 +985,7 @@ declare namespace SPClientTemplates {
         PictureSize: string;
     }
 
-    export interface FieldSchema {
+    interface FieldSchema {
         /** Specifies if the field can be edited while list view is in the Grid mode */
         AllowGridEditing: boolean;
         /** String representation of the field type, e.g. "Lookup". Same as SPField.TypeAsString */
@@ -979,7 +999,7 @@ declare namespace SPClientTemplates {
 
     /** Represents field schema in Grid mode and on list forms.
             Consider casting objects of this type to more specific field types, e.g. FieldSchemaInForm_Lookup */
-    export interface FieldSchema_InForm extends FieldSchema {
+    interface FieldSchema_InForm extends FieldSchema {
         /** Description for this field. */
         Description: string;
         /** Direction of the reading order for the field. */
@@ -1002,25 +1022,24 @@ declare namespace SPClientTemplates {
         UseMinWidth: boolean;
     }
 
-    export interface ListSchema {
+    interface ListSchema {
         Field: FieldSchema[];
     }
 
-
-    export interface ListSchema_InForm extends ListSchema {
+    interface ListSchema_InForm extends ListSchema {
         Field: FieldSchema_InForm[];
     }
-    export interface ListData_InForm {
+    interface ListData_InForm {
         Items: Item[];
     }
-    export interface RenderContext_FieldInForm extends RenderContext_Form {
+    interface RenderContext_FieldInForm extends RenderContext_Form {
         CurrentGroupIdx: number;
         CurrentGroup: Group;
         CurrentItems: Item[];
         CurrentFieldSchema: FieldSchema_InForm;
         CurrentFieldValue: any;
     }
-    export interface RenderContext_Form extends RenderContext {
+    interface RenderContext_Form extends RenderContext {
         CurrentItem: Item;
         FieldControlModes: { [fieldInternalName: string]: ClientControlMode; };
         FormContext: ClientFormContext;
@@ -1030,9 +1049,7 @@ declare namespace SPClientTemplates {
         CSRCustomLayout?: boolean;
     }
 
-
-
-    export interface FieldSchema_InView_LookupField extends FieldSchema_InView {
+    interface FieldSchema_InView_LookupField extends FieldSchema_InView {
         /** Either "TRUE" or "FALSE" */
         AllowMultipleValues: string;
         /** Target lookup list display form URL, including PageType and List attributes. */
@@ -1040,7 +1057,7 @@ declare namespace SPClientTemplates {
         /** Either "TRUE" or "FALSE" */
         HasPrefix: string;
     }
-    export interface FieldSchema_InView_UserField extends FieldSchema_InView {
+    interface FieldSchema_InView_UserField extends FieldSchema_InView {
         /** Either "TRUE" or "FALSE" */
         AllowMultipleValues: string;
         /** Either "TRUE" or "FALSE" */
@@ -1053,7 +1070,7 @@ declare namespace SPClientTemplates {
         DefaultRender: string;
     }
     /** Represents field schema in a list view. */
-    export interface FieldSchema_InView extends FieldSchema {
+    interface FieldSchema_InView extends FieldSchema {
         /** Either "TRUE" or "FALSE" */
         CalloutMenu: string;
         ClassInfo: string; // e.g. "Menu"
@@ -1082,7 +1099,7 @@ declare namespace SPClientTemplates {
         /** Indicates whether the field can be sorted. Either "TRUE" or "FALSE" */
         Sortable: string;
     }
-    export interface ListSchema_InView extends ListSchema {
+    interface ListSchema_InView extends ListSchema {
         /** Key-value object that represents all aggregations defined for the view.
             Key specifies the field internal name, and value specifies the type of the aggregation. */
         Aggregate: { [name: string]: string; };
@@ -1151,7 +1168,7 @@ declare namespace SPClientTemplates {
         /** Query string parameters that specify current root folder (RootFolder) and folder content type id (FolderCTID) */
         ViewSelector_ViewParameters: string;
     }
-    export interface ListData_InView {
+    interface ListData_InView {
         FilterLink: string;
         FilterFields: string;
         FirstRow: number;
@@ -1167,12 +1184,12 @@ declare namespace SPClientTemplates {
         LastRow: number;
         Row: Item[];
     }
-    export interface RenderContext_GroupInView extends RenderContext_InView {
+    interface RenderContext_GroupInView extends RenderContext_InView {
         CurrentGroupIdx: number;
         CurrentGroup: Group;
         CurrentItems: Item[];
     }
-    export interface RenderContext_InView extends RenderContext {
+    interface RenderContext_InView extends RenderContext {
         AllowCreateFolder: boolean;
         AllowGridMode: boolean;
         BasePermissions: { [PermissionName: string]: boolean; }; // SP.BasePermissions?
@@ -1185,6 +1202,7 @@ declare namespace SPClientTemplates {
         ctxType: any; // not in View
         CurrentUserId: number;
         CurrentUserIsSiteAdmin: boolean;
+        LastSelectedItemIID: any;
         dictSel: any;
         /** Absolute path for the list display form */
         displayFormUrl: string;
@@ -1260,11 +1278,11 @@ declare namespace SPClientTemplates {
         wpq: string;
         WriteSecurity: string;
     }
-    export interface RenderContext_ItemInView extends RenderContext_InView {
+    interface RenderContext_ItemInView extends RenderContext_InView {
         CurrentItem: Item;
         CurrentItemIdx: number;
     }
-    export interface RenderContext_FieldInView extends RenderContext_ItemInView {
+    interface RenderContext_FieldInView extends RenderContext_ItemInView {
         /** If in grid mode (context.inGridMode == true), cast to FieldSchema_InForm, otherwise cast to FieldSchema_InView */
         CurrentFieldSchema: FieldSchema_InForm | FieldSchema_InView;
         CurrentFieldValue: any;
@@ -1273,15 +1291,15 @@ declare namespace SPClientTemplates {
         FormUniqueId: string;
     }
 
-    export interface Item {
+    interface Item {
         [fieldInternalName: string]: any;
     }
-    export interface Group {
+    interface Group {
         Items: Item[];
     }
     type RenderCallback = (ctx: RenderContext) => void;
 
-    export interface RenderContext {
+    interface RenderContext {
         BaseViewID?: number;
         ControlMode?: ClientControlMode;
         CurrentCultureName?: string;
@@ -1292,46 +1310,37 @@ declare namespace SPClientTemplates {
         OnPostRender?: RenderCallback | RenderCallback[];
         OnPreRender?: RenderCallback | RenderCallback[];
         onRefreshFailed?: any;
-        RenderBody?: (renderContext: RenderContext) => string;
-        RenderFieldByName?: (renderContext: RenderContext, fieldName: string) => string;
-        RenderFields?: (renderContext: RenderContext) => string;
-        RenderFooter?: (renderContext: RenderContext) => string;
-        RenderGroups?: (renderContext: RenderContext) => string;
-        RenderHeader?: (renderContext: RenderContext) => string;
-        RenderItems?: (renderContext: RenderContext) => string;
-        RenderView?: (renderContext: RenderContext) => string;
+        RenderBody?(renderContext: RenderContext): string;
+        RenderFieldByName?(renderContext: RenderContext, fieldName: string): string;
+        RenderFields?(renderContext: RenderContext): string;
+        RenderFooter?(renderContext: RenderContext): string;
+        RenderGroups?(renderContext: RenderContext): string;
+        RenderHeader?(renderContext: RenderContext): string;
+        RenderItems?(renderContext: RenderContext): string;
+        RenderView?(renderContext: RenderContext): string;
         SiteClientTag?: string;
         Templates?: Templates;
     }
 
-    export interface SingleTemplateCallback {
-        /** Must return null in order to fall back to a more common template or to a system default template */
-        (renderContext: RenderContext_InView): string;
-    }
-    export interface GroupCallback {
-        /** Must return null in order to fall back to a more common template or to a system default template */
-        (renderContext: RenderContext_GroupInView): string;
-    }
-    export interface ItemCallback {
-        /** Must return null in order to fall back to a more common template or to a system default template */
-        (renderContext: RenderContext): string;
-    }
+    /** Must return null in order to fall back to a more common template or to a system default template */
+    type SingleTemplateCallback = (renderContext: RenderContext_InView) => string;
 
-    export interface FieldCallback {
-        /** Must return null in order to fall back to a more common template or to a system default template */
-        (renderContext: RenderContext): string;
-    }
+    /** Must return null in order to fall back to a more common template or to a system default template */
+    type GroupCallback = (renderContext: RenderContext_GroupInView) => string;
 
-    export interface FieldInFormCallback {
-        /** Must return null in order to fall back to a more common template or to a system default template */
-        (renderContext: RenderContext_FieldInForm): string;
-    }
-    export interface FieldInViewCallback {
-        /** Must return null in order to fall back to a more common template or to a system default template */
-        (renderContext: RenderContext_FieldInView): string;
-    }
+    /** Must return null in order to fall back to a more common template or to a system default template */
+    type ItemCallback = (renderContext: RenderContext) => string;
 
-    export interface FieldTemplateOverrides {
+    /** Must return null in order to fall back to a more common template or to a system default template */
+    type FieldCallback = (renderContext: RenderContext) => string;
+
+    /** Must return null in order to fall back to a more common template or to a system default template */
+    type FieldInFormCallback = (renderContext: RenderContext_FieldInForm) => string;
+
+    /** Must return null in order to fall back to a more common template or to a system default template */
+    type FieldInViewCallback = (renderContext: RenderContext_FieldInView) => string;
+
+    interface FieldTemplateOverrides {
         /** Defines templates for rendering the field on a display form. */
         DisplayForm?: FieldInFormCallback;
         /** Defines templates for rendering the field on an edit form. */
@@ -1342,11 +1351,11 @@ declare namespace SPClientTemplates {
         View?: FieldInViewCallback;
     }
 
-    export interface FieldTemplates {
+    interface FieldTemplates {
         [fieldInternalName: string]: FieldCallback;
     }
 
-    export interface Templates {
+    interface Templates {
         View?: RenderCallback | string; // TODO: determine appropriate context type and purpose of this template
         Body?: RenderCallback | string; // TODO: determine appropriate context type and purpose of this template
         /** Defines templates for rendering groups (aggregations). */
@@ -1363,11 +1372,11 @@ declare namespace SPClientTemplates {
         Fields?: FieldTemplates;
     }
 
-    export interface FieldTemplateMap {
+    interface FieldTemplateMap {
         [fieldInternalName: string]: FieldTemplateOverrides;
     }
 
-    export interface TemplateOverrides {
+    interface TemplateOverrides {
         View?: RenderCallback | string; // TODO: determine appropriate context type and purpose of this template
         Body?: RenderCallback | string; // TODO: determine appropriate context type and purpose of this template
         /** Defines templates for rendering groups (aggregations). */
@@ -1383,14 +1392,14 @@ declare namespace SPClientTemplates {
         /** Defines templates for fields rendering. The field is specified by it's internal name. */
         Fields?: FieldTemplateMap;
     }
-    export interface TemplateOverridesOptions {
+    interface TemplateOverridesOptions {
         /** Template overrides */
         Templates?: TemplateOverrides;
 
-        /** �allbacks called before rendering starts. Can be function (ctx: RenderContext) => void or array of functions.*/
+        /** Callbacks called before rendering starts. Can be function (ctx: RenderContext) => void or array of functions.*/
         OnPreRender?: RenderCallback | RenderCallback[];
 
-        /** �allbacks called after rendered html inserted into DOM. Can be function (ctx: RenderContext) => void or array of functions.*/
+        /** Callbacks called after rendered html inserted into DOM. Can be function (ctx: RenderContext) => void or array of functions.*/
         OnPostRender?: RenderCallback | RenderCallback[];
 
         /** View style (SPView.StyleID) for which the templates should be applied.
@@ -1403,12 +1412,12 @@ declare namespace SPClientTemplates {
             If not defined, the templates will be applied to all views. */
         BaseViewID?: number | string;
     }
-    export class TemplateManager {
+    class TemplateManager {
         static RegisterTemplateOverrides(renderCtx: TemplateOverridesOptions): void;
         static GetTemplates(renderCtx: RenderContext): Templates;
     }
 
-    export interface ClientUserValue {
+    interface ClientUserValue {
         lookupId: number;
         lookupValue: string;
         displayStr: string;
@@ -1419,15 +1428,15 @@ declare namespace SPClientTemplates {
         department: string;
         jobTitle: string;
     }
-    export interface ClientLookupValue {
+    interface ClientLookupValue {
         LookupId: number;
         LookupValue: string;
     }
-    export interface ClientUrlValue {
+    interface ClientUrlValue {
         URL: string;
         Description: string;
     }
-    export class Utility {
+    class Utility {
         static ComputeRegisterTypeInfo(renderCtx: TemplateOverridesOptions): any;
         static ControlModeToString(mode: SPClientTemplates.ClientControlMode): string;
         static FileSystemObjectTypeToString(fileSystemObjectType: SPClientTemplates.FileSystemObjectType): string;
@@ -1454,10 +1463,10 @@ declare namespace SPClientTemplates {
         /** Returns ";#" */
         static UserLookupDelimitString: string;
         /** Returns ";#" */
-        static UserMultiValueDelimitString:string;
+        static UserMultiValueDelimitString: string;
     }
 
-    export class ClientFormContext {
+    class ClientFormContext {
         fieldValue: any;
         fieldSchema: SPClientTemplates.FieldSchema_InForm;
         fieldName: string;
@@ -1491,7 +1500,6 @@ declare namespace SPClientTemplates {
         registerClientValidator(fieldname: string, validator: SPClientForms.ClientValidation.ValidatorSet): void;
         registerHasValueChangedCallback(fieldname: string, callback: (eventArg?: any) => void): void;
     }
-
 }
 
 declare function GenerateIID(renderCtx: SPClientTemplates.RenderContext_ItemInView): string;
@@ -1502,55 +1510,53 @@ declare function CoreRender(template: any, context: any): string;
 
 declare namespace SPClientForms {
     namespace ClientValidation {
-        export class ValidationResult {
+        class ValidationResult {
             constructor(hasErrors: boolean, errorMsg: string);
         }
 
-        export class ValidatorSet {
-            public RegisterValidator(validator: IValidator): void;
+        class ValidatorSet {
+            RegisterValidator(validator: IValidator): void;
         }
-
-        export interface IValidator {
+        // tslint:disable-next-line: interface-name
+        interface IValidator {
             Validate(value: any): ValidationResult;
         }
 
-        export class RequiredValidator implements IValidator {
+        class RequiredValidator implements IValidator {
             Validate(value: any): ValidationResult;
         }
 
-        export class RequiredFileValidator implements IValidator {
+        class RequiredFileValidator implements IValidator {
             Validate(value: any): ValidationResult;
         }
 
-        export class RequiredRichTextValidator implements IValidator {
+        class RequiredRichTextValidator implements IValidator {
             Validate(value: any): ValidationResult;
         }
 
-        export class MaxLengthUrlValidator implements IValidator {
+        class MaxLengthUrlValidator implements IValidator {
             Validate(value: any): ValidationResult;
         }
-
-
     }
 
-    export enum FormManagerEvents {
-        Event_OnControlValueChanged,//: 1,
-        Event_OnControlInitializedCallback,//: 2,
-        Event_OnControlFocusSetCallback,//: 3,
-        Event_GetControlValueCallback,//: 4,
-        Event_OnControlValidationError,//: 5,
-        Event_RegisterControlValidator,//: 6,
-        Event_GetHasValueChangedCallback//: 7
+    enum FormManagerEvents {
+        Event_OnControlValueChanged, // : 1,
+        Event_OnControlInitializedCallback, // : 2,
+        Event_OnControlFocusSetCallback, // : 3,
+        Event_GetControlValueCallback, // : 4,
+        Event_OnControlValidationError, // : 5,
+        Event_RegisterControlValidator, // : 6,
+        Event_GetHasValueChangedCallback // : 7
     }
 
-    export class ClientForm {
+    class ClientForm {
         constructor(qualifier: string);
         RenderClientForm(): void;
         SubmitClientForm(): boolean;
         NotifyControlEvent(eventName: FormManagerEvents, fldName: string, eventArg: any): void;
     }
 
-    export class ClientFormManager {
+    class ClientFormManager {
         static GetClientForm(qualifier: string): ClientForm;
         static RegisterClientForm(qualifier: string): void;
         static SubmitClientForm(qualifier: string): boolean;
@@ -1558,10 +1564,10 @@ declare namespace SPClientForms {
 }
 
 declare class SPMgr {
-    NewGroup(listItem: Object, fieldName: string): boolean;
+    NewGroup(listItem: { [name: string]: any }, fieldName: string): boolean;
     RenderHeader(renderCtx: SPClientTemplates.RenderContext, field: SPClientTemplates.FieldSchema): string;
-    RenderField(renderCtx: SPClientTemplates.RenderContext, field: SPClientTemplates.FieldSchema, listItem: Object, listSchema: SPClientTemplates.ListSchema): string;
-    RenderFieldByName(renderCtx: SPClientTemplates.RenderContext, fieldName: string, listItem: Object, listSchema: SPClientTemplates.ListSchema): string;
+    RenderField(renderCtx: SPClientTemplates.RenderContext, field: SPClientTemplates.FieldSchema, listItem: { [name: string]: any }, listSchema: SPClientTemplates.ListSchema): string;
+    RenderFieldByName(renderCtx: SPClientTemplates.RenderContext, fieldName: string, listItem: { [name: string]: any }, listSchema: SPClientTemplates.ListSchema): string;
 }
 
 declare var spMgr: SPMgr;
@@ -1593,7 +1599,7 @@ declare function SPFieldLookupMulti_Edit(ctx: SPClientTemplates.RenderContext_Fi
 declare function SPFieldAttachments_Default(ctx: SPClientTemplates.RenderContext_FieldInForm): string;
 
 declare namespace SPAnimation {
-    export enum Attribute {
+    enum Attribute {
         PositionX,
         PositionY,
         Height,
@@ -1601,7 +1607,7 @@ declare namespace SPAnimation {
         Opacity
     }
 
-    export enum ID {
+    enum ID {
         Basic_Show,
         Basic_SlowShow,
         Basic_Fade,
@@ -1626,28 +1632,26 @@ declare namespace SPAnimation {
         Basic_QuickSize
     }
 
-    export class Settings {
+    class Settings {
         static DisableAnimation(): void;
         static DisableSessionAnimation(): void;
         static IsAnimationEnabled(): boolean;
     }
 
-
-    export class State {
+    class State {
         SetAttribute(attributeId: Attribute, value: number): void;
         GetAttribute(attributeId: Attribute): number;
-        GetDataIndex(attributeId: Attribute): number
+        GetDataIndex(attributeId: Attribute): number;
     }
 
-    export class Object {
-        constructor(animationID: ID, delay: number, element: HTMLElement, finalState: State, finishFunc?: (data: any) => void, data?: any);
-        constructor(animationID: ID, delay: number, element: HTMLElement[], finalState: State, finishFunc?: (data: any) => void, data?: any);
+    class Object {
+        constructor(animationID: ID, delay: number, element: HTMLElement | HTMLElement[], finalState: State, finishFunc?: (data: any) => void, data?: any);
         RunAnimation(): void;
     }
 }
 
 declare namespace SPAnimationUtility {
-    export class BasicAnimator {
+    class BasicAnimator {
         static FadeIn(element: HTMLElement, finishFunc?: (data: any) => void, data?: any): void;
         static FadeOut(element: HTMLElement, finishFunc?: (data: any) => void, data?: any): void;
         static Move(element: HTMLElement, posX: number, posY: number, finishFunc?: (data: any) => void, data?: any): void;
@@ -1669,35 +1673,36 @@ declare namespace SPAnimationUtility {
     }
 }
 
+// tslint:disable-next-line: interface-name
 interface IEnumerator<T> {
     get_current(): T;
     moveNext(): boolean;
     reset(): void;
 }
 
+// tslint:disable-next-line: interface-name
 interface IEnumerable<T> {
     getEnumerator(): IEnumerator<T>;
 }
 
 declare namespace SP {
-    export class ScriptUtility {
+    class ScriptUtility {
         static isNullOrEmptyString(str: string): boolean;
         static isNullOrUndefined(obj: any): boolean;
         static isUndefined(obj: any): boolean;
         static truncateToInt(n: number): number;
     }
-    export class Guid {
+    class Guid {
         constructor(guidText: string);
         static get_empty(): SP.Guid;
         static newGuid(): SP.Guid;
         static isValid(uuid: string): boolean;
-        toString(): string;
-        toString(format: string): string;
+        toString(format?: string): string;
         equals(uuid: SP.Guid): boolean;
-        toSerialized(): string;
+        ToSerialized(): string;
     }
     /** Specifies permissions that are used to define user roles. Represents SPBasePermissions class. */
-    export enum PermissionKind {
+    enum PermissionKind {
         /** Has no permissions on the Web site. Not available through the user interface. */
         emptyMask,
         /** View items in lists, documents in document libraries, and view Web discussion comments. */
@@ -1774,26 +1779,26 @@ declare namespace SP {
         fullMask,
     }
 
-    export class BaseCollection<T> implements IEnumerable<T> {
+    class BaseCollection<T> implements IEnumerable<T> {
         getEnumerator(): IEnumerator<T>;
         get_count(): number;
         itemAtIndex(index: number): T;
         constructor();
     }
-    export interface IFromJson {
+    // tslint:disable-next-line: interface-name
+    interface IFromJson {
         fromJson(initValue: any): void;
         customFromJson(initValue: any): boolean;
     }
-    export class Base64EncodedByteArray {
-        constructor();
-        constructor(base64Str: string);
+    class Base64EncodedByteArray {
+        constructor(base64Str?: string);
         get_length(): number;
         toBase64String(): string;
         append(b: any): void;
         getByteAt(index: number): any;
         setByteAt(index: number, b: any): void;
     }
-    export class ConditionalScopeBase {
+    class ConditionalScopeBase {
         startScope(): any;
         startIfTrue(): any;
         startIfFalse(): any;
@@ -1801,60 +1806,59 @@ declare namespace SP {
         fromJson(initValue: any): void;
         customFromJson(initValue: any): boolean;
     }
-    export class ClientObjectPropertyConditionalScope extends SP.ConditionalScopeBase {
-        constructor(clientObject: SP.ClientObject, propertyName: string, comparisonOperator: string, valueToCompare: any);
-        constructor(clientObject: SP.ClientObject, propertyName: string, comparisonOperator: string, valueToCompare: any, allowAllActions: boolean);
+    class ClientObjectPropertyConditionalScope extends SP.ConditionalScopeBase {
+        constructor(clientObject: SP.ClientObject, propertyName: string, comparisonOperator: string, valueToCompare: any, allowAllActions?: boolean);
     }
-    //export class ClientResult {
+    // class ClientResult {
     //    get_value(): any;
     //    setValue(value: any): void;
     //    constructor();
-    //}
-    export class ClientResult<T> {
+    // }
+    class ClientResult<T> {
         get_value(): T;
         setValue(value: T): void;
         constructor();
     }
-    export class BooleanResult {
+    class BooleanResult {
         get_value(): boolean;
         constructor();
     }
-    export class CharResult {
+    class CharResult {
         get_value(): any;
         constructor();
     }
-    export class IntResult {
+    class IntResult {
         get_value(): number;
         constructor();
     }
-    export class DoubleResult {
+    class DoubleResult {
         get_value(): number;
         constructor();
     }
-    export class StringResult {
+    class StringResult {
         get_value(): string;
         constructor();
     }
-    export class DateTimeResult {
+    class DateTimeResult {
         get_value(): Date;
         constructor();
     }
-    export class GuidResult {
+    class GuidResult {
         get_value(): SP.Guid;
         constructor();
     }
-    export class JsonObjectResult {
+    class JsonObjectResult {
         get_value(): any;
         constructor();
     }
-    export class ClientDictionaryResultHandler<T> {
+    class ClientDictionaryResultHandler<T> {
         constructor(dict: SP.ClientResult<T>);
     }
-    export class ClientUtility {
+    class ClientUtility {
         static urlPathEncodeForXmlHttpRequest(url: string): string;
         static getOrCreateObjectPathForConstructor(context: SP.ClientRuntimeContext, typeId: string, args: any[]): SP.ObjectPath;
     }
-    export class XElement {
+    class XElement {
         get_name(): string;
         set_name(value: string): void;
         get_attributes(): any;
@@ -1863,17 +1867,17 @@ declare namespace SP {
         set_children(value: any): void;
         constructor();
     }
-    export class ClientXElement {
+    class ClientXElement {
         get_element(): SP.XElement;
         set_element(value: SP.XElement): void;
         constructor();
     }
-    export class ClientXDocument {
+    class ClientXDocument {
         get_root(): SP.XElement;
         set_root(value: SP.XElement): void;
         constructor();
     }
-    export class DataConvert {
+    class DataConvert {
         static writePropertiesToXml(writer: SP.XmlWriter, obj: any, propNames: string[], serializationContext: SP.SerializationContext): void;
         static populateDictionaryFromObject(dict: any, parentNode: any): void;
         static fixupTypes(context: SP.ClientRuntimeContext, dict: any): void;
@@ -1889,18 +1893,20 @@ declare namespace SP {
         static createUtcDateTime(milliseconds: number): Date;
         static createLocalDateTime(milliseconds: number): Date;
     }
-    export interface IWebRequestExecutorFactory {
+
+    // tslint:disable-next-line: interface-name
+    interface IWebRequestExecutorFactory {
         createWebRequestExecutor(): Sys.Net.WebRequestExecutor;
     }
-    export class PageRequestFailedEventArgs extends Sys.EventArgs {
+    class PageRequestFailedEventArgs extends Sys.EventArgs {
         get_executor(): Sys.Net.WebRequestExecutor;
         get_errorMessage(): string;
         get_isErrorPage(): boolean;
     }
-    export class PageRequestSucceededEventArgs extends Sys.EventArgs {
+    class PageRequestSucceededEventArgs extends Sys.EventArgs {
         get_executor(): Sys.Net.WebRequestExecutor;
     }
-    export class PageRequest {
+    class PageRequest {
         get_request(): Sys.Net.WebRequest;
         get_url(): string;
         set_url(value: string): void;
@@ -1916,11 +1922,11 @@ declare namespace SP {
         remove_failed(value: (sender: any, args: SP.PageRequestFailedEventArgs) => void): void;
         constructor();
     }
-    export class ResResources {
+    class ResResources {
         static getString(resourceId: string, args: any[]): string;
     }
     /** Defines a writer that provides a set of methods to append text in XML format. Use the static SP.XmlWriter.create(sb) Method to create an SP.XmlWriter object with the Sys.StringBuilder object you pass in. */
-    export class XmlWriter {
+    class XmlWriter {
         /** Creates a new instance of the XmlWriter class with the specified string builder. */
         static create(sb: Sys.StringBuilder): SP.XmlWriter;
         /** Appends a start element tag with the specified name in XML format to the object?s string builder. */
@@ -1943,7 +1949,7 @@ declare namespace SP {
         close(): void;
     }
 
-    export class ClientConstants {
+    class ClientConstants {
         AddExpandoFieldTypeSuffix: string;
         Actions: string;
         ApplicationName: string;
@@ -2068,14 +2074,13 @@ declare namespace SP {
         fluidApplicationInitParamRequestToken: string;
         fluidApplicationInitParamFormDigestTimeoutSeconds: string;
         fluidApplicationInitParamFormDigest: string;
-
     }
-    export class ClientSchemaVersions {
+    class ClientSchemaVersions {
         version14: string;
         version15: string;
         currentVersion: string;
     }
-    export class ClientErrorCodes {
+    class ClientErrorCodes {
         genericError: number;
         accessDenied: number;
         docAlreadyExists: number;
@@ -2088,46 +2093,49 @@ declare namespace SP {
         fieldValueFailedValidation: number;
         itemValueFailedValidation: number;
     }
-    export class ClientAction {
+    class ClientAction {
         get_id(): number;
         get_path(): SP.ObjectPath;
         get_name(): string;
     }
-    export class ClientActionSetProperty extends SP.ClientAction {
+    class ClientActionSetProperty extends SP.ClientAction {
         constructor(obj: SP.ClientObject, propName: string, propValue: any);
     }
-    export class ClientActionSetStaticProperty extends SP.ClientAction {
+    class ClientActionSetStaticProperty extends SP.ClientAction {
         constructor(context: SP.ClientRuntimeContext, typeId: string, propName: string, propValue: any);
     }
-    export class ClientActionInvokeMethod extends SP.ClientAction {
+    class ClientActionInvokeMethod extends SP.ClientAction {
         constructor(obj: SP.ClientObject, methodName: string, parameters: any[]);
     }
-    export class ClientActionInvokeStaticMethod extends SP.ClientAction {
+    class ClientActionInvokeStaticMethod extends SP.ClientAction {
         constructor(context: SP.ClientRuntimeContext, typeId: string, methodName: string, parameters: any[]);
     }
-    export class ClientObject {
+    class ClientObject {
+        constructor(context: SP.ClientRuntimeContext, objectPath: SP.ObjectPath);
         get_context(): SP.ClientRuntimeContext;
         get_path(): SP.ObjectPath;
         get_objectVersion(): string;
         set_objectVersion(value: string): void;
         fromJson(initValue: any): void;
         customFromJson(initValue: any): boolean;
-        retrieve(): void;
         refreshLoad(): void;
-        retrieve(propertyNames: string[]): void;
+        retrieve(propertyNames?: string[]): void;
         isPropertyAvailable(propertyName: string): boolean;
         isObjectPropertyInstantiated(propertyName: string): boolean;
         get_serverObjectIsNull(): boolean;
         get_typedObject(): SP.ClientObject;
+        initPropertiesFromJson(initValue: any): void;
+        checkUninitializedProperty(propName: string): void;
     }
-    export class ClientObjectData {
+    class ClientObjectData {
         get_properties(): any;
         get_clientObjectProperties(): any;
         get_methodReturnObjects(): any;
         constructor();
     }
     /** Provides a base class for a collection of objects on a remote client. */
-    export class ClientObjectCollection<T> extends SP.ClientObject implements IEnumerable<T> {
+    class ClientObjectCollection<T> extends SP.ClientObject implements IEnumerable<T> {
+        constructor();
         get_areItemsAvailable(): boolean;
         /** Gets the data for all of the items in the collection. */
         retrieveItems(): SP.ClientObjectPrototype;
@@ -2140,31 +2148,30 @@ declare namespace SP {
         getItemAtIndex(index: number): T;
         fromJson(obj: any): void;
     }
-    export class ClientObjectList<T> extends SP.ClientObjectCollection<T> {
+    class ClientObjectList<T> extends SP.ClientObjectCollection<T> {
         constructor(context: SP.ClientRuntimeContext, objectPath: SP.ObjectPath, childItemType: any);
         fromJson(initValue: any): void;
         customFromJson(initValue: any): boolean;
     }
-    export class ClientObjectPrototype {
-        retrieve(): void;
-        retrieve(propertyNames: string[]): void;
+    class ClientObjectPrototype {
+        retrieve(propertyNames?: string[]): void;
         retrieveObject(propertyName: string): SP.ClientObjectPrototype;
         retrieveCollectionObject(propertyName: string): SP.ClientObjectCollectionPrototype;
     }
-    export class ClientObjectCollectionPrototype extends SP.ClientObjectPrototype {
+    class ClientObjectCollectionPrototype extends SP.ClientObjectPrototype {
         retrieveItems(): SP.ClientObjectPrototype;
     }
-    export enum ClientRequestStatus {
+    enum ClientRequestStatus {
         active,
         inProgress,
         completedSuccess,
         completedException,
     }
-    export class WebRequestEventArgs extends Sys.EventArgs {
+    class WebRequestEventArgs extends Sys.EventArgs {
         constructor(webRequest: Sys.Net.WebRequest);
         get_webRequest(): Sys.Net.WebRequest;
     }
-    export class ClientRequest {
+    class ClientRequest {
         static get_nextSequenceId(): number;
         get_webRequest(): Sys.Net.WebRequest;
         add_requestSucceeded(value: (sender: any, args: SP.ClientRequestSucceededEventArgs) => void): void;
@@ -2174,12 +2181,11 @@ declare namespace SP {
         get_navigateWhenServerRedirect(): boolean;
         set_navigateWhenServerRedirect(value: boolean): void;
     }
-    export class ClientRequestEventArgs extends Sys.EventArgs {
+    class ClientRequestEventArgs extends Sys.EventArgs {
         get_request(): SP.ClientRequest;
     }
-    export class ClientRequestFailedEventArgs extends SP.ClientRequestEventArgs {
-        constructor(request: SP.ClientRequest, message: string, stackTrace: string, errorCode: number, errorValue: string, errorTypeName: string, errorDetails: any);
-        constructor(request: SP.ClientRequest, message: string, stackTrace: string, errorCode: number, errorValue: string, errorTypeName: string, errorDetails: any, errorTraceCorrelationId: string);
+    class ClientRequestFailedEventArgs extends SP.ClientRequestEventArgs {
+        constructor(request: SP.ClientRequest, message: string, stackTrace: string, errorCode: number, errorValue: string, errorTypeName: string, errorDetails: any, errorTraceCorrelationId?: string);
         get_message(): string;
         get_stackTrace(): string;
         get_errorCode(): number;
@@ -2188,9 +2194,9 @@ declare namespace SP {
         get_errorDetails(): any;
         get_errorTraceCorrelationId(): string;
     }
-    export class ClientRequestSucceededEventArgs extends SP.ClientRequestEventArgs {
+    class ClientRequestSucceededEventArgs extends SP.ClientRequestEventArgs {
     }
-    export class ClientRuntimeContext implements Sys.IDisposable {
+    class ClientRuntimeContext implements Sys.IDisposable {
         constructor(serverRelativeUrlOrFullUrl: string);
         get_url(): string;
         get_viaUrl(): string;
@@ -2215,42 +2221,37 @@ declare namespace SP {
         remove_beginningRequest(value: (sender: any, args: SP.ClientRequestEventArgs) => void): void;
         get_requestTimeout(): number;
         set_requestTimeout(value: number): void;
-        executeQueryAsync(succeededCallback: (sender: any, args: SP.ClientRequestSucceededEventArgs) => void, failedCallback: (sender: any, args: SP.ClientRequestFailedEventArgs) => void): void;
-        executeQueryAsync(succeededCallback: (sender: any, args: SP.ClientRequestSucceededEventArgs) => void): void;
-        executeQueryAsync(): void;
+        executeQueryAsync(succeededCallback?: (sender: any, args: SP.ClientRequestSucceededEventArgs) => void, failedCallback?: (sender: any, args: SP.ClientRequestFailedEventArgs) => void): void;
         get_staticObjects(): any;
         castTo(obj: SP.ClientObject, type: any): SP.ClientObject;
         addQuery(query: SP.ClientAction): void;
         addQueryIdAndResultObject(id: number, obj: any): void;
-        parseObjectFromJsonString(json: string): any;
-        parseObjectFromJsonString(json: string, skipTypeFixup: boolean): any;
-        load(clientObject: SP.ClientObject): void;
-        loadQuery<T>(clientObjectCollection: SP.ClientObjectCollection<T>, exp: string): any;
+        parseObjectFromJsonString(json: string, skipTypeFixup?: boolean): any;
         load(clientObject: SP.ClientObject, ...exps: string[]): void;
-        loadQuery<T>(clientObjectCollection: SP.ClientObjectCollection<T>): any;
+        loadQuery<T>(clientObjectCollection: SP.ClientObjectCollection<T>, exp?: string): any;
         get_serverSchemaVersion(): string;
         get_serverLibraryVersion(): string;
         get_traceCorrelationId(): string;
         set_traceCorrelationId(value: string): void;
         dispose(): void;
     }
-    export class SimpleDataTable {
+    class SimpleDataTable {
         get_rows(): any[];
         constructor();
     }
-    export class ClientValueObject {
+    class ClientValueObject {
         fromJson(obj: any): void;
         customFromJson(obj: any): boolean;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         customWriteToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): boolean;
         get_typeId(): string;
     }
-    export class ClientValueObjectCollection<T> extends SP.ClientValueObject implements IEnumerable<T> {
+    class ClientValueObjectCollection<T> extends SP.ClientValueObject implements IEnumerable<T> {
         get_count(): number;
         getEnumerator(): IEnumerator<T>;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
     }
-    export class ExceptionHandlingScope {
+    class ExceptionHandlingScope {
         constructor(context: SP.ClientRuntimeContext);
         startScope(): any;
         startTry(): any;
@@ -2265,32 +2266,32 @@ declare namespace SP {
         get_serverErrorTypeName(): string;
         get_serverErrorDetails(): any;
     }
-    export class ObjectIdentityQuery extends SP.ClientAction {
+    class ObjectIdentityQuery extends SP.ClientAction {
         constructor(objectPath: SP.ObjectPath);
     }
-    export class ObjectPath {
+    class ObjectPath {
         setPendingReplace(): void;
     }
-    export class ObjectPathProperty extends SP.ObjectPath {
+    class ObjectPathProperty extends SP.ObjectPath {
         constructor(context: SP.ClientRuntimeContext, parent: SP.ObjectPath, propertyName: string);
     }
-    export class ObjectPathStaticProperty extends SP.ObjectPath {
+    class ObjectPathStaticProperty extends SP.ObjectPath {
         constructor(context: SP.ClientRuntimeContext, typeId: string, propertyName: string);
     }
-    export class ObjectPathMethod extends SP.ObjectPath {
+    class ObjectPathMethod extends SP.ObjectPath {
         constructor(context: SP.ClientRuntimeContext, parent: SP.ObjectPath, methodName: string, parameters: any[]);
     }
-    export class ObjectPathStaticMethod extends SP.ObjectPath {
+    class ObjectPathStaticMethod extends SP.ObjectPath {
         constructor(context: SP.ClientRuntimeContext, typeId: string, methodName: string, parameters: any[]);
     }
-    export class ObjectPathConstructor extends SP.ObjectPath {
+    class ObjectPathConstructor extends SP.ObjectPath {
         constructor(context: SP.ClientRuntimeContext, typeId: string, parameters: any[]);
     }
-    export class SerializationContext {
+    class SerializationContext {
         addClientObject(obj: SP.ClientObject): void;
         addObjectPath(path: SP.ObjectPath): void;
     }
-    export class ResourceStrings {
+    class ResourceStrings {
         argumentExceptionMessage: string;
         argumentNullExceptionMessage: string;
         cC_AppIconAlt: string;
@@ -2352,7 +2353,7 @@ declare namespace SP {
         unknownError: string;
         unknownResponseData: string;
     }
-    export class RuntimeRes {
+    class RuntimeRes {
         cC_PlaceHolderElementNotFound: string;
         rE_CannotAccessSiteOpenWindowFailed: string;
         noObjectPathAssociatedWithObject: string;
@@ -2414,16 +2415,16 @@ declare namespace SP {
         requestHasBeenExecuted: string;
         objectNameMethod: string;
     }
-    export class ParseJSONUtil {
+    class ParseJSONUtil {
         static parseObjectFromJsonString(json: string): any;
         static validateJson(text: string): boolean;
     }
-    export enum DateTimeKind {
+    enum DateTimeKind {
         unspecified,
         utc,
         local,
     }
-    export class OfficeVersion {
+    class OfficeVersion {
         majorBuildVersion: number;
         previousMajorBuildVersion: number;
         majorVersion: string;
@@ -2433,19 +2434,18 @@ declare namespace SP {
         assemblyVersion: string;
         wssMajorVersion: string;
     }
-    export class ClientContext extends SP.ClientRuntimeContext {
-        constructor(serverRelativeUrlOrFullUrl: string);
-        static get_current(): SP.ClientContext;
-        constructor();
+    class ClientContext extends SP.ClientRuntimeContext {
+        constructor(serverRelativeUrlOrFullUrl?: string);
         get_web(): SP.Web;
         get_site(): SP.Site;
         get_serverVersion(): string;
+        static get_current(): SP.ClientContext;
     }
-    export enum ULSTraceLevel {
+    enum ULSTraceLevel {
         verbose,
     }
     /** Provides a Unified Logging Service (ULS) that monitors log messages. */
-    export class ULS {
+    class ULS {
         /** Gets a value that indicates whether the Unified Logging Service (ULS) is enabled. */
         static get_enabled(): boolean;
         /** Sets a value that indicates whether the Unified Logging Service (ULS) is enabled. */
@@ -2458,17 +2458,15 @@ declare namespace SP {
         /** Decreases the indentation for subsequent log messages. */
         static decreaseIndent(): void;
         /** Traces when the function was entered. */
-        static traceApiEnter(functionName: string, args: any[]): void;
-        /** Traces when the function was entered. */
-        static traceApiEnter(functionName: string): void;
+        static traceApiEnter(functionName: string, args?: any[]): void;
         /** Traces when the function has finished. */
         static traceApiLeave(): void;
     }
-    export class AccessRequests {
+    class AccessRequests {
         static changeRequestStatus(context: SP.ClientRuntimeContext, itemId: number, newStatus: number, convStr: string, permType: string, permissionLevel: number): void;
         static changeRequestStatusBulk(context: SP.ClientRuntimeContext, requestIds: number[], newStatus: number): void;
     }
-    export enum AddFieldOptions {
+    enum AddFieldOptions {
         defaultValue,
         addToDefaultContentType,
         addToNoContentType,
@@ -2477,27 +2475,27 @@ declare namespace SP {
         addFieldToDefaultView,
         addFieldCheckDisplayName,
     }
-    export class AlternateUrl extends SP.ClientObject {
+    class AlternateUrl extends SP.ClientObject {
         get_uri(): string;
         get_urlZone(): SP.UrlZone;
     }
-    export class App extends SP.ClientObject {
+    class App extends SP.ClientObject {
         get_assetId(): string;
         get_contentMarket(): string;
         get_versionString(): string;
     }
-    export class AppCatalog {
+    class AppCatalog {
         static getAppInstances(context: SP.ClientRuntimeContext, web: SP.Web): SP.ClientObjectList<SP.AppInstance>;
         static getDeveloperSiteAppInstancesByIds(context: SP.ClientRuntimeContext, site: SP.Site, appInstanceIds: SP.Guid[]): SP.ClientObjectList<SP.AppInstance>;
         static isAppSideloadingEnabled(context: SP.ClientRuntimeContext): SP.BooleanResult;
     }
-    export class AppContextSite extends SP.ClientObject {
+    class AppContextSite extends SP.ClientObject {
         constructor(context: SP.ClientRuntimeContext, siteUrl: string);
         get_site(): SP.Site;
         get_web(): SP.Web;
         static newObject(context: SP.ClientRuntimeContext, siteUrl: string): SP.AppContextSite;
     }
-    export class AppInstance extends SP.ClientObject {
+    class AppInstance extends SP.ClientObject {
         get_appPrincipalId(): string;
         get_appWebFullUrl(): string;
         get_id(): SP.Guid;
@@ -2517,7 +2515,7 @@ declare namespace SP {
         getPreviousAppVersion(): SP.App;
         retryAllJobs(): void;
     }
-    export class AppInstanceErrorDetails extends SP.ClientObject {
+    class AppInstanceErrorDetails extends SP.ClientObject {
         get_correlationId(): SP.Guid;
         set_correlationId(value: SP.Guid): void;
         get_errorDetail(): string;
@@ -2529,7 +2527,7 @@ declare namespace SP {
         set_source(value: SP.AppInstanceErrorSource): void;
         get_sourceName(): string;
     }
-    export enum AppInstanceErrorSource {
+    enum AppInstanceErrorSource {
         common,
         appWeb,
         parentWeb,
@@ -2539,12 +2537,12 @@ declare namespace SP {
         eventCallouts,
         finalization,
     }
-    export enum AppInstanceErrorType {
+    enum AppInstanceErrorType {
         transient,
         configuration,
         app,
     }
-    export enum AppInstanceStatus {
+    enum AppInstanceStatus {
         invalidStatus,
         installing,
         canceling,
@@ -2556,36 +2554,36 @@ declare namespace SP {
         disabling,
         disabled,
     }
-    export class AppLicense extends SP.ClientValueObject {
+    class AppLicense extends SP.ClientValueObject {
         get_rawXMLLicenseToken(): string;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class AppLicenseCollection extends SP.ClientValueObjectCollection<AppLicense> {
+    class AppLicenseCollection extends SP.ClientValueObjectCollection<AppLicense> {
         add(item: SP.AppLicense): void;
         get_item(index: number): SP.AppLicense;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum AppLicenseType {
+    enum AppLicenseType {
         perpetualMultiUser,
         perpetualAllUsers,
         trialMultiUser,
         trialAllUsers,
     }
-    export class Attachment extends SP.ClientObject {
+    class Attachment extends SP.ClientObject {
         get_fileName(): string;
         get_serverRelativeUrl(): string;
         deleteObject(): void;
     }
-    export class AttachmentCollection extends SP.ClientObjectCollection<Attachment> {
+    interface AttachmentCollection extends SP.ClientObjectCollection<Attachment> {
         itemAt(index: number): SP.Attachment;
         get_item(index: number): SP.Attachment;
         getByFileName(fileName: string): SP.Attachment;
     }
-    export class AttachmentCreationInformation extends SP.ClientValueObject {
+    class AttachmentCreationInformation extends SP.ClientValueObject {
         get_contentStream(): SP.Base64EncodedByteArray;
         set_contentStream(value: SP.Base64EncodedByteArray): void;
         get_fileName(): string;
@@ -2594,7 +2592,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class BasePermissions extends SP.ClientValueObject {
+    class BasePermissions extends SP.ClientValueObject {
         set(perm: SP.PermissionKind): void;
         clear(perm: SP.PermissionKind): void;
         clearAll(): void;
@@ -2606,7 +2604,7 @@ declare namespace SP {
         constructor();
     }
     /** Specifies the base type for a list. */
-    export enum BaseType {
+    enum BaseType {
         none,
         genericList,
         documentLibrary,
@@ -2615,11 +2613,11 @@ declare namespace SP {
         survey,
         issue,
     }
-    export enum BrowserFileHandling {
+    enum BrowserFileHandling {
         permissive,
         strict,
     }
-    export enum CalendarType {
+    enum CalendarType {
         none,
         gregorian,
         japan,
@@ -2638,7 +2636,7 @@ declare namespace SP {
         umAlQura,
     }
     /** Specifies a Collaborative Application Markup Language (CAML) query on a list. */
-    export class CamlQuery extends SP.ClientValueObject {
+    class CamlQuery extends SP.ClientValueObject {
         constructor();
         /** This method creates a Collaborative Application Markup Language (CAML) string
             that can be used to recursively get all of the items in a list, including
@@ -2667,49 +2665,49 @@ declare namespace SP {
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
     }
-    export class Change extends SP.ClientObject {
+    class Change extends SP.ClientObject {
         get_changeToken(): SP.ChangeToken;
         get_changeType(): SP.ChangeType;
         get_siteId(): SP.Guid;
         get_time(): Date;
     }
-    export class ChangeAlert extends SP.Change {
+    class ChangeAlert extends SP.Change {
         get_alertId(): SP.Guid;
         get_webId(): SP.Guid;
     }
-    export class ChangeCollection extends SP.ClientObjectCollection<Change> {
+    interface ChangeCollection extends SP.ClientObjectCollection<Change> {
         itemAt(index: number): SP.Change;
         get_item(index: number): SP.Change;
     }
-    export class ChangeContentType extends SP.Change {
+    class ChangeContentType extends SP.Change {
         get_contentTypeId(): SP.ContentTypeId;
         get_webId(): SP.Guid;
     }
-    export class ChangeField extends SP.Change {
+    class ChangeField extends SP.Change {
         get_fieldId(): SP.Guid;
         get_webId(): SP.Guid;
     }
-    export class ChangeFile extends SP.Change {
+    class ChangeFile extends SP.Change {
         get_uniqueId(): SP.Guid;
         get_webId(): SP.Guid;
     }
-    export class ChangeFolder extends SP.Change {
+    class ChangeFolder extends SP.Change {
         get_uniqueId(): SP.Guid;
         get_webId(): SP.Guid;
     }
-    export class ChangeGroup extends SP.Change {
+    class ChangeGroup extends SP.Change {
         get_groupId(): number;
     }
-    export class ChangeItem extends SP.Change {
+    class ChangeItem extends SP.Change {
         get_itemId(): number;
         get_listId(): SP.Guid;
         get_webId(): SP.Guid;
     }
-    export class ChangeList extends SP.Change {
+    class ChangeList extends SP.Change {
         get_listId(): SP.Guid;
         get_webId(): SP.Guid;
     }
-    export class ChangeLogItemQuery extends SP.ClientValueObject {
+    class ChangeLogItemQuery extends SP.ClientValueObject {
         get_changeToken(): string;
         set_changeToken(value: string): void;
         get_contains(): string;
@@ -2728,7 +2726,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ChangeQuery extends SP.ClientValueObject {
+    class ChangeQuery extends SP.ClientValueObject {
         constructor();
         constructor(allChangeObjectTypes: boolean, allChangeTypes: boolean);
         get_add(): boolean;
@@ -2794,16 +2792,16 @@ declare namespace SP {
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
     }
-    export class ChangeSite extends SP.Change {
+    class ChangeSite extends SP.Change {
     }
-    export class ChangeToken extends SP.ClientValueObject {
+    class ChangeToken extends SP.ClientValueObject {
         get_stringValue(): string;
         set_stringValue(value: string): void;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum ChangeType {
+    enum ChangeType {
         noChange,
         add,
         update,
@@ -2826,35 +2824,35 @@ declare namespace SP {
         listContentTypeAdd,
         listContentTypeDelete,
     }
-    export class ChangeUser extends SP.Change {
+    class ChangeUser extends SP.Change {
         get_activate(): boolean;
         get_userId(): number;
     }
-    export class ChangeView extends SP.Change {
+    class ChangeView extends SP.Change {
         get_viewId(): SP.Guid;
         get_listId(): SP.Guid;
         get_webId(): SP.Guid;
     }
-    export class ChangeWeb extends SP.Change {
+    class ChangeWeb extends SP.Change {
         get_webId(): SP.Guid;
     }
-    export enum CheckinType {
+    enum CheckinType {
         minorCheckIn,
         majorCheckIn,
         overwriteCheckIn,
     }
-    export enum CheckOutType {
+    enum CheckOutType {
         online,
         offline,
         none,
     }
-    export enum ChoiceFormatType {
+    enum ChoiceFormatType {
         dropdown,
         radioButtons,
     }
-    export class CompatibilityRange extends SP.ClientObject {
+    class CompatibilityRange extends SP.ClientObject {
     }
-    export class ContentType extends SP.ClientObject {
+    class ContentType extends SP.ClientObject {
         get_description(): string;
         set_description(value: string): void;
         get_displayFormTemplateName(): string;
@@ -2897,14 +2895,14 @@ declare namespace SP {
         update(updateChildren: boolean): void;
         deleteObject(): void;
     }
-    export class ContentTypeCollection extends SP.ClientObjectCollection<ContentType> {
+    interface ContentTypeCollection extends SP.ClientObjectCollection<ContentType> {
         itemAt(index: number): SP.ContentType;
         get_item(index: number): SP.ContentType;
         getById(contentTypeId: string): SP.ContentType;
         addExistingContentType(contentType: SP.ContentType): SP.ContentType;
         add(parameters: SP.ContentTypeCreationInformation): SP.ContentType;
     }
-    export class ContentTypeCreationInformation extends SP.ClientValueObject {
+    class ContentTypeCreationInformation extends SP.ClientValueObject {
         get_description(): string;
         set_description(value: string): void;
         get_group(): string;
@@ -2917,33 +2915,33 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ContentTypeId extends SP.ClientValueObject {
+    class ContentTypeId extends SP.ClientValueObject {
         toString(): string;
         get_stringValue(): string;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum CustomizedPageStatus {
+    enum CustomizedPageStatus {
         none,
         uncustomized,
         customized,
     }
-    export enum DateTimeFieldFormatType {
+    enum DateTimeFieldFormatType {
         dateOnly,
         dateTime,
     }
-    export enum DateTimeFieldFriendlyFormatType {
+    enum DateTimeFieldFriendlyFormatType {
         unspecified,
         disabled,
         relative,
     }
-    export enum DraftVisibilityType {
+    enum DraftVisibilityType {
         reader,
         author,
         approver,
     }
-    export class EventReceiverDefinition extends SP.ClientObject {
+    class EventReceiverDefinition extends SP.ClientObject {
         get_receiverAssembly(): string;
         get_receiverClass(): string;
         get_receiverId(): SP.Guid;
@@ -2955,13 +2953,13 @@ declare namespace SP {
         update(): void;
         deleteObject(): void;
     }
-    export class EventReceiverDefinitionCollection extends SP.ClientObjectCollection<EventReceiverDefinition> {
+    interface EventReceiverDefinitionCollection extends SP.ClientObjectCollection<EventReceiverDefinition> {
         itemAt(index: number): SP.EventReceiverDefinition;
         get_item(index: number): SP.EventReceiverDefinition;
         getById(eventReceiverId: SP.Guid): SP.EventReceiverDefinition;
         add(eventReceiverCreationInformation: SP.EventReceiverDefinitionCreationInformation): SP.EventReceiverDefinition;
     }
-    export class EventReceiverDefinitionCreationInformation extends SP.ClientValueObject {
+    class EventReceiverDefinitionCreationInformation extends SP.ClientValueObject {
         get_receiverAssembly(): string;
         set_receiverAssembly(value: string): void;
         get_receiverClass(): string;
@@ -2980,12 +2978,12 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum EventReceiverSynchronization {
+    enum EventReceiverSynchronization {
         defaultSynchronization,
         synchronous,
         asynchronous,
     }
-    export enum EventReceiverType {
+    enum EventReceiverType {
         invalidReceiver,
         itemAdding,
         itemUpdating,
@@ -3063,23 +3061,23 @@ declare namespace SP {
         emailReceived,
         contextEvent,
     }
-    export class Feature extends SP.ClientObject {
+    class Feature extends SP.ClientObject {
         get_definitionId(): SP.Guid;
     }
-    export class FeatureCollection extends SP.ClientObjectCollection<Feature> {
+    interface FeatureCollection extends SP.ClientObjectCollection<Feature> {
         itemAt(index: number): SP.Feature;
         get_item(index: number): SP.Feature;
         getById(featureId: SP.Guid): SP.Feature;
         add(featureId: SP.Guid, force: boolean, featdefScope: SP.FeatureDefinitionScope): SP.Feature;
         remove(featureId: SP.Guid, force: boolean): void;
     }
-    export enum FeatureDefinitionScope {
+    enum FeatureDefinitionScope {
         none,
         farm,
         site,
         web,
     }
-    export class Field extends SP.ClientObject {
+    class Field extends SP.ClientObject {
         get_canBeDeleted(): boolean;
         get_defaultValue(): string;
         set_defaultValue(value: string): void;
@@ -3126,7 +3124,7 @@ declare namespace SP {
         set_validationFormula(value: string): void;
         get_validationMessage(): string;
         set_validationMessage(value: string): void;
-        validateSetValue(item: SP.ListItem, value: string): void;
+        validateSetValue<T = any>(item: SP.ListItem<T>, value: string): void;
         updateAndPushChanges(pushChangesToLists: boolean): void;
         update(): void;
         deleteObject(): void;
@@ -3134,7 +3132,7 @@ declare namespace SP {
         setShowInEditForm(value: boolean): void;
         setShowInNewForm(value: boolean): void;
     }
-    export class FieldCalculated extends SP.Field {
+    class FieldCalculated extends SP.Field {
         get_dateFormat(): SP.DateTimeFieldFormatType;
         set_dateFormat(value: SP.DateTimeFieldFormatType): void;
         get_formula(): string;
@@ -3142,24 +3140,24 @@ declare namespace SP {
         get_outputType(): SP.FieldType;
         set_outputType(value: SP.FieldType): void;
     }
-    export class FieldCalculatedErrorValue extends SP.ClientValueObject {
+    class FieldCalculatedErrorValue extends SP.ClientValueObject {
         get_errorMessage(): string;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class FieldMultiChoice extends SP.Field {
+    class FieldMultiChoice extends SP.Field {
         get_fillInChoice(): boolean;
         set_fillInChoice(value: boolean): void;
         get_mappings(): string;
         get_choices(): string[];
         set_choices(value: string[]): void;
     }
-    export class FieldChoice extends SP.FieldMultiChoice {
+    class FieldChoice extends SP.FieldMultiChoice {
         get_editFormat(): SP.ChoiceFormatType;
         set_editFormat(value: SP.ChoiceFormatType): void;
     }
-    export class FieldCollection extends SP.ClientObjectCollection<Field> {
+    interface FieldCollection extends SP.ClientObjectCollection<Field> {
         itemAt(index: number): SP.Field;
         get_item(index: number): SP.Field;
         get_schemaXml(): string;
@@ -3170,21 +3168,21 @@ declare namespace SP {
         addFieldAsXml(schemaXml: string, addToDefaultView: boolean, options: SP.AddFieldOptions): SP.Field;
         getByInternalNameOrTitle(strName: string): SP.Field;
     }
-    export class FieldComputed extends SP.Field {
+    class FieldComputed extends SP.Field {
         get_enableLookup(): boolean;
         set_enableLookup(value: boolean): void;
     }
-    export class FieldNumber extends SP.Field {
+    class FieldNumber extends SP.Field {
         get_maximumValue(): number;
         set_maximumValue(value: number): void;
         get_minimumValue(): number;
         set_minimumValue(value: number): void;
     }
-    export class FieldCurrency extends SP.FieldNumber {
+    class FieldCurrency extends SP.FieldNumber {
         get_currencyLocaleId(): number;
         set_currencyLocaleId(value: number): void;
     }
-    export class FieldDateTime extends SP.Field {
+    class FieldDateTime extends SP.Field {
         get_dateTimeCalendarType(): SP.CalendarType;
         set_dateTimeCalendarType(value: SP.CalendarType): void;
         get_displayFormat(): SP.DateTimeFieldFormatType;
@@ -3192,9 +3190,9 @@ declare namespace SP {
         get_friendlyDisplayFormat(): SP.DateTimeFieldFriendlyFormatType;
         set_friendlyDisplayFormat(value: SP.DateTimeFieldFriendlyFormatType): void;
     }
-    export class FieldGeolocation extends SP.Field {
+    class FieldGeolocation extends SP.Field {
     }
-    export class FieldGeolocationValue extends SP.ClientValueObject {
+    class FieldGeolocationValue extends SP.ClientValueObject {
         get_altitude(): number;
         set_altitude(value: number): void;
         get_latitude(): number;
@@ -3207,9 +3205,9 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class FieldGuid extends SP.Field {
+    class FieldGuid extends SP.Field {
     }
-    export class FieldLink extends SP.ClientObject {
+    class FieldLink extends SP.ClientObject {
         get_hidden(): boolean;
         set_hidden(value: boolean): void;
         get_id(): SP.Guid;
@@ -3218,21 +3216,21 @@ declare namespace SP {
         set_required(value: boolean): void;
         deleteObject(): void;
     }
-    export class FieldLinkCollection extends SP.ClientObjectCollection<FieldLink> {
+    interface FieldLinkCollection extends SP.ClientObjectCollection<FieldLink> {
         itemAt(index: number): SP.FieldLink;
         get_item(index: number): SP.FieldLink;
         getById(id: SP.Guid): SP.FieldLink;
         add(parameters: SP.FieldLinkCreationInformation): SP.FieldLink;
         reorder(internalNames: string[]): void;
     }
-    export class FieldLinkCreationInformation extends SP.ClientValueObject {
+    class FieldLinkCreationInformation extends SP.ClientValueObject {
         get_field(): SP.Field;
         set_field(value: SP.Field): void;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class FieldLookup extends SP.Field {
+    class FieldLookup extends SP.Field {
         get_allowMultipleValues(): boolean;
         set_allowMultipleValues(value: boolean): void;
         get_isRelationship(): boolean;
@@ -3248,7 +3246,7 @@ declare namespace SP {
         get_relationshipDeleteBehavior(): SP.RelationshipDeleteBehaviorType;
         set_relationshipDeleteBehavior(value: SP.RelationshipDeleteBehaviorType): void;
     }
-    export class FieldLookupValue extends SP.ClientValueObject {
+    class FieldLookupValue extends SP.ClientValueObject {
         get_lookupId(): number;
         set_lookupId(value: number): void;
         get_lookupValue(): string;
@@ -3256,7 +3254,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class FieldMultiLineText extends SP.Field {
+    class FieldMultiLineText extends SP.Field {
         get_allowHyperlink(): boolean;
         set_allowHyperlink(value: boolean): void;
         get_appendOnly(): boolean;
@@ -3269,7 +3267,7 @@ declare namespace SP {
         set_richText(value: boolean): void;
         get_wikiLinking(): boolean;
     }
-    export class FieldRatingScale extends SP.FieldMultiChoice {
+    class FieldRatingScale extends SP.FieldMultiChoice {
         get_gridEndNumber(): number;
         set_gridEndNumber(value: number): void;
         get_gridNAOptionText(): string;
@@ -3284,7 +3282,7 @@ declare namespace SP {
         set_gridTextRangeLow(value: string): void;
         get_rangeCount(): number;
     }
-    export class FieldRatingScaleQuestionAnswer extends SP.ClientValueObject {
+    class FieldRatingScaleQuestionAnswer extends SP.ClientValueObject {
         get_answer(): number;
         set_answer(value: number): void;
         get_question(): string;
@@ -3293,16 +3291,16 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class FieldStringValues extends SP.ClientObject {
+    class FieldStringValues extends SP.ClientObject {
         get_fieldValues(): any;
         get_item(fieldName: string): string;
         refreshLoad(): void;
     }
-    export class FieldText extends SP.Field {
+    class FieldText extends SP.Field {
         get_maxLength(): number;
         set_maxLength(value: number): void;
     }
-    export enum FieldType {
+    enum FieldType {
         invalid,
         integer,
         text,
@@ -3338,11 +3336,11 @@ declare namespace SP {
         outcomeChoice,
         maxItems,
     }
-    export class FieldUrl extends SP.Field {
+    class FieldUrl extends SP.Field {
         get_displayFormat(): SP.UrlFieldFormatType;
         set_displayFormat(value: SP.UrlFieldFormatType): void;
     }
-    export class FieldUrlValue extends SP.ClientValueObject {
+    class FieldUrlValue extends SP.ClientValueObject {
         get_description(): string;
         set_description(value: string): void;
         get_url(): string;
@@ -3351,7 +3349,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class FieldUser extends SP.FieldLookup {
+    class FieldUser extends SP.FieldLookup {
         get_allowDisplay(): boolean;
         set_allowDisplay(value: boolean): void;
         get_presence(): boolean;
@@ -3361,18 +3359,18 @@ declare namespace SP {
         get_selectionMode(): SP.FieldUserSelectionMode;
         set_selectionMode(value: SP.FieldUserSelectionMode): void;
     }
-    export enum FieldUserSelectionMode {
+    enum FieldUserSelectionMode {
         peopleOnly,
         peopleAndGroups,
     }
-    export class FieldUserValue extends SP.FieldLookupValue {
+    class FieldUserValue extends SP.FieldLookupValue {
         static fromUser(userName: string): SP.FieldUserValue;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
     /** Represents a file in a SharePoint Web site that can be a Web Part Page, an item in a document library, or a file in a folder. */
-    export class File extends SP.ClientObject {
+    class File extends SP.ClientObject {
         get_author(): SP.User;
         /** Returns the user who has checked out the file. */
         get_checkedOutByUser(): SP.User;
@@ -3390,7 +3388,7 @@ declare namespace SP {
         get_length(): number;
         get_level(): SP.FileLevel;
         /** Specifies the SPListItem corresponding to this file if this file belongs to a doclib. Values for all fields are returned also. */
-        get_listItemAllFields(): SP.ListItem;
+        get_listItemAllFields<T = any>(): SP.ListItem<T>;
         /** Returns the user that owns the current lock on the file. MUST return null if there is no lock. */
         get_lockedByUser(): SP.User;
         /** Specifies the major version of the file. */
@@ -3431,14 +3429,14 @@ declare namespace SP {
         recycle(): SP.GuidResult;
         checkOut(): void;
     }
-    export class FileCollection extends SP.ClientObjectCollection<File> {
+    interface FileCollection extends SP.ClientObjectCollection<File> {
         itemAt(index: number): SP.File;
         get_item(index: number): SP.File;
         getByUrl(url: string): SP.File;
         add(parameters: SP.FileCreationInformation): SP.File;
         addTemplateFile(urlOfFile: string, templateFileType: SP.TemplateFileType): SP.File;
     }
-    export class FileCreationInformation extends SP.ClientValueObject {
+    class FileCreationInformation extends SP.ClientValueObject {
         get_content(): SP.Base64EncodedByteArray;
         set_content(value: SP.Base64EncodedByteArray): void;
         get_overwrite(): boolean;
@@ -3449,12 +3447,12 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum FileLevel {
+    enum FileLevel {
         published,
         draft,
         checkout,
     }
-    export class FileSaveBinaryInformation extends SP.ClientValueObject {
+    class FileSaveBinaryInformation extends SP.ClientValueObject {
         get_checkRequiredFields(): boolean;
         set_checkRequiredFields(value: boolean): void;
         get_content(): SP.Base64EncodedByteArray;
@@ -3467,13 +3465,13 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum FileSystemObjectType {
+    enum FileSystemObjectType {
         invalid,
         file,
         folder,
         web,
     }
-    export class FileVersion extends SP.ClientObject {
+    class FileVersion extends SP.ClientObject {
         get_checkInComment(): string;
         get_created(): Date;
         get_createdBy(): SP.User;
@@ -3484,7 +3482,7 @@ declare namespace SP {
         get_versionLabel(): string;
         deleteObject(): void;
     }
-    export class FileVersionCollection extends SP.ClientObjectCollection<FileVersion> {
+    interface FileVersionCollection extends SP.ClientObjectCollection<FileVersion> {
         itemAt(index: number): SP.FileVersion;
         get_item(index: number): SP.FileVersion;
         getById(versionid: number): SP.FileVersion;
@@ -3493,10 +3491,10 @@ declare namespace SP {
         deleteAll(): void;
         restoreByLabel(versionlabel: string): void;
     }
-    export class Folder extends SP.ClientObject {
+    class Folder extends SP.ClientObject {
         get_contentTypeOrder(): SP.ContentTypeId[];
         get_files(): SP.FileCollection;
-        get_listItemAllFields(): SP.ListItem;
+        get_listItemAllFields<T = any>(): SP.ListItem<T>;
         get_itemCount(): number;
         get_name(): string;
         get_parentFolder(): SP.Folder;
@@ -3511,24 +3509,24 @@ declare namespace SP {
         deleteObject(): void;
         recycle(): SP.GuidResult;
     }
-    export class FolderCollection extends SP.ClientObjectCollection<Folder> {
+    interface FolderCollection extends SP.ClientObjectCollection<Folder> {
         itemAt(index: number): SP.Folder;
         get_item(index: number): SP.Folder;
         getByUrl(url: string): SP.Folder;
         add(url: string): SP.Folder;
     }
-    export class Form extends SP.ClientObject {
+    class Form extends SP.ClientObject {
         get_id(): SP.Guid;
         get_serverRelativeUrl(): string;
         get_formType(): SP.PageType;
     }
-    export class FormCollection extends SP.ClientObjectCollection<Form> {
+    interface FormCollection extends SP.ClientObjectCollection<Form> {
         itemAt(index: number): SP.Form;
         get_item(index: number): SP.Form;
         getByPageType(formType: SP.PageType): SP.Form;
         getById(id: SP.Guid): SP.Form;
     }
-    export class Principal extends SP.ClientObject {
+    class Principal extends SP.ClientObject {
         get_id(): number;
         get_isHiddenInUI(): boolean;
         get_loginName(): string;
@@ -3536,7 +3534,7 @@ declare namespace SP {
         set_title(value: string): void;
         get_principalType(): SP.Utilities.PrincipalType;
     }
-    export class Group extends SP.Principal {
+    class Group extends SP.Principal {
         get_allowMembersEditMembership(): boolean;
         set_allowMembersEditMembership(value: boolean): void;
         get_allowRequestToJoinLeave(): boolean;
@@ -3558,7 +3556,7 @@ declare namespace SP {
         get_users(): SP.UserCollection;
         update(): void;
     }
-    export class GroupCollection extends SP.ClientObjectCollection<Group> {
+    interface GroupCollection extends SP.ClientObjectCollection<Group> {
         itemAt(index: number): SP.Group;
         get_item(index: number): SP.Group;
         getByName(name: string): SP.Group;
@@ -3568,7 +3566,7 @@ declare namespace SP {
         removeById(id: number): void;
         remove(group: SP.Group): void;
     }
-    export class GroupCreationInformation extends SP.ClientValueObject {
+    class GroupCreationInformation extends SP.ClientValueObject {
         get_description(): string;
         set_description(value: string): void;
         get_title(): string;
@@ -3577,7 +3575,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class InformationRightsManagementSettings extends SP.ClientObject {
+    class InformationRightsManagementSettings extends SP.ClientObject {
         get_allowPrint(): boolean;
         set_allowPrint(value: boolean): void;
         get_allowScript(): boolean;
@@ -3609,7 +3607,7 @@ declare namespace SP {
         reset(): void;
         update(): void;
     }
-    export class Language extends SP.ClientValueObject {
+    class Language extends SP.ClientValueObject {
         get_displayName(): string;
         get_languageTag(): string;
         get_lcid(): number;
@@ -3617,7 +3615,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class SecurableObject extends SP.ClientObject {
+    class SecurableObject extends SP.ClientObject {
         get_firstUniqueAncestorSecurableObject(): SP.SecurableObject;
         get_hasUniqueRoleAssignments(): boolean;
         get_roleAssignments(): SP.RoleAssignmentCollection;
@@ -3625,23 +3623,23 @@ declare namespace SP {
         breakRoleInheritance(copyRoleAssignments: boolean, clearSubscopes: boolean): void;
     }
     /** Represents display mode for a control or form */
-    export enum ControlMode {
+    enum ControlMode {
         invalid,
         displayMode,
         editMode,
         newMode
     }
     /** Represents a list on a SharePoint Web site. */
-    export class List extends SP.SecurableObject {
+    class List<T = any> extends SP.SecurableObject {
         /** Gets item by id. */
-        getItemById(id: number): SP.ListItem;
+        getItemById(id: number): SP.ListItem<T>;
         /** Gets a value that specifies whether the list supports content types. */
         get_allowContentTypes(): boolean;
         /** Gets the list definition type on which the list is based. For lists based on OOTB list definitions, return value corresponds the SP.ListTemplateType enumeration. */
         get_baseTemplate(): number;
         /** Gets base type for the list. */
         get_baseType(): SP.BaseType;
-        /** Gets a value that specifies the override of the web application�s BrowserFileHandling property at the list level. */
+        /** Gets a value that specifies the override of the web application's BrowserFileHandling property at the list level. */
         get_browserFileHandling(): SP.BrowserFileHandling;
         /** Gets the content types that are associated with the list. */
         get_contentTypes(): SP.ContentTypeCollection;
@@ -3844,22 +3842,20 @@ declare namespace SP {
         /** Sends the list to the site recycle bin. */
         recycle(): SP.GuidResult;
         /** Returns collection of list items based on the specified CAML query. */
-        getItems(query: SP.CamlQuery): SP.ListItemCollection;
+        getItems(query: SP.CamlQuery): SP.ListItemCollection<T>;
         /** Creates a new list item in the list. */
-        addItem(parameters: SP.ListItemCreationInformation): SP.ListItem;
+        addItem(parameters: SP.ListItemCreationInformation): SP.ListItem<T>;
     }
     /** Represents a collection of SP.List objects */
-    export class ListCollection extends SP.ClientObjectCollection<List> {
+    interface ListCollection extends SP.ClientObjectCollection<List> {
         /** Gets the list at the specified index in the collection. */
-        itemAt(index: number): SP.List;
+        itemAt<T = any>(index: number): SP.List<T>;
         /** Gets the list at the specified index in the collection. */
-        get_item(index: number): SP.List;
+        get_item<T = any>(index: number): SP.List<T>;
         /** Returns the list with the specified title from the collection. */
-        getByTitle(title: string): SP.List;
+        getByTitle<T = any>(title: string): SP.List<T>;
         /** Returns the list with the specified list identifier. */
-        getById(id: SP.Guid): SP.List;
-        /** Returns the list with the specified list identifier. */
-        getById(id: string): SP.List;
+        getById<T = any>(id: string | SP.Guid): SP.List<T>;
         /** Creates a new list or a document library. */
         add(parameters: SP.ListCreationInformation): SP.List;
         /** Gets a list that is the default location for wiki pages. */
@@ -3867,7 +3863,7 @@ declare namespace SP {
         /** Gets a list that is the default asset location for images or other files, which the users upload to their wiki pages. */
         ensureSiteAssetsLibrary(): SP.List;
     }
-    export class ListCreationInformation extends SP.ClientValueObject {
+    class ListCreationInformation extends SP.ClientValueObject {
         get_customSchemaXml(): string;
         set_customSchemaXml(value: string): void;
         get_dataSourceProperties(): any;
@@ -3890,20 +3886,20 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ListDataSource extends SP.ClientValueObject {
+    class ListDataSource extends SP.ClientValueObject {
         get_properties(): any;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ListDataValidationExceptionValue extends SP.ClientValueObject {
+    class ListDataValidationExceptionValue extends SP.ClientValueObject {
         get_fieldFailures(): SP.ListDataValidationFailure[];
         get_itemFailure(): SP.ListDataValidationFailure;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ListDataValidationFailure extends SP.ClientValueObject {
+    class ListDataValidationFailure extends SP.ClientValueObject {
         get_displayName(): string;
         get_message(): string;
         get_name(): string;
@@ -3913,11 +3909,11 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum ListDataValidationFailureReason {
+    enum ListDataValidationFailureReason {
         dataFailure,
         formulaError,
     }
-    export enum ListDataValidationType {
+    enum ListDataValidationType {
         userFormulaField,
         userFormulaItem,
         requiredField,
@@ -3926,12 +3922,12 @@ declare namespace SP {
         textField,
     }
     /** Represents an item or row in a list. */
-    export class ListItem extends SP.SecurableObject {
-        get_fieldValues(): any;
+    class ListItem<T = any> extends SP.SecurableObject {
+        get_fieldValues(): T;
         /** Gets the specified field value for the list item. Field value is returned as string, but it can be casted to a specific field value type, e.g. SP.LookupFieldValue, etc. */
-        get_item(fieldInternalName: string): any;
+        get_item<K extends keyof T>(fieldInternalName: K): T[K];
         /** Sets the specified field value for the list item. Consider using parseAndSetFieldValue instead. */
-        set_item(fieldInternalName: string, value: any): void;
+        set_item<K extends keyof T>(fieldInternalName: K, value: T[K]): void;
         /** Gets collection of objects that represent attachments for the list item. */
         get_attachmentFiles(): SP.AttachmentCollection;
         /** Gets the content type of the item. */
@@ -3974,14 +3970,13 @@ declare namespace SP {
         /** Validates form values specified for the list item. Errors are returned through hasException and errorMessage properties of the ListItemFormUpdateValue objects */
         validateUpdateListItem(formValues: SP.ListItemFormUpdateValue[], bNewDocumentUpdate: boolean): SP.ListItemFormUpdateValue[];
     }
-    export class ListItemCollection extends SP.ClientObjectCollection<ListItem> {
-        itemAt(index: number): SP.ListItem;
-        get_item(index: number): SP.ListItem;
-        getById(id: number): SP.ListItem;
-        getById(id: string): SP.ListItem;
+    interface ListItemCollection<T = any> extends SP.ClientObjectCollection<ListItem<T>> {
+        itemAt(index: number): SP.ListItem<T>;
+        get_item(index: number): SP.ListItem<T>;
+        getById(id: number | string): SP.ListItem<T>;
         get_listItemCollectionPosition(): SP.ListItemCollectionPosition;
     }
-    export class ListItemCollectionPosition extends SP.ClientValueObject {
+    class ListItemCollectionPosition extends SP.ClientValueObject {
         get_pagingInfo(): string;
         set_pagingInfo(value: string): void;
         get_typeId(): string;
@@ -3989,7 +3984,7 @@ declare namespace SP {
         constructor();
     }
     /** Specifies the properties of the new list item. */
-    export class ListItemCreationInformation extends SP.ClientValueObject {
+    class ListItemCreationInformation extends SP.ClientValueObject {
         get_folderUrl(): string;
         /** Sets a value that specifies the folder for the new list item. */
         set_folderUrl(value: string): void;
@@ -4003,11 +3998,11 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ListItemEntityCollection extends SP.ClientObjectCollection<ListItem> {
-        itemAt(index: number): SP.ListItem;
-        get_item(index: number): SP.ListItem;
+    interface ListItemEntityCollection<T> extends SP.ClientObjectCollection<ListItem<T>> {
+        itemAt(index: number): SP.ListItem<T>;
+        get_item(index: number): SP.ListItem<T>;
     }
-    export class ListItemFormUpdateValue extends SP.ClientValueObject {
+    class ListItemFormUpdateValue extends SP.ClientValueObject {
         get_errorMessage(): string;
         set_errorMessage(value: string): void;
         get_fieldName(): string;
@@ -4020,7 +4015,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ListTemplate extends SP.ClientObject {
+    class ListTemplate extends SP.ClientObject {
         get_allowsFolderCreation(): boolean;
         get_baseType(): SP.BaseType;
         get_description(): string;
@@ -4034,12 +4029,12 @@ declare namespace SP {
         get_listTemplateTypeKind(): number;
         get_unique(): boolean;
     }
-    export class ListTemplateCollection extends SP.ClientObjectCollection<ListTemplate> {
+    interface ListTemplateCollection extends SP.ClientObjectCollection<ListTemplate> {
         itemAt(index: number): SP.ListTemplate;
         get_item(index: number): SP.ListTemplate;
         getByName(name: string): SP.ListTemplate;
     }
-    export enum ListTemplateType {
+    enum ListTemplateType {
         invalidType,
         noListTemplate,
         genericList,
@@ -4101,20 +4096,20 @@ declare namespace SP {
         healthReports,
         developerSiteDraftApps,
     }
-    export enum MoveOperations {
+    enum MoveOperations {
         none,
         overwrite,
         allowBrokenThickets,
         bypassApprovePermission,
     }
-    export class Navigation extends SP.ClientObject {
+    class Navigation extends SP.ClientObject {
         get_quickLaunch(): SP.NavigationNodeCollection;
         get_topNavigationBar(): SP.NavigationNodeCollection;
         get_useShared(): boolean;
         set_useShared(value: boolean): void;
         getNodeById(id: number): SP.NavigationNode;
     }
-    export class NavigationNode extends SP.ClientObject {
+    class NavigationNode extends SP.ClientObject {
         get_children(): SP.NavigationNodeCollection;
         get_id(): number;
         get_isDocLib(): boolean;
@@ -4128,12 +4123,12 @@ declare namespace SP {
         update(): void;
         deleteObject(): void;
     }
-    export class NavigationNodeCollection extends SP.ClientObjectCollection<NavigationNode> {
+    interface NavigationNodeCollection extends SP.ClientObjectCollection<NavigationNode> {
         itemAt(index: number): SP.NavigationNode;
         get_item(index: number): SP.NavigationNode;
         add(parameters: SP.NavigationNodeCreationInformation): SP.NavigationNode;
     }
-    export class NavigationNodeCreationInformation extends SP.ClientValueObject {
+    class NavigationNodeCreationInformation extends SP.ClientValueObject {
         get_asLastNode(): boolean;
         set_asLastNode(value: boolean): void;
         get_isExternal(): boolean;
@@ -4148,7 +4143,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ObjectSharingInformation extends SP.ClientObject {
+    class ObjectSharingInformation extends SP.ClientObject {
         get_anonymousEditLink(): string;
         get_anonymousViewLink(): string;
         get_canManagePermissions(): boolean;
@@ -4164,7 +4159,7 @@ declare namespace SP {
         static getWebSharingInformation(context: SP.ClientRuntimeContext, excludeCurrentUser: boolean, excludeSiteAdmin: boolean, excludeSecurityGroups: boolean, retrieveAnonymousLinks: boolean, retrieveUserInfoDetails: boolean, checkForAccessRequests: boolean): SP.ObjectSharingInformation;
         static getObjectSharingInformation(context: SP.ClientRuntimeContext, securableObject: SP.SecurableObject, excludeCurrentUser: boolean, excludeSiteAdmin: boolean, excludeSecurityGroups: boolean, retrieveAnonymousLinks: boolean, retrieveUserInfoDetails: boolean, checkForAccessRequests: boolean, retrievePermissionLevels: boolean): SP.ObjectSharingInformation;
     }
-    export class ObjectSharingInformationUser extends SP.ClientObject {
+    class ObjectSharingInformationUser extends SP.ClientObject {
         get_customRoleNames(): string;
         get_department(): string;
         get_email(): string;
@@ -4180,11 +4175,11 @@ declare namespace SP {
         get_sipAddress(): string;
         get_user(): SP.User;
     }
-    export enum OpenWebOptions {
+    enum OpenWebOptions {
         none,
         initNavigationCache,
     }
-    export enum PageType {
+    enum PageType {
         invalid,
         defaultView,
         normalView,
@@ -4199,13 +4194,13 @@ declare namespace SP {
         solutionForm,
         pAGE_MAXITEMS,
     }
-    export class PropertyValues extends SP.ClientObject {
+    class PropertyValues extends SP.ClientObject {
         get_fieldValues(): any;
         get_item(fieldName: string): any;
         set_item(fieldName: string, value: any): void;
         refreshLoad(): void;
     }
-    export class PushNotificationSubscriber extends SP.ClientObject {
+    class PushNotificationSubscriber extends SP.ClientObject {
         get_customArgs(): string;
         set_customArgs(value: string): void;
         get_deviceAppInstanceId(): SP.Guid;
@@ -4218,17 +4213,17 @@ declare namespace SP {
         get_user(): SP.User;
         update(): void;
     }
-    export class PushNotificationSubscriberCollection extends SP.ClientObjectCollection<PushNotificationSubscriber> {
+    interface PushNotificationSubscriberCollection extends SP.ClientObjectCollection<PushNotificationSubscriber> {
         itemAt(index: number): SP.PushNotificationSubscriber;
         get_item(index: number): SP.PushNotificationSubscriber;
         getByStoreId(id: string): SP.PushNotificationSubscriber;
     }
-    export enum QuickLaunchOptions {
+    enum QuickLaunchOptions {
         off,
         on,
         defaultValue,
     }
-    export class RecycleBinItem extends SP.ClientObject {
+    class RecycleBinItem extends SP.ClientObject {
         get_author(): SP.User;
         get_deletedBy(): SP.User;
         get_deletedDate(): Date;
@@ -4242,19 +4237,19 @@ declare namespace SP {
         deleteObject(): void;
         restore(): void;
     }
-    export class RecycleBinItemCollection extends SP.ClientObjectCollection<RecycleBinItem> {
+    interface RecycleBinItemCollection extends SP.ClientObjectCollection<RecycleBinItem> {
         itemAt(index: number): SP.RecycleBinItem;
         get_item(index: number): SP.RecycleBinItem;
         getById(id: SP.Guid): SP.RecycleBinItem;
         deleteAll(): void;
         restoreAll(): void;
     }
-    export enum RecycleBinItemState {
+    enum RecycleBinItemState {
         none,
         firstStageRecycleBin,
         secondStageRecycleBin,
     }
-    export enum RecycleBinItemType {
+    enum RecycleBinItemType {
         none,
         file,
         fileVersion,
@@ -4267,7 +4262,7 @@ declare namespace SP {
         cascadeParent,
         web,
     }
-    export class RegionalSettings extends SP.ClientObject {
+    class RegionalSettings extends SP.ClientObject {
         get_adjustHijriDays(): number;
         get_alternateCalendarType(): number;
         get_aM(): string;
@@ -4300,18 +4295,18 @@ declare namespace SP {
         get_workDays(): number;
         get_workDayStartHour(): number;
     }
-    export class RelatedField extends SP.ClientObject {
+    class RelatedField extends SP.ClientObject {
         get_fieldId(): SP.Guid;
         get_listId(): SP.Guid;
         get_lookupList(): SP.List;
         get_relationshipDeleteBehavior(): SP.RelationshipDeleteBehaviorType;
         get_webId(): SP.Guid;
     }
-    export class RelatedFieldCollection extends SP.ClientObjectCollection<RelatedField> {
+    interface RelatedFieldCollection extends SP.ClientObjectCollection<RelatedField> {
         itemAt(index: number): SP.RelatedField;
         get_item(index: number): SP.RelatedField;
     }
-    export class RelatedFieldExtendedData extends SP.ClientObject {
+    class RelatedFieldExtendedData extends SP.ClientObject {
         get_fieldId(): SP.Guid;
         get_listId(): SP.Guid;
         get_listImageUrl(): string;
@@ -4319,11 +4314,11 @@ declare namespace SP {
         get_toolTipDescription(): string;
         get_webId(): SP.Guid;
     }
-    export class RelatedFieldExtendedDataCollection extends SP.ClientObjectCollection<RelatedFieldExtendedData> {
+    interface RelatedFieldExtendedDataCollection extends SP.ClientObjectCollection<RelatedFieldExtendedData> {
         itemAt(index: number): SP.RelatedFieldExtendedData;
         get_item(index: number): SP.RelatedFieldExtendedData;
     }
-    export class RelatedItem extends SP.ClientValueObject {
+    class RelatedItem extends SP.ClientValueObject {
         get_iconUrl(): string;
         set_iconUrl(value: string): void;
         get_itemId(): number;
@@ -4340,7 +4335,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class RelatedItemManager extends SP.ClientObject {
+    class RelatedItemManager extends SP.ClientObject {
         static getRelatedItems(context: SP.ClientRuntimeContext, SourceListName: string, SourceItemID: number): SP.RelatedItem[];
         static getPageOneRelatedItems(context: SP.ClientRuntimeContext, SourceListName: string, SourceItemID: number): SP.RelatedItem[];
         static addSingleLink(context: SP.ClientRuntimeContext, SourceListName: string, SourceItemID: number, SourceWebUrl: string, TargetListName: string, TargetItemID: number, TargetWebUrl: string, TryAddReverseLink: boolean): void;
@@ -4348,19 +4343,19 @@ declare namespace SP {
         static addSingleLinkFromUrl(context: SP.ClientRuntimeContext, SourceItemUrl: string, TargetListName: string, TargetItemID: number, TryAddReverseLink: boolean): void;
         static deleteSingleLink(context: SP.ClientRuntimeContext, SourceListName: string, SourceItemID: number, SourceWebUrl: string, TargetListName: string, TargetItemID: number, TargetWebUrl: string, TryDeleteReverseLink: boolean): void;
     }
-    export enum RelationshipDeleteBehaviorType {
+    enum RelationshipDeleteBehaviorType {
         none,
         cascade,
         restrict,
     }
-    export class RequestVariable extends SP.ClientObject {
+    class RequestVariable extends SP.ClientObject {
         constructor(context: SP.ClientRuntimeContext);
         get_value(): string;
         static newObject(context: SP.ClientRuntimeContext): SP.RequestVariable;
         append(value: string): void;
         set(value: string): void;
     }
-    export class RoleAssignment extends SP.ClientObject {
+    class RoleAssignment extends SP.ClientObject {
         get_member(): SP.Principal;
         get_principalId(): number;
         get_roleDefinitionBindings(): SP.RoleDefinitionBindingCollection;
@@ -4368,7 +4363,7 @@ declare namespace SP {
         update(): void;
         deleteObject(): void;
     }
-    export class RoleAssignmentCollection extends SP.ClientObjectCollection<RoleAssignment> {
+    interface RoleAssignmentCollection extends SP.ClientObjectCollection<RoleAssignment> {
         itemAt(index: number): SP.RoleAssignment;
         get_item(index: number): SP.RoleAssignment;
         get_groups(): SP.GroupCollection;
@@ -4376,7 +4371,7 @@ declare namespace SP {
         getByPrincipalId(principalId: number): SP.RoleAssignment;
         add(principal: SP.Principal, roleBindings: SP.RoleDefinitionBindingCollection): SP.RoleAssignment;
     }
-    export class RoleDefinition extends SP.ClientObject {
+    class RoleDefinition extends SP.ClientObject {
         get_basePermissions(): SP.BasePermissions;
         set_basePermissions(value: SP.BasePermissions): void;
         get_description(): string;
@@ -4391,16 +4386,16 @@ declare namespace SP {
         update(): void;
         deleteObject(): void;
     }
-    export class RoleDefinitionBindingCollection extends SP.ClientObjectCollection<RoleDefinition> {
+    class RoleDefinitionBindingCollection extends SP.ClientObjectCollection<RoleDefinition> {
+        constructor(context: SP.ClientRuntimeContext);
         itemAt(index: number): SP.RoleDefinition;
         get_item(index: number): SP.RoleDefinition;
-        constructor(context: SP.ClientRuntimeContext);
-        static newObject(context: SP.ClientRuntimeContext): SP.RoleDefinitionBindingCollection;
         add(roleDefinition: SP.RoleDefinition): void;
         remove(roleDefinition: SP.RoleDefinition): void;
         removeAll(): void;
+        static newObject(context: SP.ClientRuntimeContext): SP.RoleDefinitionBindingCollection;
     }
-    export class RoleDefinitionCollection extends SP.ClientObjectCollection<RoleDefinition> {
+    interface RoleDefinitionCollection extends SP.ClientObjectCollection<RoleDefinition> {
         itemAt(index: number): SP.RoleDefinition;
         get_item(index: number): SP.RoleDefinition;
         getByName(name: string): SP.RoleDefinition;
@@ -4408,7 +4403,7 @@ declare namespace SP {
         getById(id: number): SP.RoleDefinition;
         getByType(roleType: SP.RoleType): SP.RoleDefinition;
     }
-    export class RoleDefinitionCreationInformation extends SP.ClientValueObject {
+    class RoleDefinitionCreationInformation extends SP.ClientValueObject {
         get_basePermissions(): SP.BasePermissions;
         set_basePermissions(value: SP.BasePermissions): void;
         get_description(): string;
@@ -4421,7 +4416,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum RoleType {
+    enum RoleType {
         none,
         guest,
         reader,
@@ -4430,11 +4425,11 @@ declare namespace SP {
         administrator,
         editor,
     }
-    export class ServerSettings {
+    class ServerSettings {
         static getAlternateUrls(context: SP.ClientRuntimeContext): SP.ClientObjectList<SP.AlternateUrl>;
         static getGlobalInstalledLanguages(context: SP.ClientRuntimeContext, compatibilityLevel: number): SP.Language[];
     }
-    export class Site extends SP.ClientObject {
+    class Site extends SP.ClientObject {
         get_allowDesigner(): boolean;
         set_allowDesigner(value: boolean): void;
         get_allowMasterPageEditing(): boolean;
@@ -4484,9 +4479,9 @@ declare namespace SP {
         extendUpgradeReminderDate(): void;
         invalidate(): void;
     }
-    export class SiteUrl extends SP.ClientObject {
+    class SiteUrl extends SP.ClientObject {
     }
-    export class SubwebQuery extends SP.ClientValueObject {
+    class SubwebQuery extends SP.ClientValueObject {
         get_configurationFilter(): number;
         set_configurationFilter(value: number): void;
         get_webTemplateFilter(): number;
@@ -4495,30 +4490,30 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum TemplateFileType {
+    enum TemplateFileType {
         standardPage,
         wikiPage,
         formPage,
     }
-    export class ThemeInfo extends SP.ClientObject {
+    class ThemeInfo extends SP.ClientObject {
         get_accessibleDescription(): string;
         get_themeBackgroundImageUri(): string;
         getThemeShadeByName(name: string): SP.StringResult;
         getThemeFontByName(name: string, lcid: number): SP.StringResult;
     }
-    export class TimeZone extends SP.ClientObject {
+    class TimeZone extends SP.ClientObject {
         get_description(): string;
         get_id(): number;
         get_information(): SP.TimeZoneInformation;
         localTimeToUTC(date: Date): SP.DateTimeResult;
         utcToLocalTime(date: Date): SP.DateTimeResult;
     }
-    export class TimeZoneCollection extends SP.ClientObjectCollection<TimeZone> {
+    interface TimeZoneCollection extends SP.ClientObjectCollection<TimeZone> {
         itemAt(index: number): SP.TimeZone;
         get_item(index: number): SP.TimeZone;
         getById(id: number): SP.TimeZone;
     }
-    export class TimeZoneInformation extends SP.ClientValueObject {
+    class TimeZoneInformation extends SP.ClientValueObject {
         get_bias(): number;
         get_daylightBias(): number;
         get_standardBias(): number;
@@ -4526,7 +4521,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class UpgradeInfo extends SP.ClientValueObject {
+    class UpgradeInfo extends SP.ClientValueObject {
         get_errorFile(): string;
         get_errors(): number;
         get_lastUpdated(): Date;
@@ -4541,28 +4536,28 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export enum UpgradeStatus {
+    enum UpgradeStatus {
         none,
         inProgress,
         failed,
         completed,
     }
-    export enum UpgradeType {
+    enum UpgradeType {
         buildUpgrade,
         versionUpgrade,
     }
-    export enum UrlFieldFormatType {
+    enum UrlFieldFormatType {
         hyperlink,
         image,
     }
-    export enum UrlZone {
+    enum UrlZone {
         defaultZone,
         intranet,
         internet,
         custom,
         extranet,
     }
-    export class UsageInfo extends SP.ClientValueObject {
+    class UsageInfo extends SP.ClientValueObject {
         get_bandwidth(): number;
         get_discussionStorage(): number;
         get_hits(): number;
@@ -4573,7 +4568,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class User extends SP.Principal {
+    class User extends SP.Principal {
         get_email(): string;
         set_email(value: string): void;
         get_groups(): SP.GroupCollection;
@@ -4582,7 +4577,7 @@ declare namespace SP {
         get_userId(): SP.UserIdInfo;
         update(): void;
     }
-    export class UserCollection extends SP.ClientObjectCollection<User> {
+    interface UserCollection extends SP.ClientObjectCollection<User> {
         itemAt(index: number): SP.User;
         get_item(index: number): SP.User;
         getByLoginName(loginName: string): SP.User;
@@ -4594,7 +4589,7 @@ declare namespace SP {
         add(parameters: SP.UserCreationInformation): SP.User;
         addUser(user: SP.User): SP.User;
     }
-    export class UserCreationInformation extends SP.ClientValueObject {
+    class UserCreationInformation extends SP.ClientValueObject {
         get_email(): string;
         set_email(value: string): void;
         get_loginName(): string;
@@ -4605,7 +4600,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class UserCustomAction extends SP.ClientObject {
+    class UserCustomAction extends SP.ClientObject {
         get_commandUIExtension(): string;
         set_commandUIExtension(value: string): void;
         get_description(): string;
@@ -4640,34 +4635,34 @@ declare namespace SP {
         update(): void;
         deleteObject(): void;
     }
-    export class UserCustomActionCollection extends SP.ClientObjectCollection<UserCustomAction> {
+    interface UserCustomActionCollection extends SP.ClientObjectCollection<UserCustomAction> {
         itemAt(index: number): SP.UserCustomAction;
         get_item(index: number): SP.UserCustomAction;
         getById(id: SP.Guid): SP.UserCustomAction;
         clear(): void;
         add(): SP.UserCustomAction;
     }
-    export enum UserCustomActionRegistrationType {
+    enum UserCustomActionRegistrationType {
         none,
         list,
         contentType,
         progId,
         fileType,
     }
-    export enum UserCustomActionScope {
+    enum UserCustomActionScope {
         unknown,
         site,
         web,
         list,
     }
-    export class UserIdInfo extends SP.ClientValueObject {
+    class UserIdInfo extends SP.ClientValueObject {
         get_nameId(): string;
         get_nameIdIssuer(): string;
         get_typeId(): string;
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class View extends SP.ClientObject {
+    class View extends SP.ClientObject {
         get_aggregations(): string;
         set_aggregations(value: string): void;
         get_aggregationsStatus(): string;
@@ -4733,14 +4728,14 @@ declare namespace SP {
         renderAsHtml(): SP.StringResult;
         update(): void;
     }
-    export class ViewCollection extends SP.ClientObjectCollection<View> {
+    interface ViewCollection extends SP.ClientObjectCollection<View> {
         itemAt(index: number): SP.View;
         get_item(index: number): SP.View;
         getByTitle(strTitle: string): SP.View;
         getById(guidId: SP.Guid): SP.View;
         add(parameters: SP.ViewCreationInformation): SP.View;
     }
-    export class ViewCreationInformation extends SP.ClientValueObject {
+    class ViewCreationInformation extends SP.ClientValueObject {
         get_paged(): boolean;
         set_paged(value: boolean): void;
         get_personalView(): boolean;
@@ -4761,7 +4756,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class ViewFieldCollection extends SP.ClientObjectCollection<string> {
+    interface ViewFieldCollection extends SP.ClientObjectCollection<string> {
         itemAt(index: number): string;
         get_item(index: number): string;
         get_schemaXml(): string;
@@ -4770,13 +4765,13 @@ declare namespace SP {
         remove(strField: string): void;
         removeAll(): void;
     }
-    export enum ViewScope {
+    enum ViewScope {
         defaultValue,
         recursive,
         recursiveAll,
         filesOnly,
     }
-    export enum ViewType {
+    enum ViewType {
         none,
         html,
         grid,
@@ -4785,7 +4780,7 @@ declare namespace SP {
         chart,
         gantt,
     }
-    export class Web extends SP.SecurableObject {
+    class Web extends SP.SecurableObject {
         get_allowDesignerForCurrentUser(): boolean;
         get_allowMasterPageEditingForCurrentUser(): boolean;
         get_allowRevertFromTemplateForCurrentUser(): boolean;
@@ -4838,6 +4833,7 @@ declare namespace SP {
         get_serverRelativeUrl(): string;
         set_serverRelativeUrl(value: string): void;
         get_showUrlStructureForCurrentUser(): boolean;
+        get_siteLogoUrl(): string;
         get_siteGroups(): SP.GroupCollection;
         get_siteUserInfoList(): SP.List;
         get_siteUsers(): SP.UserCollection;
@@ -4892,12 +4888,12 @@ declare namespace SP {
         /** Available after March 2015 CU for SharePoint 2013*/
         getList(url: string): List;
     }
-    export class WebCollection extends SP.ClientObjectCollection<Web> {
+    interface WebCollection extends SP.ClientObjectCollection<Web> {
         itemAt(index: number): SP.Web;
         get_item(index: number): SP.Web;
         add(parameters: SP.WebCreationInformation): SP.Web;
     }
-    export class WebCreationInformation extends SP.ClientValueObject {
+    class WebCreationInformation extends SP.ClientValueObject {
         get_description(): string;
         set_description(value: string): void;
         get_language(): number;
@@ -4914,7 +4910,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class WebInformation extends SP.ClientObject {
+    class WebInformation extends SP.ClientObject {
         get_configuration(): number;
         get_created(): Date;
         get_description(): string;
@@ -4926,10 +4922,10 @@ declare namespace SP {
         get_webTemplate(): string;
         get_webTemplateId(): number;
     }
-    export class WebProxy {
+    class WebProxy {
         static invoke(context: SP.ClientRuntimeContext, requestInfo: SP.WebRequestInfo): SP.WebResponseInfo;
     }
-    export class WebRequestInfo extends SP.ClientValueObject {
+    class WebRequestInfo extends SP.ClientValueObject {
         get_body(): string;
         set_body(value: string): void;
         get_headers(): any;
@@ -4942,7 +4938,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class WebResponseInfo extends SP.ClientValueObject {
+    class WebResponseInfo extends SP.ClientValueObject {
         get_body(): string;
         set_body(value: string): void;
         get_headers(): any;
@@ -4953,7 +4949,7 @@ declare namespace SP {
         writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
         constructor();
     }
-    export class WebTemplate extends SP.ClientObject {
+    class WebTemplate extends SP.ClientObject {
         get_description(): string;
         get_displayCategory(): string;
         get_id(): number;
@@ -4965,34 +4961,34 @@ declare namespace SP {
         get_name(): string;
         get_title(): string;
     }
-    export class WebTemplateCollection extends SP.ClientObjectCollection<WebTemplate> {
+    interface WebTemplateCollection extends SP.ClientObjectCollection<WebTemplate> {
         itemAt(index: number): SP.WebTemplate;
         get_item(index: number): SP.WebTemplate;
         getByName(name: string): SP.WebTemplate;
     }
 
-    export module Application {
-        export module UI {
-            export interface DefaultFormsInformationRequestor {
+    namespace Application {
+        namespace UI {
+            interface DefaultFormsInformationRequestor {
                 onDefaultFormsInformationRetrieveSuccess(defaultForms: SP.Application.UI.DefaultFormsInformation): void;
                 onDefaultFormsInformationRetrieveFailure(): void;
             }
-            export class FormsInfo {
+            class FormsInfo {
                 ContentTypeName: string;
                 NewFormUrl: string;
                 DisplayFormUrl: string;
                 EditFormUrl: string;
                 constructor();
             }
-            export class DefaultFormsInformation {
+            class DefaultFormsInformation {
                 DefaultForms: SP.Application.UI.FormsInfo;
                 OtherForms: any;
                 constructor();
             }
-            export class DefaultFormsMenuBuilder {
+            class DefaultFormsMenuBuilder {
                 static getDefaultFormsInformation(requestor: SP.Application.UI.DefaultFormsInformationRequestor, listId: SP.Guid): void;
             }
-            export class ViewSelectorMenuOptions {
+            class ViewSelectorMenuOptions {
                 showRepairView: boolean;
                 showMergeView: boolean;
                 showEditView: boolean;
@@ -5003,10 +4999,10 @@ declare namespace SP {
                 viewParameters: string;
                 constructor();
             }
-            export interface ViewInformationRequestor {
+            interface ViewInformationRequestor {
                 onViewInformationReturned(viewGroups: SP.Application.UI.ViewSelectorGroups): void;
             }
-            export class ViewSelectorGroups {
+            class ViewSelectorGroups {
                 ModeratedViews: any;
                 PublicViews: any;
                 PersonalViews: any;
@@ -5015,7 +5011,7 @@ declare namespace SP {
                 ViewCreation: any;
                 constructor();
             }
-            export class ViewSelectorMenuItem {
+            class ViewSelectorMenuItem {
                 Text: string;
                 ActionScriptText: string;
                 NavigateUrl: string;
@@ -5027,33 +5023,33 @@ declare namespace SP {
                 GroupId: number;
                 constructor();
             }
-            export class ViewSelectorSubMenu {
+            class ViewSelectorSubMenu {
                 Text: string;
                 ImageSourceUrl: string;
                 SubMenuItems: any;
                 constructor();
             }
-            export class ViewSelectorMenuBuilder {
+            class ViewSelectorMenuBuilder {
                 static get_filterMenuItemsCallback(): (menuItems: any) => any;
                 static set_filterMenuItemsCallback(value: (menuItems: any) => any): void;
                 static showMenu(elem: HTMLElement, options: SP.Application.UI.ViewSelectorMenuOptions): void;
                 static getViewInformation(requestor: SP.Application.UI.ViewInformationRequestor, options: SP.Application.UI.ViewSelectorMenuOptions): void;
             }
-            export class MoreColorsPicker extends Sys.UI.Control {
+            class MoreColorsPicker extends Sys.UI.Control {
                 constructor(e: HTMLElement);
                 initialize(): void;
                 dispose(): void;
                 get_colorValue(): string;
                 set_colorValue(value: string): void;
             }
-            export class MoreColorsPage extends Sys.UI.Control {
+            class MoreColorsPage extends Sys.UI.Control {
                 constructor(e: HTMLElement);
                 initialize(): void;
                 dispose(): void;
                 get_moreColorsPicker(): SP.Application.UI.MoreColorsPicker;
                 set_moreColorsPicker(value: SP.Application.UI.MoreColorsPicker): void;
             }
-            export class ThemeWebPage extends Sys.UI.Control {
+            class ThemeWebPage extends Sys.UI.Control {
                 add_themeDisplayUpdated(value: (sender: any, e: Sys.EventArgs) => void): void;
                 remove_themeDisplayUpdated(value: (sender: any, e: Sys.EventArgs) => void): void;
                 constructor(e: HTMLElement);
@@ -5064,7 +5060,7 @@ declare namespace SP {
                 get_thmxThemes(): any;
                 set_thmxThemes(value: any): void;
             }
-            export class WikiPageNameInPlaceEditor {
+            class WikiPageNameInPlaceEditor {
                 constructor(ownerDoc: any, displayElemId: string, editElemId: string, editTextBoxId: string);
                 editingPageCallback(): void;
                 savingPageCallback(): void;
@@ -5072,15 +5068,14 @@ declare namespace SP {
         }
     }
 
-
-    export module Analytics {
-        export class AnalyticsUsageEntry extends SP.ClientObject {
+    namespace Analytics {
+        class AnalyticsUsageEntry extends SP.ClientObject {
             static logAnalyticsEvent(context: SP.ClientRuntimeContext, eventTypeId: number, itemId: string): void;
             static logAnalyticsEvent2(context: SP.ClientRuntimeContext, eventTypeId: number, itemId: string, rollupScopeId: SP.Guid, siteId: SP.Guid, userId: string): void;
             static logAnalyticsAppEvent(context: SP.ClientRuntimeContext, appEventTypeId: SP.Guid, itemId: string): void;
             static logAnalyticsAppEvent2(context: SP.ClientRuntimeContext, appEventTypeId: SP.Guid, itemId: string, rollupScopeId: SP.Guid, siteId: SP.Guid, userId: string): void;
         }
-        export enum EventTypeId {
+        enum EventTypeId {
             none,
             first,
             view,
@@ -5090,8 +5085,8 @@ declare namespace SP {
         }
     }
 
-    export module SiteHealth {
-        export class SiteHealthResult extends SP.ClientValueObject {
+    namespace SiteHealth {
+        class SiteHealthResult extends SP.ClientValueObject {
             get_messageAsText(): string;
             get_ruleHelpLink(): string;
             get_ruleId(): SP.Guid;
@@ -5105,29 +5100,24 @@ declare namespace SP {
             writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
             constructor();
         }
-        export enum SiteHealthStatusType {
+        enum SiteHealthStatusType {
             passed,
             failedWarning,
             failedError,
         }
-        export class SiteHealthSummary extends SP.ClientObject {
+        class SiteHealthSummary extends SP.ClientObject {
             get_failedErrorCount(): number;
             get_failedWarningCount(): number;
             get_passedCount(): number;
             get_results(): SP.SiteHealth.SiteHealthResult[];
         }
     }
-
 }
-
-
-
 
 declare namespace Microsoft.SharePoint.Client.Search {
     namespace Query {
-
         /**Contains information common to all types of search queries.*/
-        export class Query extends SP.ClientObject {
+        class Query extends SP.ClientObject {
             get_blockDedupeMode: () => number;
             set_blockDedupeMode: (value: number) => void;
 
@@ -5234,24 +5224,20 @@ declare namespace Microsoft.SharePoint.Client.Search {
             get_trimDuplicates: () => boolean;
             set_trimDuplicates: (value: boolean) => void;
 
-
             get_uiLanguage: () => number;
             set_uiLanguage: (value: number) => void;
 
-
-
-            getQuerySuggestionsWithResults: (iNumberOfQuerySuggestions: number,
+            getQuerySuggestionsWithResults: (
+                iNumberOfQuerySuggestions: number,
                 iNumberOfResultSuggestions: number,
                 fPreQuerySuggestions: boolean,
                 fHitHighlighting: boolean,
                 fCapitalizeFirstLetters: boolean,
                 fPrefixMatchAllTerms: boolean) => QuerySuggestionResults;
-
-
         }
 
         /**Contains information about a keyword based search query.*/
-        export class KeywordQuery extends Query {
+        class KeywordQuery extends Query {
             constructor(context: SP.ClientContext);
 
             get_collapseSpecification: () => string;
@@ -5284,7 +5270,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
         }
 
         /**Executes queries against a search server.*/
-        export class SearchExecutor extends SP.ClientObject {
+        class SearchExecutor extends SP.ClientObject {
             constructor(context: SP.ClientContext);
 
             /**Runs a query.*/
@@ -5303,21 +5289,20 @@ declare namespace Microsoft.SharePoint.Client.Search {
             exportPopularQueries: (web: SP.Web, sourceId: SP.Guid) => SP.JsonObjectResult;
         }
 
-
-        export class StringCollection extends SP.ClientObjectCollection<string> {
+        class StringCollection extends SP.ClientObjectCollection<string> {
             constructor(context: SP.ClientContext);
-            itemAt: (index: number) => string;
-            get_item: (index: number) => string;
-            get_childItemType: () => Object;
-            add: (property: string) => void;
-            clear: () => void;
+            itemAt(index: number): string;
+            get_item(index: number): string;
+            get_childItemType(): typeof String;
+            add(property: string): void;
+            clear(): void;
         }
 
-        export class QueryPersonalizationData extends SP.ClientObject {
-            //It's really empty;
+        class QueryPersonalizationData extends SP.ClientObject {
+            // It's really empty;
         }
 
-        export class QuerySuggestionResults extends SP.ClientValueObject {
+        class QuerySuggestionResults extends SP.ClientValueObject {
             get_peopleNames: () => string[];
             set_peopleNames: (value: string[]) => void;
 
@@ -5328,7 +5313,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             set_queries: (value: QuerySuggestionQuery[]) => void;
         }
 
-        export class PersonalResultSuggestion extends SP.ClientValueObject {
+        class PersonalResultSuggestion extends SP.ClientValueObject {
             get_highlightedTitle: () => string;
             set_highlightedTitle: (value: string) => void;
 
@@ -5342,7 +5327,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             set_url: (value: string) => void;
         }
 
-        export class QuerySuggestionQuery extends SP.ClientValueObject {
+        class QuerySuggestionQuery extends SP.ClientValueObject {
             get_isPersonal: () => boolean;
             set_isPersonal: (value: boolean) => void;
 
@@ -5350,14 +5335,14 @@ declare namespace Microsoft.SharePoint.Client.Search {
             set_query: (value: string) => void;
         }
 
-        export class KeywordQueryProperties extends SP.ClientObject {
+        class KeywordQueryProperties extends SP.ClientObject {
             get_item: (key: string) => any;
             set_item: (key: string, value: any) => void;
             setQueryPropertyValue: (name: string) => QueryPropertyValue;
             getQueryPropertyValue: (name: string, value: QueryPropertyValue) => void;
         }
 
-        export enum QueryPropertyValueType {
+        enum QueryPropertyValueType {
             none,
             stringType,
             int32TYpe,
@@ -5366,7 +5351,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             unSupportedType
         }
 
-        export class QueryPropertyValue extends SP.ClientValueObject {
+        class QueryPropertyValue extends SP.ClientValueObject {
             get_boolVal: () => boolean;
             set_boolVal: (value: boolean) => boolean;
 
@@ -5380,20 +5365,20 @@ declare namespace Microsoft.SharePoint.Client.Search {
             set_strVal: (value: string) => string;
         }
 
-        export class QueryUtility {
+        class QueryUtility {
             static create: (name: string, val: any) => QueryPropertyValue;
             static getQueryPropertyValueType: (val: QueryPropertyValue) => QueryPropertyValueType;
             static queryPropertyValueToObject: (val: QueryPropertyValue) => any;
         }
-        export class ReorderingRuleCollection extends SP.ClientObjectCollection<ReorderingRule> {
-            itemAt: (index: number) => ReorderingRule;
-            get_item: (index: number) => ReorderingRule;
-            get_childItemType: () => Object;
-            add: (property: ReorderingRule) => void;
-            clear: () => void;
+        interface ReorderingRuleCollection extends SP.ClientObjectCollection<ReorderingRule> {
+            itemAt(index: number): ReorderingRule;
+            get_item(index: number): ReorderingRule;
+            get_childItemType(): typeof ReorderingRule;
+            add(property: ReorderingRule): void;
+            clear(): void;
         }
 
-        export enum ReorderingRuleMatchType {
+        enum ReorderingRuleMatchType {
             resultContainsKeyword,
             titleContainsKeyword,
             titleMatchesKeyword,
@@ -5405,7 +5390,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             manualCondition
         }
 
-        export class ReorderingRule extends SP.ClientValueObject {
+        class ReorderingRule extends SP.ClientValueObject {
             get_boost: () => number;
             set_boost: (value: number) => void;
 
@@ -5416,12 +5401,12 @@ declare namespace Microsoft.SharePoint.Client.Search {
             set_matchValue: (value: string) => void;
         }
 
-        export class SortCollection extends SP.ClientObjectCollection<Sort> {
-            itemAt: (index: number) => Sort;
-            get_item: (index: number) => Sort;
-            get_childItemType: () => Object;
-            add: (strProperty: string, sortDirection: SortDirection) => void;
-            clear: () => void;
+        interface SortCollection extends SP.ClientObjectCollection<Sort> {
+            itemAt(index: number): Sort;
+            get_item(index: number): Sort;
+            get_childItemType(): typeof Sort;
+            add(strProperty: string, sortDirection: SortDirection): void;
+            clear(): void;
         }
 
         enum SortDirection {
@@ -5429,7 +5414,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             descending,
             fqlFormula
         }
-        export class Sort extends SP.ClientValueObject {
+        class Sort extends SP.ClientValueObject {
             get_direction: () => SortDirection;
             set_direction: (value: SortDirection) => void;
 
@@ -5437,8 +5422,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             set_property: (value: string) => void;
         }
 
-
-        export class ResultTableCollection extends SP.ClientValueObjectCollection<ResultTable> {
+        class ResultTableCollection extends SP.ClientValueObjectCollection<ResultTable> {
             get_item: (index: number) => ResultTable;
 
             get_elapsedTime: () => number;
@@ -5455,10 +5439,9 @@ declare namespace Microsoft.SharePoint.Client.Search {
             get_triggeredRules: () => SP.Guid[];
 
             initPropertiesFromJson: (parentNode: any) => void;
-
         }
 
-        export class ResultTable extends SP.ClientValueObject {
+        class ResultTable extends SP.ClientValueObject {
             get_groupTemplateId: () => string;
 
             get_itemTemplateId: () => string;
@@ -5469,7 +5452,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
 
             get_queryRuleId: () => string;
 
-            get_resultRows: () => { [key: string]: any; }[];
+            get_resultRows: () => Array<{ [key: string]: any; }>;
 
             get_resultTitle: () => string;
 
@@ -5486,14 +5469,14 @@ declare namespace Microsoft.SharePoint.Client.Search {
             initPropertiesFromJson: (parentNode: any) => void;
         }
 
-        export class RankingLabeling extends SP.ClientObject {
+        class RankingLabeling extends SP.ClientObject {
             constructor(context: SP.ClientContext);
             getJudgementsForQuery: (query: string) => SP.JsonObjectResult;
             addJudgment: (userQuery: string, url: string, labelId: number) => void;
             normalizeResultUrl: (url: string) => SP.JsonObjectResult;
         }
 
-        export class PopularQuery extends SP.ClientValueObject {
+        class PopularQuery extends SP.ClientValueObject {
             get_clickCount: () => number;
             set_clickCount: (value: number) => void;
 
@@ -5507,7 +5490,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             set_queryText: (value: string) => void;
         }
 
-        export class QueryPropertyNames {
+        class QueryPropertyNames {
             static blockDedupeMode: string; // 'BlockDedupeMode';
             static bypassResultTypes: string; // 'BypassResultTypes';
             static clientType: string; // 'ClientType';
@@ -5545,12 +5528,12 @@ declare namespace Microsoft.SharePoint.Client.Search {
             static uiLanguage: string; // 'UILanguage';
         }
 
-        export class QueryObjectPropertyNames {
+        class QueryObjectPropertyNames {
             static hitHighlightedProperties: string; // = 'HitHighlightedProperties';
             static personalizationData: string; // = 'PersonalizationData';
         }
 
-        export class KeywordQueryPropertyNames {
+        class KeywordQueryPropertyNames {
             static collapseSpecification: string; // 'CollapseSpecification';
             static enableSorting: string; // 'EnableSorting';
             static hiddenConstraints: string; // 'HiddenConstraints';
@@ -5558,7 +5541,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             static trimDuplicatesIncludeId: string; // 'TrimDuplicatesIncludeId';
         }
 
-        export class KeywordQueryObjectPropertyNames {
+        class KeywordQueryObjectPropertyNames {
             static properties: string; // 'Properties';
             static refinementFilters: string; // 'RefinementFilters';
             static reorderingRules: string; // 'ReorderingRules';
@@ -5568,7 +5551,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
     }
 
     namespace WebControls {
-        export class ControlMessage extends SP.ClientValueObject {
+        class ControlMessage extends SP.ClientValueObject {
             get_code: () => number;
 
             get_correlationID: () => string;
@@ -5594,7 +5577,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
             get_type: () => string;
         }
 
-        export enum MessageLevel {
+        enum MessageLevel {
             information,
             warning,
             error
@@ -5602,9 +5585,10 @@ declare namespace Microsoft.SharePoint.Client.Search {
     }
 
     namespace Administration {
-        export class DocumentCrawlLog extends SP.ClientObject {
+        class DocumentCrawlLog extends SP.ClientObject {
             constructor(context: SP.ClientContext, site: SP.Site);
-            getCrawledUrls: (getCountOnly: boolean,
+            getCrawledUrls: (
+                getCountOnly: boolean,
                 maxRows: { High: number; Low: number; },
                 queryString: string,
                 isLike: boolean,
@@ -5615,11 +5599,11 @@ declare namespace Microsoft.SharePoint.Client.Search {
                 endDateTime: Date) => SP.JsonObjectResult;
         }
 
-        export class SearchObjectOwner extends SP.ClientObject {
+        class SearchObjectOwner extends SP.ClientObject {
             constructor(context: SP.ClientContext, lowestCurrentLevelToUse: SearchObjectLevel);
         }
 
-        export enum SearchObjectLevel {
+        enum SearchObjectLevel {
             spWeb,
             spSite,
             spSiteSubscription,
@@ -5628,7 +5612,7 @@ declare namespace Microsoft.SharePoint.Client.Search {
     }
 
     namespace Portability {
-        export class SearchConfigurationPortability extends SP.ClientObject {
+        class SearchConfigurationPortability extends SP.ClientObject {
             constructor(context: SP.ClientContext);
             get_importWarnings: () => string;
 
@@ -5639,14 +5623,14 @@ declare namespace Microsoft.SharePoint.Client.Search {
             deleteSearchConfiguration: (owningScope: Administration.SearchObjectOwner, searchConfiguration: string) => void;
         }
 
-        export class SearchConfigurationPortabilityPropertyNames {
-            static importWarnings: string;// = 'ImportWarnings'
+        class SearchConfigurationPortabilityPropertyNames {
+            static importWarnings: string; // = 'ImportWarnings'
         }
     }
 
     /**Located in sp.search.apps.js*/
     namespace Analytics {
-        export class AnalyticsItemData extends SP.ClientObject {
+        class AnalyticsItemData extends SP.ClientObject {
             get_lastProcessingTime: () => Date;
 
             get_totalHits: () => number;
@@ -5662,24 +5646,21 @@ declare namespace Microsoft.SharePoint.Client.Search {
             getUniqueUsersCountForMonth: (day: Date) => number;
         }
 
-        export class UsageAnalytics extends SP.ClientObject {
-            getAnalyticsItemData: (eventType: number, listItem: SP.ListItem) => AnalyticsItemData;
+        class UsageAnalytics extends SP.ClientObject {
+            getAnalyticsItemData: <T = any>(eventType: number, listItem: SP.ListItem<T>) => AnalyticsItemData;
 
-            getAnalyticsItemDataForApplicationEventType: (appEventType: SP.Guid, listItem: SP.ListItem) => AnalyticsItemData;
+            getAnalyticsItemDataForApplicationEventType: <T = any>(appEventType: SP.Guid, listItem: SP.ListItem<T>) => AnalyticsItemData;
 
             deleteStandardEventUsageData: (eventType: number) => void;
 
             deleteCustomEventUsageData: (appEventTypeId: SP.Guid) => void;
         }
-
-
-
     }
 }
 
 declare namespace SP {
-    export module BusinessData {
-        export class AppBdcCatalog extends SP.ClientObject {
+    namespace BusinessData {
+        class AppBdcCatalog extends SP.ClientObject {
             getEntity(namespace: string, name: string): SP.BusinessData.Entity;
             getLobSystemProperty(lobSystemName: string, propertyName: string): SP.StringResult;
             setLobSystemProperty(lobSystemName: string, propertyName: string, propertyValue: string): void;
@@ -5689,7 +5670,7 @@ declare namespace SP {
             setConnectionId(lobSystemName: string, lobSystemInstanceName: string, connectionId: string): void;
             getPermissibleConnections(): string[];
         }
-        export class Entity extends SP.ClientObject {
+        class Entity extends SP.ClientObject {
             get_estimatedInstanceCount(): number;
             get_name(): string;
             get_namespace(): string;
@@ -5714,20 +5695,20 @@ declare namespace SP {
             subscribe(eventType: SP.BusinessData.Runtime.EntityEventType, notificationCallback: SP.BusinessData.Runtime.NotificationCallback, onBehalfOfUser: string, subscriberName: string, lobSystemInstance: SP.BusinessData.LobSystemInstance): SP.BusinessData.Runtime.Subscription;
             unsubscribe(subscription: SP.BusinessData.Runtime.Subscription, onBehalfOfUser: string, unsubscriberName: string, lobSystemInstance: SP.BusinessData.LobSystemInstance): void;
         }
-        export class EntityField extends SP.ClientObject {
+        class EntityField extends SP.ClientObject {
             get_containsLocalizedDisplayName(): boolean;
             get_defaultDisplayName(): string;
             get_localizedDisplayName(): string;
             get_name(): string;
         }
-        export class EntityIdentifier extends SP.ClientObject {
+        class EntityIdentifier extends SP.ClientObject {
             get_identifierType(): string;
             get_name(): string;
             getDefaultDisplayName(): SP.StringResult;
             containsLocalizedDisplayName(): SP.BooleanResult;
             getLocalizedDisplayName(): SP.StringResult;
         }
-        export class EntityView extends SP.ClientObject {
+        class EntityView extends SP.ClientObject {
             get_fields(): SP.BusinessData.Collections.EntityFieldCollection;
             get_name(): string;
             get_relatedSpecificFinderName(): string;
@@ -5736,7 +5717,7 @@ declare namespace SP {
             getTypeDescriptor(fieldDotNotation: string): SP.BusinessData.TypeDescriptor;
             getType(fieldDotNotation: string): SP.StringResult;
         }
-        export class Filter extends SP.ClientObject {
+        class Filter extends SP.ClientObject {
             get_defaultDisplayName(): string;
             get_filterField(): string;
             get_filterType(): string;
@@ -5744,21 +5725,21 @@ declare namespace SP {
             get_name(): string;
             get_valueCount(): number;
         }
-        export class LobSystem extends SP.ClientObject {
+        class LobSystem extends SP.ClientObject {
             get_name(): string;
             getLobSystemInstances(): SP.BusinessData.Collections.LobSystemInstanceCollection;
         }
-        export class LobSystemInstance extends SP.ClientObject {
+        class LobSystemInstance extends SP.ClientObject {
             get_name(): string;
         }
-        export class MethodExecutionResult extends SP.ClientObject {
+        class MethodExecutionResult extends SP.ClientObject {
             get_returnParameterCollection(): SP.BusinessData.ReturnParameterCollection;
         }
-        export class ReturnParameterCollection extends SP.ClientObjectCollection<SP.BusinessData.Runtime.EntityFieldValueDictionary> {
+        interface ReturnParameterCollection extends SP.ClientObjectCollection<SP.BusinessData.Runtime.EntityFieldValueDictionary> {
             itemAt(index: number): SP.BusinessData.Runtime.EntityFieldValueDictionary;
             get_item(index: number): SP.BusinessData.Runtime.EntityFieldValueDictionary;
         }
-        export class TypeDescriptor extends SP.ClientObject {
+        class TypeDescriptor extends SP.ClientObject {
             get_containsReadOnly(): boolean;
             get_isCollection(): boolean;
             get_isReadOnly(): boolean;
@@ -5772,50 +5753,50 @@ declare namespace SP {
             getChildTypeDescriptors(): SP.BusinessData.Collections.TypeDescriptorCollection;
             getParentTypeDescriptor(): SP.BusinessData.TypeDescriptor;
         }
-        export module Collections {
-            export class EntityFieldCollection extends SP.ClientObjectCollection<SP.BusinessData.EntityField> {
+        namespace Collections {
+            interface EntityFieldCollection extends SP.ClientObjectCollection<SP.BusinessData.EntityField> {
                 itemAt(index: number): SP.BusinessData.EntityField;
                 get_item(index: number): SP.BusinessData.EntityField;
             }
-            export class EntityIdentifierCollection extends SP.ClientObjectCollection<SP.BusinessData.EntityIdentifier> {
+            interface EntityIdentifierCollection extends SP.ClientObjectCollection<SP.BusinessData.EntityIdentifier> {
                 itemAt(index: number): SP.BusinessData.EntityIdentifier;
                 get_item(index: number): SP.BusinessData.EntityIdentifier;
             }
-            export class EntityInstanceCollection extends SP.ClientObjectCollection<SP.BusinessData.Runtime.EntityInstance> {
+            interface EntityInstanceCollection extends SP.ClientObjectCollection<SP.BusinessData.Runtime.EntityInstance> {
                 itemAt(index: number): SP.BusinessData.Runtime.EntityInstance;
                 get_item(index: number): SP.BusinessData.Runtime.EntityInstance;
             }
-            export class FilterCollection extends SP.ClientObjectCollection<SP.BusinessData.Filter> {
+            interface FilterCollection extends SP.ClientObjectCollection<SP.BusinessData.Filter> {
                 itemAt(index: number): SP.BusinessData.Filter;
                 get_item(index: number): SP.BusinessData.Filter;
                 setFilterValue(inputFilterName: string, valueIndex: number, value: any): void;
             }
-            export class LobSystemInstanceCollection extends SP.ClientObjectCollection<SP.BusinessData.LobSystemInstance> {
+            interface LobSystemInstanceCollection extends SP.ClientObjectCollection<SP.BusinessData.LobSystemInstance> {
                 itemAt(index: number): SP.BusinessData.LobSystemInstance;
                 get_item(index: number): SP.BusinessData.LobSystemInstance;
             }
-            export class TypeDescriptorCollection extends SP.ClientObjectCollection<SP.BusinessData.TypeDescriptor> {
+            interface TypeDescriptorCollection extends SP.ClientObjectCollection<SP.BusinessData.TypeDescriptor> {
                 itemAt(index: number): SP.BusinessData.TypeDescriptor;
                 get_item(index: number): SP.BusinessData.TypeDescriptor;
             }
         }
 
-        export module Infrastructure {
-            export class ExternalSubscriptionStore extends SP.ClientObject {
+        namespace Infrastructure {
+            class ExternalSubscriptionStore extends SP.ClientObject {
                 constructor(context: SP.ClientRuntimeContext, web: SP.Web);
                 static newObject(context: SP.ClientRuntimeContext, web: SP.Web): SP.BusinessData.Infrastructure.ExternalSubscriptionStore;
                 indexStore(): void;
             }
         }
 
-        export module Runtime {
-            export enum EntityEventType {
+        namespace Runtime {
+            enum EntityEventType {
                 none,
                 itemAdded,
                 itemUpdated,
                 itemDeleted,
             }
-            export class EntityFieldValueDictionary extends SP.ClientObject {
+            class EntityFieldValueDictionary extends SP.ClientObject {
                 get_fieldValues(): any;
                 get_item(fieldName: string): any;
                 set_item(fieldName: string, value: any): void;
@@ -5826,7 +5807,7 @@ declare namespace SP {
                 createCollectionInstance(fieldDotNotation: string, size: number): void;
                 getCollectionSize(fieldDotNotation: string): SP.IntResult;
             }
-            export class EntityIdentity extends SP.ClientObject {
+            class EntityIdentity extends SP.ClientObject {
                 get_fieldValues(): any;
                 get_item(fieldName: string): any;
                 constructor(context: SP.ClientRuntimeContext, identifierValues: any[]);
@@ -5834,7 +5815,7 @@ declare namespace SP {
                 static newObject(context: SP.ClientRuntimeContext, identifierValues: any[]): SP.BusinessData.Runtime.EntityIdentity;
                 refreshLoad(): void;
             }
-            export class EntityInstance extends SP.ClientObject {
+            class EntityInstance extends SP.ClientObject {
                 get_fieldValues(): any;
                 get_item(fieldName: string): any;
                 set_item(fieldName: string, value: any): void;
@@ -5847,7 +5828,7 @@ declare namespace SP {
                 fromXml(xml: string): void;
                 toXml(): SP.StringResult;
             }
-            export class NotificationCallback extends SP.ClientObject {
+            class NotificationCallback extends SP.ClientObject {
                 constructor(context: SP.ClientRuntimeContext, notificationEndpoint: string);
                 get_notificationContext(): string;
                 set_notificationContext(value: string): void;
@@ -5856,7 +5837,7 @@ declare namespace SP {
                 set_notificationForwarderType(value: string): void;
                 static newObject(context: SP.ClientRuntimeContext, notificationEndpoint: string): SP.BusinessData.Runtime.NotificationCallback;
             }
-            export class Subscription extends SP.ClientObject {
+            class Subscription extends SP.ClientObject {
                 constructor(context: SP.ClientRuntimeContext, id: any, hash: string);
                 get_hash(): string;
                 get_iD(): any;
@@ -5867,19 +5848,19 @@ declare namespace SP {
 }
 
 declare namespace SP {
-    export module Sharing {
-        export class DocumentSharingManager {
+    namespace Sharing {
+        class DocumentSharingManager {
             static getRoleDefinition(context: SP.ClientRuntimeContext, role: SP.Sharing.Role): SP.RoleDefinition;
             static isDocumentSharingEnabled(context: SP.ClientRuntimeContext, list: SP.List): SP.BooleanResult;
             static updateDocumentSharingInfo(context: SP.ClientRuntimeContext, resourceAddress: string, userRoleAssignments: SP.Sharing.UserRoleAssignment[], validateExistingPermissions: boolean, additiveMode: boolean, sendServerManagedNotification: boolean, customMessage: string, includeAnonymousLinksInNotification: boolean): SP.Sharing.UserSharingResult[];
         }
-        export enum Role {
+        enum Role {
             none,
             view,
             edit,
             owner,
         }
-        export class UserRoleAssignment extends SP.ClientValueObject {
+        class UserRoleAssignment extends SP.ClientValueObject {
             get_role(): SP.Sharing.Role;
             set_role(value: SP.Sharing.Role): void;
             get_userId(): string;
@@ -5888,7 +5869,7 @@ declare namespace SP {
             writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
             constructor();
         }
-        export class UserSharingResult extends SP.ClientValueObject {
+        class UserSharingResult extends SP.ClientValueObject {
             get_allowedRoles(): SP.Sharing.Role[];
             get_currentRole(): SP.Sharing.Role;
             get_isUserKnown(): boolean;
@@ -5900,21 +5881,19 @@ declare namespace SP {
             constructor();
         }
     }
-
 }
 
 declare namespace SP {
-
-    export module Social {
+    namespace Social {
         /** Identifies an actor as a user, document, site, or tag. */
-        export enum SocialActorType {
+        enum SocialActorType {
             user,
             document,
             site,
             tag
         }
         /** Specifies one or more actor types in a query to the server. */
-        export enum SocialActorTypes {
+        enum SocialActorTypes {
             none,
             users,
             documents,
@@ -5925,21 +5904,21 @@ declare namespace SP {
             all
         }
         /** Specifies whether the action is to navigate to the attachment or to perform some action dependent on the context in which the attachment is presented to the user. */
-        export enum SocialAttachmentActionKind {
+        enum SocialAttachmentActionKind {
             /** This value specifies that the action is to navigate to the attachment. */
             navigate,
             /** This value specifies that the action is dependent on the context that the attachment is displayed to the user. */
             adHocAction
         }
 
-        export enum SocialAttachmentKind {
+        enum SocialAttachmentKind {
             image,
             video,
             document
         }
 
         /** Specifies whether the item being inserted is a user, document, site, tag, or link. */
-        export enum SocialDataItemType {
+        enum SocialDataItemType {
             user,
             document,
             site,
@@ -5948,19 +5927,19 @@ declare namespace SP {
         }
 
         /** Specifies whether the overlay is a link or one or more actors. */
-        export enum SocialDataOverlayType {
+        enum SocialDataOverlayType {
             link,
             actors
         }
 
         /** Specifies whether the sort order is by creation time or modification time. */
-        export enum SocialFeedSortOrder {
+        enum SocialFeedSortOrder {
             byModifiedTime,
             byCreatedTime
         }
 
         /** Identifies the kind of post to be retrieved.  */
-        export enum SocialFeedType {
+        enum SocialFeedType {
             personal,
             news,
             timeline,
@@ -5969,22 +5948,22 @@ declare namespace SP {
         }
 
         // For some reasons this enum doesn't exist
-        //export enum SocialFollowResult {
+        // enum SocialFollowResult {
         //    ok = 0,
         //    alreadyFollowing = 1,
         //    limitReached = 2,
         //    internalError = 3
-        //}
+        // }
 
         /** Provides information about the feed.
             This type provides information about whether the feed on the server contains additional threads that were not returned. */
-        export enum SocialFeedAttributes {
+        enum SocialFeedAttributes {
             none,
             moreThreadsAvailable
         }
 
         /** Specifies attributes of the post, such as whether the current user can like or delete the post. */
-        export enum SocialPostAttributes {
+        enum SocialPostAttributes {
             none,
             canLike,
             canDelete,
@@ -5995,7 +5974,7 @@ declare namespace SP {
 
         /** Defines the type of item being specified in the SocialPostDefinitionDataItem.
             This type is only available in server-to-server calls. */
-        export enum SocialPostDefinitionDataItemType {
+        enum SocialPostDefinitionDataItemType {
             text,
             user,
             document,
@@ -6004,13 +5983,13 @@ declare namespace SP {
             link
         }
 
-        export enum SocialPostType {
+        enum SocialPostType {
             root,
             reply
         }
 
         /** Specifies a status or error code. */
-        export enum SocialStatusCode {
+        enum SocialStatusCode {
             OK,
             /** This value specifies that an invalid request was encountered. */
             invalidRequest,
@@ -6041,7 +6020,7 @@ declare namespace SP {
         }
 
         /** Specifies properties of the thread. */
-        export enum SocialThreadAttributes {
+        enum SocialThreadAttributes {
             none,
             isDigest,
             canReply,
@@ -6050,7 +6029,7 @@ declare namespace SP {
             replyLimitReached
         }
 
-        export enum SocialThreadType {
+        enum SocialThreadType {
             normal,
             likeReference,
             replyReference,
@@ -6059,7 +6038,7 @@ declare namespace SP {
         }
 
         /** Contains information about an actor retrieved from server. An actor is a user, document, site, or tag. */
-        export class SocialActor extends SP.ClientValueObject {
+        class SocialActor extends SP.ClientValueObject {
             /** The AccountName property returns the user account name.
                 This property is only available for social actors of type "user". */
             get_accountName(): string;
@@ -6105,7 +6084,7 @@ declare namespace SP {
         }
 
         /** Identifies an actor to the server. An actor can be a user, document, site, or tag. */
-        export class SocialActorInfo extends SP.ClientValueObject {
+        class SocialActorInfo extends SP.ClientValueObject {
             /** User account name.
                 This property is only available for social actors of type "user". */
             get_accountName(): string;
@@ -6135,7 +6114,7 @@ declare namespace SP {
         }
 
         /** Represents an image, document preview, or video preview attachment.  */
-        export class SocialAttachment extends SP.ClientValueObject {
+        class SocialAttachment extends SP.ClientValueObject {
             /** Specifies the type of object that the attachment contains. */
             get_attachmentKind(): SocialAttachmentKind;
             /** Specifies the type of object that the attachment contains. */
@@ -6166,10 +6145,10 @@ declare namespace SP {
             get_name(): string;
             /** Provides the attachment name. */
             set_name(value: string): string;
-            /** Specifies the URI of the attachment�s preview thumbnail.
+            /** Specifies the URI of the attachment's preview thumbnail.
                 This property is only present if the AttachmentKind is Document or Video. */
             get_previewUri(): string;
-            /** Specifies the URI of the attachment�s preview thumbnail.
+            /** Specifies the URI of the attachment's preview thumbnail.
                 This property is only present if the AttachmentKind is Document or Video. */
             set_previewUri(value: string): string;
             /** Provides the attachment URI. */
@@ -6182,7 +6161,7 @@ declare namespace SP {
             set_width(value: number): number;
         }
         /** Specifies the user actions that are allowed for the attachment object. */
-        export class SocialAttachmentAction extends SP.ClientValueObject {
+        class SocialAttachmentAction extends SP.ClientValueObject {
             /** Specifies whether the action is to navigate to a URI or an action that is dependent on the context in which the object is presented to the user. */
             get_actionKind(): SocialAttachmentActionKind;
             /** Specifies whether the action is to navigate to a URI or an action that is dependent on the context in which the object is presented to the user. */
@@ -6196,7 +6175,7 @@ declare namespace SP {
         /** Defines a user, document, site, tag, or link to be inserted in a new post.
             The SocialPostCreationData class defines the content text that contains substitution strings.
             Each substitution string is replaced by a SocialDataItem value. */
-        export class SocialDataItem extends SP.ClientValueObject {
+        class SocialDataItem extends SP.ClientValueObject {
             /** Identifies the user.  */
             get_accountName(): string;
             /** Identifies the user.  */
@@ -6223,7 +6202,7 @@ declare namespace SP {
             An overlay is a substring in a post that represents a user, document, site, tag, or link.
             The SocialPost class contains an array of SocialDataOverlay objects.
             Each of the SocialDataOverlay objects specifies a link or one or more actors. */
-        export class SocialDataOverlay extends SP.ClientValueObject {
+        class SocialDataOverlay extends SP.ClientValueObject {
             /** Specifies one or more actors as an array of integers where each integer specifies an index into the SocialThreadActors array.
                 This property is only available if the get_overlayType() has a value of SocialDataOverlayType.actors. */
             get_actorIndexes(): number[];
@@ -6239,7 +6218,7 @@ declare namespace SP {
         }
 
         /** Specifies information about errors that the server has encountered. */
-        export class SocialExceptionDetails extends SP.ClientValueObject {
+        class SocialExceptionDetails extends SP.ClientValueObject {
             get_internalErrorCode(): number;
             get_internalMessage(): string;
             get_internalStackTrace(): string;
@@ -6249,7 +6228,7 @@ declare namespace SP {
         }
 
         /** Specifies a feed, which contains an array of SocialThreads, each of which specifies a root SocialPost object and an array of response SocialPost objects. */
-        export class SocialFeed extends SP.ClientValueObject {
+        class SocialFeed extends SP.ClientValueObject {
             /** Specifies attributes of the returned feed.
                 The attributes specify if the requested feed has additional threads that were not included in the returned thread. */
             get_attributes(): SocialFeedAttributes;
@@ -6269,7 +6248,7 @@ declare namespace SP {
 
         /** Provides access to social feeds.
             It provides methods to create posts, delete posts, read posts, and perform other operations on posts. */
-        export class SocialFeedManager extends SP.ClientObject {
+        class SocialFeedManager extends SP.ClientObject {
             constructor(context: SP.ClientRuntimeContext);
             /** Returns the current user */
             get_owner(): SocialActor;
@@ -6339,7 +6318,7 @@ declare namespace SP {
             getPreviewImage(url: string, key: string, iv: string): any;
         }
 
-        export class SocialFeedOptions extends SP.ClientObject {
+        class SocialFeedOptions extends SP.ClientObject {
             get_maxThreadCount(): number;
             set_maxThreadCount(value: number): number;
             get_newerThan(): string;
@@ -6352,7 +6331,7 @@ declare namespace SP {
 
         /** Provides properties and methods for managing a user's list of followed actors.
             Actors can be users, documents, sites, and tags. */
-        export class SocialFollowingManager extends SP.ClientObject {
+        class SocialFollowingManager extends SP.ClientObject {
             constructor(context: SP.ClientRuntimeContext);
             /** URI to a site  that lists the current user's followed documents. */
             get_followedDocumentsUri(): string;
@@ -6376,7 +6355,7 @@ declare namespace SP {
 
         /** Defines a link that includes a URI and text representation.
             This class is used to represent the location of a web site.  */
-        export class SocialLink extends SP.ClientValueObject {
+        class SocialLink extends SP.ClientValueObject {
             get_text(): string;
             set_text(value: string): string;
             get_uri(): string;
@@ -6384,7 +6363,7 @@ declare namespace SP {
         }
 
         /** Specifies a post read from the server. */
-        export class SocialPost extends SP.ClientValueObject {
+        class SocialPost extends SP.ClientValueObject {
             /** Specifies an image, document preview, or video preview attachment */
             get_attachment(): SocialAttachment;
             /** Describes attributes about the post, such as whether the current user can delete or like the post.  */
@@ -6412,7 +6391,7 @@ declare namespace SP {
         }
 
         /** Specifies a set of users, documents, sites, and tags by an index into the SocialThreadActors array  */
-        export class SocialPostActorInfo extends SP.ClientValueObject {
+        class SocialPostActorInfo extends SP.ClientValueObject {
             get_includesCurrentUser(): boolean;
             /** Specifies an array of indexes into the SocialThreadActors array.
                 The server can choose to return a limited set of actors. For example, the server can choose to return a subset of the users that like a post. */
@@ -6422,17 +6401,17 @@ declare namespace SP {
 
         /** Specifies the content of a post in the SocialFeedManager.createPost method.
             The post consists of a text message, which can optionally include social tags, mentions of users, and links. */
-        export class SocialPostCreationData extends SP.ClientValueObject {
+        class SocialPostCreationData extends SP.ClientValueObject {
             /** Specifies an image, document preview, or video preview to be used in the post. */
             get_attachment(): SocialAttachment;
             /** Specifies an image, document preview, or video preview to be used in the post. */
             set_attachment(value: SocialAttachment): SocialAttachment;
             /** Specifies an array consisting of social tags, user mentions, links to documents, links to sites, and generic links.
                 Each element in the array is inserted into the ContentText string if there is a substitution reference to the array element in the string. */
-            get_contentItems(): SocialDataItem;
+            get_contentItems(): SocialDataItem[];
             /** Specifies an array consisting of social tags, user mentions, links to documents, links to sites, and generic links.
                 Each element in the array is inserted into the ContentText string if there is a substitution reference to the array element in the string. */
-            set_contentItems(value: SocialDataItem): SocialDataItem;
+            set_contentItems(value: SocialDataItem[]): SocialDataItem[];
             /** Contains the text body of the post. */
             get_contentText(): string;
             /** Contains the text body of the post.
@@ -6461,7 +6440,7 @@ declare namespace SP {
 
         /** Provides additional information about server-generated posts.
             This type can only be specified in a server-to-server call. */
-        export class SocialPostDefinitionData extends SP.ClientValueObject {
+        class SocialPostDefinitionData extends SP.ClientValueObject {
             get_items(): SocialPostDefinitionDataItem[];
             set_items(value: SocialPostDefinitionDataItem[]): SocialPostDefinitionDataItem[];
             get_name(): string;
@@ -6470,7 +6449,7 @@ declare namespace SP {
 
         /** Specifies an item to be inserted in a post by replacing a token in the post definition.
             This type can only be specified in a server-to-server call. */
-        export class SocialPostDefinitionDataItem extends SP.ClientValueObject {
+        class SocialPostDefinitionDataItem extends SP.ClientValueObject {
             /** Specifies the name of the user.
                 This property is only used if the ItemType property specifies that the item is a User. */
             get_accountName(): string;
@@ -6505,7 +6484,7 @@ declare namespace SP {
 
         /** Specifies a reference to a post in another thread.
             The referenced post can be a post with a tag, a post that is liked, a post that mentions a user, or a post that is a reply. */
-        export class SocialPostReference extends SP.ClientValueObject {
+        class SocialPostReference extends SP.ClientValueObject {
             /** Provides a digest of the thread containing the referenced post */
             get_digest(): SocialThread;
             get_post(): SocialPost;
@@ -6517,7 +6496,7 @@ declare namespace SP {
 
         /** Specifies a thread that is stored on the server.
             The thread contains a root post and zero or more reply posts. */
-        export class SocialThread extends SP.ClientValueObject {
+        class SocialThread extends SP.ClientValueObject {
             /** Specifies the users who have created a post in the returned thread and also contains any users, documents, sites, and tags that are referenced in any of the posts in the returned thread. */
             get_actors(): SocialActor[];
             /** Specifies attributes of the thread, such as whether the current user can reply or lock the thread and whether the thread is a digest of a thread on the server, whether the number of replies has reached the maximum, and whether the thread is locked. */
@@ -6542,18 +6521,16 @@ declare namespace SP {
             get_threadType(): SocialThreadType;
             get_totalReplyCount(): number;
         }
-
     }
-
 }
 declare namespace SP {
     namespace Taxonomy {
-        export enum StringMatchOption {
+        enum StringMatchOption {
             startsWith,
             exactMatch
         }
 
-        export enum ChangeItemType {
+        enum ChangeItemType {
             unknown,
             term,
             termSet,
@@ -6562,7 +6539,7 @@ declare namespace SP {
             site
         }
 
-        export enum ChangeOperationType {
+        enum ChangeOperationType {
             unknown,
             add,
             edit,
@@ -6575,8 +6552,7 @@ declare namespace SP {
             restore
         }
 
-
-        export class TaxonomySession extends SP.ClientObject {
+        class TaxonomySession extends SP.ClientObject {
             static getTaxonomySession(context: SP.ClientContext): TaxonomySession;
             get_offlineTermStoreNames(): string[];
             get_termStores(): TermStoreCollection;
@@ -6608,14 +6584,14 @@ declare namespace SP {
             getDefaultSiteCollectionTermStore(): TermStore;
         }
 
-        export class TermStoreCollection extends SP.ClientObjectCollection<TermStore> {
+        interface TermStoreCollection extends SP.ClientObjectCollection<TermStore> {
             itemAt(index: number): TermStore;
             get_item(index: number): TermStore;
             getById(id: SP.Guid): TermStore;
             getByName(name: string): TermStore;
         }
 
-        export class TermStore extends SP.ClientObject {
+        class TermStore extends SP.ClientObject {
             get_contentTypePublishingHub(): string;
             get_defaultLanguage(): number;
             set_defaultLanguage(value: number): void;
@@ -6633,8 +6609,7 @@ declare namespace SP {
 
             addLanguage(lcid: number): void;
             commitAll(): void;
-            createGroup(name: string): TermGroup;
-            createGroup(name: string, groupId: SP.Guid): TermGroup;
+            createGroup(name: string, groupId?: SP.Guid): TermGroup;
 
             deleteLanguage(lcid: number): void;
 
@@ -6659,7 +6634,7 @@ declare namespace SP {
             updateUsedTermsOnSite(currentSite: SP.Site): void;
         }
 
-        export class TaxonomyItem extends SP.ClientObject {
+        class TaxonomyItem extends SP.ClientObject {
             static normalizeName(context: SP.ClientContext, name: string): SP.StringResult;
             get_createdDate(): Date;
             get_id(): SP.Guid;
@@ -6670,14 +6645,14 @@ declare namespace SP {
             deleteObject(): void;
         }
 
-        export class TermGroupCollection extends SP.ClientObjectCollection<TermGroup> {
+        interface TermGroupCollection extends SP.ClientObjectCollection<TermGroup> {
             itemAt(index: number): TermGroup;
             get_item(index: number): TermGroup;
             getById(id: SP.Guid): TermGroup;
             getByName(name: string): TermGroup;
         }
 
-        export class TermGroup extends TaxonomyItem {
+        class TermGroup extends TaxonomyItem {
             get_description(): string;
             set_description(value: string): void;
             get_isSiteCollectionGroup(): boolean;
@@ -6689,7 +6664,7 @@ declare namespace SP {
             getTermSetsWithCustomProperty(customPropertyMatchInformation: CustomPropertyMatchInformation): TermSetCollection;
         }
 
-        export class TermSetItem extends TaxonomyItem {
+        class TermSetItem extends TaxonomyItem {
             get_customProperties(): { [key: string]: string; };
             get_customSortOrder(): string;
             set_customSortOrder(value: string): void;
@@ -6699,7 +6674,7 @@ declare namespace SP {
             set_owner(value: string): void;
             get_terms(): TermCollection;
             createTerm(name: string, lcid: number, newTermId: SP.Guid): Term;
-            /*getTerms(pagingLimit: number): TermCollection;*/ //Moved to descendants to void TypeScript errors
+            /*getTerms(pagingLimit: number): TermCollection;*/ // Moved to descendants to void TypeScript errors
             reuseTerm(sourceTerm: Term, reuseBranch: boolean): Term;
             reuseTermWithPinning(sourceTerm: Term): Term;
             deleteCustomProperty(name: string): void;
@@ -6707,14 +6682,14 @@ declare namespace SP {
             setCustomProperty(name: string, value: string): void;
         }
 
-        export class TermSetCollection extends SP.ClientObjectCollection<TermSet> {
+        interface TermSetCollection extends SP.ClientObjectCollection<TermSet> {
             itemAt(index: number): TermSet;
             get_item(index: number): TermSet;
             getById(id: SP.Guid): TermSet;
             getByName(name: string): TermSet;
         }
 
-        export class TermSet extends TermSetItem {
+        class TermSet extends TermSetItem {
             get_contact(): string;
             set_contact(value: string): void;
             get_description(): string;
@@ -6730,22 +6705,21 @@ declare namespace SP {
             getAllTerms(): TermCollection;
             getChanges(changeInformation: ChangeInformation): ChangedItemCollection;
             getTerm(termId: SP.Guid): Term;
-            getTerms(pagingLimit: number): TermCollection;
+            getTerms(pagingLimit: number | LabelMatchInformation): TermCollection;
             getTerms(termLabel: string, trimUnavailable: boolean): TermCollection;
-            getTerms(labelMatchInformation: LabelMatchInformation): TermCollection;
             getTermsWithCustomProperty(customPropertyName: string, trimUnavailable: boolean): TermCollection;
             getTermsWithCustomProperty(customPropertyMatchInformation: CustomPropertyMatchInformation): TermCollection;
             move(targetGroup: TermGroup): void;
         }
 
-        export class TermCollection extends SP.ClientObjectCollection<Term> {
+        interface TermCollection extends SP.ClientObjectCollection<Term> {
             itemAt(index: number): Term;
             get_item(index: number): Term;
             getById(id: SP.Guid): Term;
             getByName(name: string): Term;
         }
 
-        export class Term extends TermSetItem {
+        class Term extends TermSetItem {
             get_description(): string;
             get_isDeprecated(): boolean;
             get_isKeyword(): boolean;
@@ -6792,14 +6766,13 @@ declare namespace SP {
             getPath(lcid: number): SP.StringResult;
         }
 
-
-        export class LabelCollection extends SP.ClientObjectCollection<Label> {
+        interface LabelCollection extends SP.ClientObjectCollection<Label> {
             itemAt(index: number): Label;
             get_item(index: number): Label;
             getByValue(name: string): Label;
         }
 
-        export class Label extends SP.ClientObject {
+        class Label extends SP.ClientObject {
             get_isDefaultForLanguage(): boolean;
             get_language(): number;
             set_language(value: number): void;
@@ -6810,7 +6783,7 @@ declare namespace SP {
             setAsDefaultForLanguage(): void;
         }
 
-        export class LabelMatchInformation extends SP.ClientObject {
+        class LabelMatchInformation extends SP.ClientObject {
             constructor(context: SP.ClientContext);
             get_defaultLabelOnly(): boolean;
             set_defaultLabelOnly(value: boolean): void;
@@ -6830,7 +6803,7 @@ declare namespace SP {
             set_trimUnavailable(value: boolean): void;
         }
 
-        export class CustomPropertyMatchInformation extends SP.ClientObject {
+        class CustomPropertyMatchInformation extends SP.ClientObject {
             constructor(context: SP.ClientContext);
             get_customPropertyName(): string;
             set_customPropertyName(value: string): void;
@@ -6844,7 +6817,7 @@ declare namespace SP {
             set_trimUnavailable(value: boolean): void;
         }
 
-        export class ChangeInformation extends SP.ClientObject {
+        class ChangeInformation extends SP.ClientObject {
             constructor(context: SP.ClientContext);
             get_itemType(): ChangeItemType;
             set_itemType(value: ChangeItemType): void;
@@ -6856,12 +6829,12 @@ declare namespace SP {
             set_withinTimeSpan(value: number): void;
         }
 
-        export class ChangedItemCollection extends SP.ClientObjectCollection<ChangedItem> {
+        interface ChangedItemCollection extends SP.ClientObjectCollection<ChangedItem> {
             itemAt(index: number): ChangedItem;
             get_item(index: number): ChangedItem;
         }
 
-        export class ChangedItem extends SP.ClientObject {
+        class ChangedItem extends SP.ClientObject {
             get_changedBy(): string;
             get_changedTime(): Date;
             get_id(): SP.Guid;
@@ -6869,16 +6842,16 @@ declare namespace SP {
             get_operation(): ChangeOperationType;
         }
 
-        export class ChangedSite extends ChangedItem {
+        class ChangedSite extends ChangedItem {
             get_siteId(): SP.Guid;
             get_termId(): SP.Guid;
             get_termSetId(): SP.Guid;
         }
 
-        export class ChangedGroup extends ChangedItem {
+        class ChangedGroup extends ChangedItem {
         }
 
-        export class ChangedTerm extends ChangedItem {
+        class ChangedTerm extends ChangedItem {
             get_changedCustomProperties(): string[];
             get_changedLocalCustomProperties(): string[];
             get_groupId(): SP.Guid;
@@ -6887,17 +6860,17 @@ declare namespace SP {
             get_termSetId(): SP.Guid;
         }
 
-        export class ChangedTermSet extends ChangedItem {
+        class ChangedTermSet extends ChangedItem {
             get_fromGroupId(): SP.Guid;
             get_groupId(): SP.Guid;
         }
-        export class ChangedTermStore extends ChangedItem {
+        class ChangedTermStore extends ChangedItem {
             get_changedLanguage(): number;
             get_isDefaultLanguageChanged(): boolean;
             get_isFullFarmRestore(): boolean;
         }
 
-        export class TaxonomyField extends SP.FieldLookup {
+        class TaxonomyField extends SP.FieldLookup {
             constructor(context: SP.ClientContext, fields: SP.FieldCollection, filedName: string);
             get_anchorId(): SP.Guid;
             set_anchorId(value: SP.Guid): void;
@@ -6924,24 +6897,23 @@ declare namespace SP {
             getFieldValueAsText(value: TaxonomyFieldValue): SP.StringResult;
             getFieldValueAsTaxonomyFieldValue(value: string): TaxonomyFieldValue;
             getFieldValueAsTaxonomyFieldValueCollection(value: string): TaxonomyFieldValueCollection;
-            setFieldValueByTerm(listItem: SP.ListItem, term: Term, lcid: number): void;
-            setFieldValueByTermCollection(listItem: SP.ListItem, terms: TermCollection, lcid: number): void;
-            setFieldValueByCollection(listItem: SP.ListItem, terms: Term[], lcid: number): void;
-            setFieldValueByValue(listItem: SP.ListItem, taxValue: TaxonomyFieldValue): void;
-            setFieldValueByValueCollection(listItem: SP.ListItem, taxValueCollection: TaxonomyFieldValueCollection): void;
+            setFieldValueByTerm<T = any>(listItem: SP.ListItem<T>, term: Term, lcid: number): void;
+            setFieldValueByTermCollection<T = any>(listItem: SP.ListItem<T>, terms: TermCollection, lcid: number): void;
+            setFieldValueByCollection<T = any>(listItem: SP.ListItem<T>, terms: Term[], lcid: number): void;
+            setFieldValueByValue<T = any>(listItem: SP.ListItem<T>, taxValue: TaxonomyFieldValue): void;
+            setFieldValueByValueCollection<T = any>(listItem: SP.ListItem<T>, taxValueCollection: TaxonomyFieldValueCollection): void;
             getFieldValueAsHtml(value: TaxonomyFieldValue): SP.StringResult;
             getValidatedString(value: TaxonomyFieldValue): SP.StringResult;
-
         }
 
-        export class TaxonomyFieldValueCollection extends SP.ClientObjectCollection<TaxonomyFieldValue> {
+        class TaxonomyFieldValueCollection extends SP.ClientObjectCollection<TaxonomyFieldValue> {
             constructor(context: SP.ClientContext, fieldValue: string, creatingField: SP.Field);
             itemAt(index: number): TaxonomyFieldValue;
             get_item(index: number): TaxonomyFieldValue;
             populateFromLabelGuidPairs(text: string): void;
         }
 
-        export class TaxonomyFieldValue extends SP.ClientValueObject {
+        class TaxonomyFieldValue extends SP.ClientValueObject {
             get_label(): string;
             set_label(value: string): void;
             get_termGuid(): SP.Guid;
@@ -6950,67 +6922,67 @@ declare namespace SP {
             set_wssId(value: number): void;
         }
 
-        export class MobileTaxonomyField extends SP.ClientObject {
+        class MobileTaxonomyField extends SP.ClientObject {
             get_readOnly(): boolean;
         }
     }
 }
 
 declare namespace SP {
-    export module DocumentSet {
-        export class DocumentSet extends ClientObject {
+    namespace DocumentSet {
+        class DocumentSet extends ClientObject {
             static create(context: ClientContext, parentFolder: Folder, name: string, ctid: ContentTypeId): StringResult;
         }
     }
 
-    export module Video {
-        export class EmbedCodeConfiguration extends ClientValueObject {
-            public get_autoPlay(): boolean;
-            public set_autoPlay(value: boolean): boolean;
+    namespace Video {
+        class EmbedCodeConfiguration extends ClientValueObject {
+            get_autoPlay(): boolean;
+            set_autoPlay(value: boolean): boolean;
 
-            public get_displayTitle(): boolean;
-            public set_displayTitle(value: boolean): boolean;
+            get_displayTitle(): boolean;
+            set_displayTitle(value: boolean): boolean;
 
-            public get_linkToOwnerProfilePage(): boolean;
-            public set_linkToOwnerProfilePage(value: boolean): boolean;
+            get_linkToOwnerProfilePage(): boolean;
+            set_linkToOwnerProfilePage(value: boolean): boolean;
 
-            public get_linkToVideoHomePage(): boolean;
-            public set_linkToVideoHomePage(value: boolean): boolean;
+            get_linkToVideoHomePage(): boolean;
+            set_linkToVideoHomePage(value: boolean): boolean;
 
-            public get_loop(): boolean;
-            public set_loop(value: boolean): boolean;
+            get_loop(): boolean;
+            set_loop(value: boolean): boolean;
 
-            public get_pixelHeight(): number;
-            public set_pixelHeight(value: number): number;
+            get_pixelHeight(): number;
+            set_pixelHeight(value: number): number;
 
-            public get_pixelWidth(): number;
-            public set_pixelWidth(value: number): number;
+            get_pixelWidth(): number;
+            set_pixelWidth(value: number): number;
 
-            public get_startTime(): number;
-            public set_startTime(value: number): number;
+            get_startTime(): number;
+            set_startTime(value: number): number;
 
-            public get_previewImagePath(): string;
-            public set_previewImagePath(value: string): string;
+            get_previewImagePath(): string;
+            set_previewImagePath(value: string): string;
         }
 
-        export class VideoSet extends DocumentSet.DocumentSet {
+        class VideoSet extends DocumentSet.DocumentSet {
             static createVideo(context: ClientContext, parentFolder: Folder, name: string, ctid: ContentTypeId): StringResult;
             static uploadVideo(context: ClientContext, list: List, fileName: string, file: any[], overwriteIfExists: boolean, parentFolderPath: string): StringResult;
             static getEmbedCode(context: ClientContext, videoPath: string, properties: EmbedCodeConfiguration): StringResult;
-            static migrateVideo(context: ClientContext, videoFile: File): SP.ListItem;
+            static migrateVideo<T = any>(context: ClientContext, videoFile: File): SP.ListItem<T>;
         }
     }
 }
 
-
 declare namespace SP {
-    export module UI {
-        export module ApplicationPages {
-            export class SelectorSelectionEventArgs extends Sys.EventArgs {
+    namespace UI {
+        namespace ApplicationPages {
+            class SelectorSelectionEventArgs extends Sys.EventArgs {
                 constructor(entities: any);
                 get_entities(): any;
             }
-            export interface ISelectorComponent {
+            // tslint:disable-next-line: interface-name
+            interface ISelectorComponent {
                 get_selectedEntities(): any;
                 set_selectedEntities(value: any): void;
                 get_callback(): (sender: any, e: Sys.EventArgs) => void;
@@ -7021,14 +6993,14 @@ declare namespace SP {
                 removeEntity(ent: SP.UI.ApplicationPages.ResolveEntity): void;
                 setEntity(ent: SP.UI.ApplicationPages.ResolveEntity): void;
             }
-            export enum SelectorType {
+            enum SelectorType {
                 none,
                 resource,
                 people,
                 people_And_Resource,
                 event,
             }
-            export class CalendarSelector extends Sys.Component {
+            class CalendarSelector extends Sys.Component {
                 static instance(): SP.UI.ApplicationPages.CalendarSelector;
                 registerSelector(selector: SP.UI.ApplicationPages.ISelectorComponent): void;
                 getSelector(type: SP.UI.ApplicationPages.SelectorType, scopeKey: string): SP.UI.ApplicationPages.ISelectorComponent;
@@ -7037,7 +7009,7 @@ declare namespace SP {
                 removeEntity(scopeKey: string, ent: SP.UI.ApplicationPages.ResolveEntity): void;
                 constructor();
             }
-            export class BaseSelectorComponent implements SP.UI.ApplicationPages.ISelectorComponent {
+            class BaseSelectorComponent implements SP.UI.ApplicationPages.ISelectorComponent {
                 constructor(key: string, type: SP.UI.ApplicationPages.SelectorType);
                 get_scopeKey(): string;
                 get_componentType(): SP.UI.ApplicationPages.SelectorType;
@@ -7049,7 +7021,9 @@ declare namespace SP {
                 removeEntity(ent: SP.UI.ApplicationPages.ResolveEntity): void;
                 setEntity(ent: SP.UI.ApplicationPages.ResolveEntity): void;
             }
-            export interface ICalendarController {
+
+            // tslint:disable-next-line: interface-name
+            interface ICalendarController {
                 moveToDate(date: string): void;
                 moveToViewType(viewType: string): void;
                 moveToViewDate(scope: SP.UI.ApplicationPages.CalendarScope, date: string): void;
@@ -7061,7 +7035,7 @@ declare namespace SP {
                 newItemDialog(contentTypeId: string): void;
                 deleteItem(itemId: string): void;
             }
-            export enum CalendarScope {
+            enum CalendarScope {
                 nothing,
                 monthly,
                 weeklyGroup,
@@ -7069,12 +7043,12 @@ declare namespace SP {
                 weekly,
                 dailyGroup,
             }
-            export class CalendarInstanceRepository {
+            class CalendarInstanceRepository {
                 static registerInstance(instanceId: string, contoller: SP.UI.ApplicationPages.ICalendarController): void;
                 static lookupInstance(instanceId: string): SP.UI.ApplicationPages.ICalendarController;
                 static firstInstance(): SP.UI.ApplicationPages.ICalendarController;
             }
-            export class ResolveEntity {
+            class ResolveEntity {
                 tYPE_EVENT: string;
                 tYPE_USER: string;
                 tYPE_RESOURCE: string;
@@ -7090,7 +7064,7 @@ declare namespace SP {
                 get_key(): string;
                 constructor();
             }
-            export class ClientPeoplePickerQueryParameters extends SP.ClientValueObject {
+            class ClientPeoplePickerQueryParameters extends SP.ClientValueObject {
                 get_allowEmailAddresses(): boolean;
                 set_allowEmailAddresses(value: boolean): void;
                 get_allowMultipleEntities(): boolean;
@@ -7125,11 +7099,11 @@ declare namespace SP {
                 writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
                 constructor();
             }
-            export class ClientPeoplePickerWebServiceInterface {
+            class ClientPeoplePickerWebServiceInterface {
                 static clientPeoplePickerSearchUser(context: SP.ClientRuntimeContext, queryParams: SP.UI.ApplicationPages.ClientPeoplePickerQueryParameters): SP.StringResult;
                 static clientPeoplePickerResolveUser(context: SP.ClientRuntimeContext, queryParams: SP.UI.ApplicationPages.ClientPeoplePickerQueryParameters): SP.StringResult;
             }
-            export class PeoplePickerWebServiceInterface {
+            class PeoplePickerWebServiceInterface {
                 static getSearchResultsByHierarchy(context: SP.ClientRuntimeContext, providerID: string, hierarchyNodeID: string, entityTypes: string, contextUrl: string): SP.StringResult;
                 static getSearchResults(context: SP.ClientRuntimeContext, searchPattern: string, providerID: string, hierarchyNodeID: string, entityTypes: string): SP.StringResult;
             }
@@ -7138,8 +7112,8 @@ declare namespace SP {
 }
 
 declare namespace SP {
-    export module UI {
-        export class PopoutMenu implements Sys.IDisposable {
+    namespace UI {
+        class PopoutMenu implements Sys.IDisposable {
             constructor(launcherId: string, menuId: string, iconId: string, launcherOpenCssClass: string, textDirection: string, closeIconUrl: string, isClustered: boolean, closeIconOffsetLeft: number, closeIconOffsetTop: number, closeIconHeight: number, closeIconWidth: number);
             launchMenu(): void;
             closeMenu(): void;
@@ -7147,7 +7121,7 @@ declare namespace SP {
             static closeActivePopoutMenuInstance(): void;
             dispose(): void;
         }
-        export class AttractModeControl extends Sys.UI.Control {
+        class AttractModeControl extends Sys.UI.Control {
             defaultAttractModeIcon: string;
             cssAttractMode: string;
             cssAttractModeBackground: string;
@@ -7160,19 +7134,18 @@ declare namespace SP {
             constructor();
         }
 
-        export module Notify {
-            export function addNotification(strHtml: string, bSticky: boolean): string;
-            export function removeNotification(nid: string): void;
-            export function showLoadingNotification(bSticky: boolean): string;
+        namespace Notify {
+            function addNotification(strHtml: string, bSticky: boolean): string;
+            function removeNotification(nid: string): void;
+            function showLoadingNotification(bSticky: boolean): string;
 
-
-            export class Notification {
+            class Notification {
                 constructor(containerId: SPNotifications.ContainerID, strHtml: string, bSticky?: boolean, strTooltip?: string, onclickHandler?: () => void, extraData?: SPStatusNotificationData);
                 get_id(): string;
                 Show(bNoAnimate: boolean): void;
                 Hide(bNoAnimate: boolean): void;
             }
-            export class NotificationContainer {
+            class NotificationContainer {
                 constructor(id: number, element: any, layer: number, notificationLimit?: number);
                 Clear(): void;
                 GetCount(): number;
@@ -7180,7 +7153,7 @@ declare namespace SP {
             }
         }
 
-        export class Status {
+        class Status {
             static addStatus(strTitle: string, strHtml?: string, atBegining?: boolean): string;
             static appendStatus(sid: string, strTitle: string, strHtml: string): string;
             static updateStatus(sid: string, strHtml: string): void;
@@ -7190,11 +7163,11 @@ declare namespace SP {
             constructor();
         }
 
-        export module Workspace {
-            export function add_resized(handler: () => void): void;
-            export function remove_resized(handler: () => void): void;
+        namespace Workspace {
+            function add_resized(handler: () => void): void;
+            function remove_resized(handler: () => void): void;
         }
-        export class Menu {
+        class Menu {
             static create(id: string): SP.UI.Menu;
             addMenuItem(text: string, actionScriptText: string, imageSourceUrl: string, imageAlternateText: string, sequenceNumber: number, description: string, id: string): HTMLElement;
             addSeparator(): void;
@@ -7204,15 +7177,15 @@ declare namespace SP {
             hideIcons(): void;
             showIcons(): void;
         }
-        export class MenuTest {
+        class MenuTest {
             static setup(relativeElement: HTMLElement): void;
             constructor();
         }
 
-        export function $create_DialogOptions(): DialogOptions;
+        function $create_DialogOptions(): DialogOptions;
 
         /** Result of a modal dialog execution */
-        export enum DialogResult {
+        enum DialogResult {
             /** Do not use this */
             invalid,
             /** User closed dialog, cancelling the action */
@@ -7221,11 +7194,10 @@ declare namespace SP {
             OK
         }
         /** Callback which processes dialog result value after dialog is closed */
-        export interface DialogReturnValueCallback {
-            (dialogResult: DialogResult, returnValue: any): void;
-        }
+        type DialogReturnValueCallback = (dialogResult: DialogResult, returnValue: any) => void;
         /** Options for dialog creation */
-        export interface IDialogOptions {
+        // tslint:disable-next-line: interface-name
+        interface IDialogOptions {
             /** Text displayed in the title bar of the dialog box. If not defined, it will default to the title of the page defined by url property. */
             title?: string;
             /** X coordinate of the dialog box. */
@@ -7257,7 +7229,7 @@ declare namespace SP {
             /** custom arguments to be passed to the dialog */
             args?: any;
         }
-        export class DialogOptions implements IDialogOptions {
+        class DialogOptions implements IDialogOptions {
             /** Text displayed in the title bar of the dialog box. If not defined, it will default to the title of the page defined by url property. */
             title: string;
             /** X coordinate of the dialog box. */
@@ -7290,7 +7262,7 @@ declare namespace SP {
             args: any;
         }
         /** Represents a dialog. Do not use this class directly from your code. */
-        export class Dialog {
+        class Dialog {
             get_firstTabStop(): HTMLElement;
             get_lastTabStop(): HTMLElement;
             get_url(): string;
@@ -7309,7 +7281,7 @@ declare namespace SP {
             autoSize(): void;
         }
         /** Represents a modal dialog */
-        export class ModalDialog extends SP.UI.Dialog {
+        class ModalDialog extends SP.UI.Dialog {
             /** Displays a modal dialog defined by the specified options. */
             static showModalDialog(options: SP.UI.IDialogOptions): SP.UI.ModalDialog;
             /** Should be called from an existing dialog. */
@@ -7335,8 +7307,7 @@ declare namespace SP {
             close(dialogResult: SP.UI.DialogResult): void;
         }
 
-
-        export class Command {
+        class Command {
             constructor(name: string, displayName: string);
             get_displayName(): string;
             set_displayName(value: string): string;
@@ -7360,14 +7331,11 @@ declare namespace SP {
             attachEvents(): void;
             render(builder: HtmlBuilder): void;
 
-
             /**Should override*/
             onClick(): void;
-
         }
 
-
-        export class CommandBar {
+        class CommandBar {
             constructor();
             get_commands(): Command[];
             get_dropDownThreshold(): number;
@@ -7382,8 +7350,7 @@ declare namespace SP {
             findCommandByName(name: string): Command;
         }
 
-
-        export class PagingControl {
+        class PagingControl {
             constructor(id: string);
             render(innerContent: string): string;
             postRender(): void;
@@ -7400,50 +7367,49 @@ declare namespace SP {
             static ButtonIDs: {
                 prev: number;
                 next: number;
-            }
+            };
 
             static ButtonState: {
-                hidden: number
+                hidden: number;
                 disabled: number;
                 enabled: number;
-            }
+            };
         }
 
-        export module Workplace {
-            export function add_resized(handler: Function): void;
-            export function remove_resized(handler: Function): void;
+        namespace Workplace {
+            function add_resized(handler: (obj: any, args: any) => void): void;
+            function remove_resized(handler: (obj: any, args: any) => void): void;
         }
 
-        export module UIUtility {
-            export function generateRandomElementId(): string;
-            export function cancelEvent(evt: Event): void;
-            export function clearChildNodes(elem: HTMLElement): void;
-            export function hideElement(elem: HTMLElement): void;
-            export function showElement(elem: HTMLElement): void;
-            export function insertBefore(elem: HTMLElement, targetElement: HTMLElement): void;
-            export function insertAfter(elem: HTMLElement, targetElement: HTMLElement): void;
-            export function removeNode(elem: HTMLElement): void;
-            export function calculateOffsetLeft(elem: HTMLElement): number;
-            export function calculateOffsetTop(elem: HTMLElement): number;
-            export function createHtmlInputText(text: string): HTMLInputElement;
-            export function createHtmlInputCheck(isChecked: boolean): HTMLInputElement;
-            export function setInnerText(elem: HTMLElement, value: string): void;
-            export function getInnerText(elem: HTMLElement): string;
-            export function isTextNode(elem: HTMLElement): boolean;
-            export function isSvgNode(elem: HTMLElement): boolean;
-            export function isNodeOfType(elem: HTMLElement, tagNames: string[]): boolean;
-            export function focusValidOnThisNode(elem: HTMLElement): boolean;
+        namespace UIUtility {
+            function generateRandomElementId(): string;
+            function cancelEvent(evt: Event): void;
+            function clearChildNodes(elem: HTMLElement): void;
+            function hideElement(elem: HTMLElement): void;
+            function showElement(elem: HTMLElement): void;
+            function insertBefore(elem: HTMLElement, targetElement: HTMLElement): void;
+            function insertAfter(elem: HTMLElement, targetElement: HTMLElement): void;
+            function removeNode(elem: HTMLElement): void;
+            function calculateOffsetLeft(elem: HTMLElement): number;
+            function calculateOffsetTop(elem: HTMLElement): number;
+            function createHtmlInputText(text: string): HTMLInputElement;
+            function createHtmlInputCheck(isChecked: boolean): HTMLInputElement;
+            function setInnerText(elem: HTMLElement, value: string): void;
+            function getInnerText(elem: HTMLElement): string;
+            function isTextNode(elem: HTMLElement): boolean;
+            function isSvgNode(elem: HTMLElement): boolean;
+            function isNodeOfType(elem: HTMLElement, tagNames: string[]): boolean;
+            function focusValidOnThisNode(elem: HTMLElement): boolean;
         }
     }
 }
 
 declare namespace SPNotifications {
-
-    export enum ContainerID {
+    enum ContainerID {
         Basic,
         Status,
     }
-    export enum EventID {
+    enum EventID {
         OnShow,
         OnHide,
         OnDisplayNotification,
@@ -7455,13 +7421,13 @@ declare namespace SPNotifications {
 declare class SPStatusNotificationData {
     constructor(text: string, subText: string, imageUrl: string, sip: string);
 }
-declare function RefreshCommandUI():void;
+declare function RefreshCommandUI(): void;
 
 declare namespace SP {
-    export module UI {
-        export module Controls {
-
-            export interface INavigationOptions {
+    namespace UI {
+        namespace Controls {
+            // tslint:disable-next-line: interface-name
+            interface INavigationOptions {
                 assetId?: string;
                 siteTitle?: string;
                 siteUrl?: string;
@@ -7478,66 +7444,63 @@ declare namespace SP {
                 appWebUrl?: string;
                 onCssLoaded?: string;
 
-
                 bottomHeaderVisible?: boolean;
                 topHeaderVisible?: boolean;
             }
 
-            export class NavigationOptions implements INavigationOptions { }
+            class NavigationOptions implements INavigationOptions { }
 
-
-            export interface ISettingsLink {
+            // tslint:disable-next-line: interface-name
+            interface ISettingsLink {
                 linkUrl: string;
                 displayName: string;
             }
 
-            export class SettingsLink implements ISettingsLink {
+            class SettingsLink implements ISettingsLink {
                 linkUrl: string;
                 displayName: string;
             }
 
-
-            export class Navigation {
+            class Navigation {
                 constructor(placeholderDOMElementId: string, options: INavigationOptions);
-                public get_assetId(): string;
-                public get_siteTitle(): string;
-                public get_siteUrl(): string;
+                get_assetId(): string;
+                get_siteTitle(): string;
+                get_siteUrl(): string;
 
-                public get_appTitle(): string;
-                public set_appTitle(value: string): string;
+                get_appTitle(): string;
+                set_appTitle(value: string): string;
 
-                public get_appTitleIconUrl(): string;
-                public set_appTitleIconUrl(value: string): string;
+                get_appTitleIconUrl(): string;
+                set_appTitleIconUrl(value: string): string;
 
-                public get_rightToLeft(): boolean;
-                public set_rightToLeft(value: boolean): boolean;
+                get_rightToLeft(): boolean;
+                set_rightToLeft(value: boolean): boolean;
 
-                public get_appStartPage(): string;
-                public set_appStartPage(value: string): string;
+                get_appStartPage(): string;
+                set_appStartPage(value: string): string;
 
-                public get_appIconUrl(): string;
-                public set_appIconUrl(value: string): string;
+                get_appIconUrl(): string;
+                set_appIconUrl(value: string): string;
 
-                public get_appHelpPageUrl(): string;
-                public set_appHelpPageUrl(value: string): string;
+                get_appHelpPageUrl(): string;
+                set_appHelpPageUrl(value: string): string;
 
-                public get_appHelpPageOnClick(): string;
-                public set_appHelpPageOnClick(value: string): string;
+                get_appHelpPageOnClick(): string;
+                set_appHelpPageOnClick(value: string): string;
 
-                public get_settingsLinks(): ISettingsLink[];
-                public set_settingsLinks(value: ISettingsLink[]): ISettingsLink[];
+                get_settingsLinks(): ISettingsLink[];
+                set_settingsLinks(value: ISettingsLink[]): ISettingsLink[];
 
-                public setVisible(value: boolean): void;
+                setVisible(value: boolean): void;
 
-                public setTopHeaderVisible(value: boolean): void;
-                public setBottomHeaderVisible(value: boolean): void;
-                public remove(): void;
+                setTopHeaderVisible(value: boolean): void;
+                setBottomHeaderVisible(value: boolean): void;
+                remove(): void;
 
                 static getVersionedLayoutsUrl(pageName: string): string;
             }
 
-
-            export class ControlManager {
+            class ControlManager {
                 static getControl(placeHolderId: string): any;
             }
         }
@@ -7545,10 +7508,9 @@ declare namespace SP {
 }
 
 declare namespace SP {
-
-    export module UserProfiles {
+    namespace UserProfiles {
         /** Specifies types of changes made in the user profile store. */
-        export enum ChangeTypes {
+        enum ChangeTypes {
             /** No change was made */
             none,
             /** An object was added */
@@ -7563,18 +7525,18 @@ declare namespace SP {
             all
         }
 
-        export class HashTag extends ClientValueObject {
+        class HashTag extends ClientValueObject {
             get_name(): string;
             get_useCount(): number;
         }
 
-        export class HashTagCollection extends SP.ClientObjectCollection<HashTag> {
+        interface HashTagCollection extends SP.ClientObjectCollection<HashTag> {
             itemAt(index: number): HashTag;
             get_item(index: number): HashTag;
         }
 
         /** Specifies types of user-related objects that can be changed in the user profile store. */
-        export enum ObjectTypes {
+        enum ObjectTypes {
             none,
             singleValueProperty,
             multiValueProperty,
@@ -7594,8 +7556,8 @@ declare namespace SP {
 
         /** Provides methods for operations related to people.
             Note: The SocialFollowingManager object is the recommended object for performing Following People and Following Content tasks.
-            However, PeopleManager provides some methods that SocialFollowingManager doesn�t. */
-        export class PeopleManager extends SP.ClientObject {
+            However, PeopleManager provides some methods that SocialFollowingManager doesn't. */
+        class PeopleManager extends SP.ClientObject {
             constructor(context: SP.ClientRuntimeContext);
             static getTrendingTags(context: SP.ClientRuntimeContext): HashTagCollection;
             /** Checks whether the first user is following the second user. */
@@ -7641,7 +7603,7 @@ declare namespace SP {
         }
 
         /** Specifies the capabilities of a personal site. */
-        export enum PersonalSiteCapabilities {
+        enum PersonalSiteCapabilities {
             none,
             profile,
             social,
@@ -7652,7 +7614,7 @@ declare namespace SP {
         }
 
         /** Specifies an exception or status code for the state of a personal site instantiation. */
-        export enum PersonalSiteInstantiationState {
+        enum PersonalSiteInstantiationState {
             uninitialized,
             enqueued,
             created,
@@ -7673,7 +7635,7 @@ declare namespace SP {
             errorSelfServiceSiteCreateCallFailed
         }
 
-        export enum SocialDataStoreExceptionCode {
+        enum SocialDataStoreExceptionCode {
             socialListNotFound,
             personalSiteNotFound,
             cannotCreatePersonalSite,
@@ -7681,7 +7643,7 @@ declare namespace SP {
         }
 
         /** Represents user properties. */
-        export class PersonProperties extends SP.ClientObject {
+        class PersonProperties extends SP.ClientObject {
             /** Specifies the person's account name */
             get_accountName(): string;
             /** Specifies an array of strings containing the account names of a person's direct reports. */
@@ -7716,7 +7678,7 @@ declare namespace SP {
         }
 
         /** Provides an alternate entry point to user profiles rather than calling methods directly. */
-        export class ProfileLoader extends SP.ClientObject {
+        class ProfileLoader extends SP.ClientObject {
             static getProfileLoader(context: SP.ClientRuntimeContext): ProfileLoader;
             getUserProfile(): UserProfile;
         }
@@ -7725,7 +7687,7 @@ declare namespace SP {
             Note: The client-side UserProfile object provides methods you can use to create a personal site for the current user.
             However, it does not contain the user properties that the server-side UserProfile object contains.
             To access user properties from client-side code, use PeopleManager */
-        export class UserProfile extends SP.ClientObject {
+        class UserProfile extends SP.ClientObject {
             constructor();
             /** Represents the content that the user is following. */
             get_followedContent(): FollowedContent;
@@ -7750,7 +7712,7 @@ declare namespace SP {
         }
 
         /** Provides access to followed content items. */
-        export class FollowedContent extends SP.ClientObject {
+        class FollowedContent extends SP.ClientObject {
             constructor(context: SP.ClientRuntimeContext);
             static newObject(context: SP.ClientRuntimeContext): FollowedContent;
             /** Gets the location of the followed sites view */
@@ -7760,7 +7722,7 @@ declare namespace SP {
             /** The Follow method adds the specified document or site to the list of followed content.
                 @param url  URL that identifies the item to follow.
                             The url parameter can identify an existing document or site using the url property of the original item.
-                            The url parameter can also identify a document with the following format: http://host/site?listId=<listGuid>&itemId=<itemId>
+                            The url parameter can also identify a document with the following format: http:// host/site?listId=<listGuid>&itemId=<itemId>
                 @param data Optional parameter that holds application-defined data for the item.
                 */
             follow(url: string, data?: FollowedItemData): FollowResult;
@@ -7771,23 +7733,23 @@ declare namespace SP {
             /** Removes the specified document or site from list of followed content.
                 @param url  URL that identifies the item to stop following.
                             The url parameter can identify an existing document or site using the url property of the original item.
-                            The url parameter can also identify a document with the following format: http://host/site?listId=<listGuid>&itemId=<itemId> */
+                            The url parameter can also identify a document with the following format: http:// host/site?listId=<listGuid>&itemId=<itemId> */
             stopFollowing(url: string): void;
             /** Determines if the specified document or site is being followed.
                 @param url  URL that identifies the item that is supposed to be followed.
                             The url parameter can identify an existing document or site using the url property of the original item.
-                            The url parameter can also identify a document with the following format: http://host/site?listId=<listGuid>&itemId=<itemId> */
+                            The url parameter can also identify a document with the following format: http:// host/site?listId=<listGuid>&itemId=<itemId> */
             isFollowed(url: string): SP.BooleanResult;
             /** Retrieves the followed status of the specified document or site.
                 Returns a value of type FollowedStatus, wrapped into a SP.IntResult object.
                 @param url  URL that identifies the followed item.
                             The url parameter can identify an existing document or site using the url property of the original item.
-                            The url parameter can also identify a document with the following format: http://host/site?listId=<listGuid>&itemId=<itemId> */
+                            The url parameter can also identify a document with the following format: http:// host/site?listId=<listGuid>&itemId=<itemId> */
             getFollowedStatus(url: string): SP.IntResult;
             /** Returns the followed item identified by a given URL or returns null if the item does not exist.
                 @param url  URL that identifies the followed item.
                             The url parameter can identify an existing document or site using the url property of the original item.
-                            The url parameter can also identify a document with the following format: http://host/site?listId=<listGuid>&itemId=<itemId> */
+                            The url parameter can also identify a document with the following format: http:// host/site?listId=<listGuid>&itemId=<itemId> */
             getItem(url: string): FollowedItem;
             /** Returns an array of zero or more followed items described by the type and subtype parameters.
                 @param options Describes the type of item to return.
@@ -7796,7 +7758,7 @@ declare namespace SP {
             /** Updates the properties for followed item with specified URL.
                 @param url  URL that identifies the followed item.
                             The url parameter can identify an existing document or site using the url property of the original item.
-                            The url parameter can also identify a document with the following format: http://host/site?listId=<listGuid>&itemId=<itemId>
+                            The url parameter can also identify a document with the following format: http:// host/site?listId=<listGuid>&itemId=<itemId>
                 @param data Application-defined data stored with the followed item. */
             updateData(url: string, data: FollowedItemData): void;
             /** Returns the refreshed item that is being pointed to in the Social list.
@@ -7808,7 +7770,7 @@ declare namespace SP {
         }
 
         /** Represents a followed content resource. */
-        export class FollowedItem extends SP.ClientValueObject {
+        class FollowedItem extends SP.ClientValueObject {
             /** Additional metadata associated with this item */
             get_data(): { [name: string]: any; };
             /** Additional metadata associated with this item */
@@ -7891,14 +7853,14 @@ declare namespace SP {
             set_webId(value: SP.Guid): any;
         }
 
-        export enum FollowedItemType {
+        enum FollowedItemType {
             unknown,
             document,
             site,
             all
         }
 
-        export enum FollowedContentExceptionType {
+        enum FollowedContentExceptionType {
             itemAlreadyExists,
             itemDoesNotExist,
             invalidQueryString,
@@ -7910,7 +7872,7 @@ declare namespace SP {
             internalError
         }
 
-        export enum FollowedContentQueryOptions {
+        enum FollowedContentQueryOptions {
             unset,
             sites,
             documents,
@@ -7920,28 +7882,27 @@ declare namespace SP {
             all
         }
 
-        export enum FollowedStatus {
+        enum FollowedStatus {
             followed,
             notFollowed,
             notFollowable
         }
 
-
         /** Contains additional data that can be attached to a FollowedItem object */
-        export class FollowedItemData extends SP.ClientObject {
+        class FollowedItemData extends SP.ClientObject {
             /** An unordered collection of key/value pairs for custom properties to be set on the item. */
             get_properties(): { [name: string]: any; };
         }
 
         /** Returns information about a request to follow an item. */
-        export class FollowResult extends SP.ClientValueObject {
+        class FollowResult extends SP.ClientValueObject {
             /** Contains the item being followed. */
             get_item(): FollowedItem;
             /** Provides information about the attempt to follow an item. */
             get_resultType(): FollowResultType;
         }
 
-        export enum FollowResultType {
+        enum FollowResultType {
             /** Result is unknown */
             unknown,
             /** The request succeeded and the item is being followed. */
@@ -7955,7 +7916,7 @@ declare namespace SP {
         }
 
         /** Represents a set of user profile properties for a specified user. */
-        export class UserProfilePropertiesForUser extends SP.ClientObject {
+        class UserProfilePropertiesForUser extends SP.ClientObject {
             /** Creates new UserProfilePropertiesForUser object
                 @param context Specifies the client context to use.
                 @param accountName Specifies the user by account name.
@@ -7970,13 +7931,11 @@ declare namespace SP {
             getPropertyNames(): string[];
         }
     }
-
 }
 
 declare namespace SP {
-
-    export module Utilities {
-        export class Utility {
+    namespace Utilities {
+        class Utility {
             lAYOUTS_LATESTVERSION_RELATIVE_URL: string;
             lAYOUTS_LATESTVERSION_URL: string;
             static get_layoutsLatestVersionRelativeUrl(): string;
@@ -7991,8 +7950,8 @@ declare namespace SP {
             static logCustomAppError(context: SP.ClientRuntimeContext, error: string): SP.IntResult;
             static logCustomRemoteAppError(context: SP.ClientRuntimeContext, productId: SP.Guid, error: string): SP.IntResult;
             static getLocalizedString(context: SP.ClientRuntimeContext, source: string, defaultResourceFile: string, language: number): SP.StringResult;
-            static createNewDiscussion(context: SP.ClientRuntimeContext, list: SP.List, title: string): SP.ListItem;
-            static createNewDiscussionReply(context: SP.ClientRuntimeContext, parent: SP.ListItem): SP.ListItem;
+            static createNewDiscussion<T>(context: SP.ClientRuntimeContext, list: SP.List, title: string): SP.ListItem<T>;
+            static createNewDiscussionReply<T>(context: SP.ClientRuntimeContext, parent: SP.ListItem<T>): SP.ListItem<T>;
             static markDiscussionAsFeatured(context: SP.ClientRuntimeContext, listID: string, topicIDs: string): void;
             static unmarkDiscussionAsFeatured(context: SP.ClientRuntimeContext, listID: string, topicIDs: string): void;
             static searchPrincipals(context: SP.ClientRuntimeContext, web: SP.Web, input: string, scopes: SP.Utilities.PrincipalType, sources: SP.Utilities.PrincipalSource, usersContainer: SP.UserCollection, maxCount: number): SP.Utilities.PrincipalInfo[];
@@ -8004,7 +7963,7 @@ declare namespace SP {
             static formatDateTime(context: SP.ClientRuntimeContext, web: SP.Web, datetime: Date, format: SP.Utilities.DateTimeFormat): SP.StringResult;
             static isUserLicensedForEntityInContext(context: SP.ClientRuntimeContext, licensableEntity: string): SP.BooleanResult;
         }
-        export enum DateTimeFormat {
+        enum DateTimeFormat {
             dateTime,
             dateOnly,
             timeOnly,
@@ -8014,7 +7973,7 @@ declare namespace SP {
             longDate,
             unknownFormat,
         }
-        export class EmailProperties extends SP.ClientValueObject {
+        class EmailProperties extends SP.ClientValueObject {
             get_additionalHeaders(): any;
             set_additionalHeaders(value: any): void;
             get_bCC(): string[];
@@ -8033,17 +7992,17 @@ declare namespace SP {
             writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
             constructor();
         }
-        export enum IconSize {
+        enum IconSize {
             size16,
             size32,
             size256,
         }
-        export enum LogAppErrorResult {
+        enum LogAppErrorResult {
             success,
             errorsThrottled,
             accessDenied,
         }
-        export class PrincipalInfo extends SP.ClientValueObject {
+        class PrincipalInfo extends SP.ClientValueObject {
             get_department(): string;
             get_displayName(): string;
             get_email(): string;
@@ -8057,7 +8016,7 @@ declare namespace SP {
             writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
             constructor();
         }
-        export enum PrincipalSource {
+        enum PrincipalSource {
             none,
             userInfoList,
             windows,
@@ -8065,7 +8024,7 @@ declare namespace SP {
             roleProvider,
             all,
         }
-        export enum PrincipalType {
+        enum PrincipalType {
             none,
             user,
             distributionList,
@@ -8073,13 +8032,13 @@ declare namespace SP {
             sharePointGroup,
             all,
         }
-        export enum SPWOPIFrameAction {
+        enum SPWOPIFrameAction {
             view,
             edit,
             mobileView,
             interactivePreview,
         }
-        export class WikiPageCreationInformation extends SP.ClientValueObject {
+        class WikiPageCreationInformation extends SP.ClientValueObject {
             get_serverRelativeUrl(): string;
             set_serverRelativeUrl(value: string): void;
             get_wikiHtmlContent(): string;
@@ -8088,13 +8047,13 @@ declare namespace SP {
             writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
             constructor();
         }
-        export class DateUtility {
+        class DateUtility {
             static isLeapYear(year: number): boolean;
             static dateToJulianDay(year: number, month: number, day: number): number;
             static julianDayToDate(julianDay: number): SP.DateTimeUtil.SimpleDate;
             static daysInMonth(year: number, month: number): number;
         }
-        export class HttpUtility {
+        class HttpUtility {
             /** Official version of STSHtmlEncode. Calls it internally. */
             static htmlEncode(stringToEncode: string): string;
             static urlPathEncode(stringToEncode: string): string;
@@ -8107,7 +8066,7 @@ declare namespace SP {
             static escapeXmlText(stringToEscape: string): string;
             static navigateHttpFolder(urlSrc: string, frameTarget: string): void;
         }
-        export class UrlBuilder {
+        class UrlBuilder {
             constructor(path: string);
             static urlCombine(path1: string, path2: string): string;
             static replaceOrAddQueryString(url: string, key: string, value: string): string;
@@ -8120,21 +8079,20 @@ declare namespace SP {
             toString(): string;
         }
 
-        export class LocUtility {
+        class LocUtility {
             static getLocalizedCountValue(locText: string, intervals: string, count: number): string;
         }
 
-        export class VersionUtility {
+        class VersionUtility {
             static get_layoutsLatestVersionRelativeUrl(): string;
             static get_layoutsLatestVersionUrl(): string;
             static getLayoutsPageUrl(pageName: string): string;
             static getImageUrl(imageName: string): string;
         }
-
     }
 
-    export module DateTimeUtil {
-        export class SimpleDate {
+    namespace DateTimeUtil {
+        class SimpleDate {
             constructor(year: number, month: number, day: number, era: number);
             get_year(): number;
             set_year(value: number): void;
@@ -8154,19 +8112,19 @@ declare namespace SP {
 }
 
 declare namespace SP {
-    export module WebParts {
-        export class LimitedWebPartManager extends SP.ClientObject {
+    namespace WebParts {
+        class LimitedWebPartManager extends SP.ClientObject {
             get_hasPersonalizedParts(): boolean;
             get_scope(): SP.WebParts.PersonalizationScope;
             get_webParts(): SP.WebParts.WebPartDefinitionCollection;
             addWebPart(webPart: SP.WebParts.WebPart, zoneId: string, zoneIndex: number): SP.WebParts.WebPartDefinition;
             importWebPart(webPartXml: string): SP.WebParts.WebPartDefinition;
         }
-        export enum PersonalizationScope {
+        enum PersonalizationScope {
             user,
             shared,
         }
-        export class TileData extends SP.ClientValueObject {
+        class TileData extends SP.ClientValueObject {
             get_backgroundImageLocation(): string;
             set_backgroundImageLocation(value: string): void;
             get_description(): string;
@@ -8183,7 +8141,7 @@ declare namespace SP {
             writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
             constructor();
         }
-        export class WebPart extends SP.ClientObject {
+        class WebPart extends SP.ClientObject {
             get_hidden(): boolean;
             set_hidden(value: boolean): void;
             get_isClosed(): boolean;
@@ -8195,7 +8153,7 @@ declare namespace SP {
             set_titleUrl(value: string): void;
             get_zoneIndex(): number;
         }
-        export class WebPartDefinition extends SP.ClientObject {
+        class WebPartDefinition extends SP.ClientObject {
             get_id(): SP.Guid;
             get_webPart(): SP.WebParts.WebPart;
             saveWebPartChanges(): void;
@@ -8204,7 +8162,7 @@ declare namespace SP {
             deleteWebPart(): void;
             moveWebPartTo(zoneID: string, zoneIndex: number): void;
         }
-        export class WebPartDefinitionCollection extends SP.ClientObjectCollection<WebPartDefinition> {
+        interface WebPartDefinitionCollection extends SP.ClientObjectCollection<WebPartDefinition> {
             itemAt(index: number): SP.WebParts.WebPartDefinition;
             get_item(index: number): SP.WebParts.WebPartDefinition;
             getById(id: SP.Guid): SP.WebParts.WebPartDefinition;
@@ -8214,8 +8172,8 @@ declare namespace SP {
 }
 
 declare namespace SP {
-    export module Workflow {
-        export class WorkflowAssociation extends SP.ClientObject {
+    namespace Workflow {
+        class WorkflowAssociation extends SP.ClientObject {
             get_allowManual(): boolean;
             set_allowManual(value: boolean): void;
             get_associationData(): string;
@@ -8246,14 +8204,14 @@ declare namespace SP {
             update(): void;
             deleteObject(): void;
         }
-        export class WorkflowAssociationCollection extends SP.ClientObjectCollection<WorkflowAssociation> {
+        interface WorkflowAssociationCollection extends SP.ClientObjectCollection<WorkflowAssociation> {
             itemAt(index: number): SP.Workflow.WorkflowAssociation;
             get_item(index: number): SP.Workflow.WorkflowAssociation;
             getById(associationId: SP.Guid): SP.Workflow.WorkflowAssociation;
             add(parameters: SP.Workflow.WorkflowAssociationCreationInformation): SP.Workflow.WorkflowAssociation;
             getByName(name: string): SP.Workflow.WorkflowAssociation;
         }
-        export class WorkflowAssociationCreationInformation extends SP.ClientValueObject {
+        class WorkflowAssociationCreationInformation extends SP.ClientValueObject {
             get_contentTypeAssociationHistoryListName(): string;
             set_contentTypeAssociationHistoryListName(value: string): void;
             get_contentTypeAssociationTaskListName(): string;
@@ -8270,7 +8228,7 @@ declare namespace SP {
             writeToXml(writer: SP.XmlWriter, serializationContext: SP.SerializationContext): void;
             constructor();
         }
-        export class WorkflowTemplate extends SP.ClientObject {
+        class WorkflowTemplate extends SP.ClientObject {
             get_allowManual(): boolean;
             get_associationUrl(): string;
             get_autoStartChange(): boolean;
@@ -8281,7 +8239,7 @@ declare namespace SP {
             get_name(): string;
             get_permissionsManual(): SP.BasePermissions;
         }
-        export class WorkflowTemplateCollection extends SP.ClientObjectCollection<WorkflowTemplate> {
+        interface WorkflowTemplateCollection extends SP.ClientObjectCollection<WorkflowTemplate> {
             itemAt(index: number): SP.Workflow.WorkflowTemplate;
             get_item(index: number): SP.Workflow.WorkflowTemplate;
             getById(templateId: SP.Guid): SP.Workflow.WorkflowTemplate;
@@ -8291,8 +8249,7 @@ declare namespace SP {
 }
 
 declare namespace SP.WorkflowServices {
-
-    export enum WorkflowStatus {
+    enum WorkflowStatus {
         notStarted,
         started,
         suspended,
@@ -8305,7 +8262,7 @@ declare namespace SP.WorkflowServices {
     }
 
     // TODO: comments, types
-    export class InteropService extends SP.ClientObject {
+    class InteropService extends SP.ClientObject {
         constructor(context: SP.ClientRuntimeContext, objectPath: SP.ObjectPathStaticProperty);
         static getCurrent(context: SP.ClientRuntimeContext): InteropService;
         enableEvents(listId: SP.Guid, itemGuid: SP.Guid): void;
@@ -8315,7 +8272,7 @@ declare namespace SP.WorkflowServices {
     }
 
     /** Represents a workflow definition and associated properties. */
-    export class WorkflowDefinition extends SP.ClientObject {
+    class WorkflowDefinition extends SP.ClientObject {
         constructor(context: SP.ClientRuntimeContext);
         /** Url of the association form */
         get_associationUrl(): string;
@@ -8371,14 +8328,14 @@ declare namespace SP.WorkflowServices {
         get_xaml(): string;
         /** XAML definition of the workflow */
         set_xaml(value: string): string;
-        /** This method adds a key-value pair (propertyName, value) to the workflow definition object�s property bag.  */
+        /** This method adds a key-value pair (propertyName, value) to the workflow definition object's property bag.  */
         setProperty(propertyName: string, value: string): void;
         /** This method is internal and is not intended to be used in your code. */
         initPropertiesFromJson(parentNode: any): void;
     }
 
     /** Represents a collection of WorkflowDefinition objects */
-    export class WorkflowDefinitionCollection extends SP.ClientObjectCollection<WorkflowDefinition> {
+    interface WorkflowDefinitionCollection extends SP.ClientObjectCollection<WorkflowDefinition> {
         itemAt(index: number): WorkflowDefinition;
         get_item(index: number): WorkflowDefinition;
         /** returns SP.WorkflowDefinition class */
@@ -8386,7 +8343,7 @@ declare namespace SP.WorkflowServices {
     }
 
     /** Manages workflow definitions and workflow activity authoring. */
-    export class WorkflowDeploymentService extends SP.ClientObject {
+    class WorkflowDeploymentService extends SP.ClientObject {
         /** Returns an XML representation of a list of valid Workflow Manager Client 1.0 actions for the specified web (WorkflowInfo element). */
         getDesignerActions(web: SP.Web): SP.StringResult;
         /** Returns an XML representation of a collection of XAML class signatures for workflow definitions.
@@ -8431,7 +8388,7 @@ declare namespace SP.WorkflowServices {
     }
 
     /** Represents an instance of a workflow association that performs on a list item the process that is defined in a workflow template */
-    export class WorkflowInstance extends SP.ClientObject {
+    class WorkflowInstance extends SP.ClientObject {
         /** Contains the error string or exception information if the workflow faults. */
         get_faultInfo(): string;
         /** Unique identifier (GUID) for the workflow instance */
@@ -8452,11 +8409,10 @@ declare namespace SP.WorkflowServices {
         get_workflowSubscriptionId(): SP.Guid;
         /** This method is internal and is not intended to be used in your code. */
         initPropertiesFromJson(parentNode: any): void;
-
     }
 
     /** Represents a collection of WorkflowInstance objects */
-    export class WorkflowInstanceCollection extends SP.ClientObjectCollection<WorkflowInstance> {
+    interface WorkflowInstanceCollection extends SP.ClientObjectCollection<WorkflowInstance> {
         itemAt(index: number): WorkflowInstance;
         get_item(index: number): WorkflowInstance;
         /** returns SP.WorkflowInstance class */
@@ -8464,7 +8420,7 @@ declare namespace SP.WorkflowServices {
     }
 
     /** Reads the SharePoint workflow instances from the external workflow host and manages the instance execution. */
-    export class WorkflowInstanceService extends SP.ClientObject {
+    class WorkflowInstanceService extends SP.ClientObject {
         /** Starts a Workflow Manager Client 1.0 instance specified by the subscription and passes the supplied parameters.
             Returns GUID of the instance object.
             @param payload Object that contains name-value pairs of parameter names and values to pass into the workflow instance. */
@@ -8505,7 +8461,7 @@ declare namespace SP.WorkflowServices {
     }
 
     /** Describes the workflow host configuration states and provides service objects that interact with the workflow */
-    export class WorkflowServicesManager extends SP.ClientObject {
+    class WorkflowServicesManager extends SP.ClientObject {
         constructor(context: SP.ClientRuntimeContext, web: SP.Web);
         static newObject(context: SP.ClientRuntimeContext, web: SP.Web): WorkflowServicesManager;
         /** The current application identifier.*/
@@ -8523,7 +8479,7 @@ declare namespace SP.WorkflowServices {
     }
 
     /** Base class representing subscriptions for the external workflow host. */
-    export class WorkflowSubscription extends SP.ClientObject {
+    class WorkflowSubscription extends SP.ClientObject {
         /** Gets the unique ID of the workflow definition to activate. */
         get_definitionId(): SP.Guid;
         /** Sets the unique ID of the workflow definition to activate. */
@@ -8569,14 +8525,14 @@ declare namespace SP.WorkflowServices {
     }
 
     /** Represents a collection of WorkflowSubscription objects */
-    export class WorkflowSubscriptionCollection extends SP.ClientObjectCollection<WorkflowSubscription> {
+    interface WorkflowSubscriptionCollection extends SP.ClientObjectCollection<WorkflowSubscription> {
         itemAt(index: number): WorkflowSubscription;
         get_item(index: number): WorkflowSubscription;
         /** returns SP.WorkflowInstance class */
         get_childItemType(): any;
     }
 
-    export class WorkflowSubscriptionService extends SP.ClientObject {
+    class WorkflowSubscriptionService extends SP.ClientObject {
         constructor(context: SP.ClientRuntimeContext, objectPath: SP.ObjectPathStaticProperty);
         static getCurrent(context: SP.ClientRuntimeContext): WorkflowSubscriptionService;
         /** Creates a workflow subscription for a workflow, and returns the unique identifier of the new subscription. */
@@ -8606,71 +8562,67 @@ declare namespace SP.WorkflowServices {
             @param listId The unique identifier (GUID) of the list on which to filter the subscriptions. */
         enumerateSubscriptionsByList(listId: string): WorkflowSubscriptionCollection;
     }
-
 }
 
-
-
 declare namespace SP {
-    export module Publishing {
-        export class PublishingWeb extends ClientObject {
+    namespace Publishing {
+        class PublishingWeb extends ClientObject {
             static getPublishingWeb(context: ClientContext, web: Web): PublishingWeb;
 
-            public get_web(): Web;
-            public addPublishingPage(pageInformation: PublishingPageInformation): PublishingPage;
+            get_web(): Web;
+            addPublishingPage(pageInformation: PublishingPageInformation): PublishingPage;
         }
 
-        export class PublishingPageInformation extends ClientValueObject {
+        class PublishingPageInformation extends ClientValueObject {
+            get_folder(): Folder;
+            set_folder(value: Folder): Folder;
 
-            public get_folder(): Folder;
-            public set_folder(value: Folder): Folder;
+            get_name(): string;
+            set_name(value: string): string;
 
-            public get_name(): string;
-            public set_name(value: string): string;
-
-            public get_pageLayoutListItem(): ListItem;
-            public set_pageLayoutListItem(value: ListItem): ListItem;
+            get_pageLayoutListItem(): ListItem;
+            set_pageLayoutListItem(value: ListItem): ListItem;
         }
 
-        export class PublishingPage extends ScheduledItem {
+        class PublishingPage extends ScheduledItem {
             static getPublishingPage(context: ClientContext, sourceListItem: ListItem): PublishingPage;
-            public addFriendlyUrl(friendlyUrlSegment: string, editableParent: Navigation.NavigationTermSetItem, doAddToNavigation: boolean): StringResult;
+            addFriendlyUrl(friendlyUrlSegment: string, editableParent: Navigation.NavigationTermSetItem, doAddToNavigation: boolean): StringResult;
         }
 
-        export class ScheduledItem extends ClientObject {
-            public get_listItem(): ListItem;
+        class ScheduledItem extends ClientObject {
+            get_listItem(): ListItem;
 
-            public get_startDate(): Date;
-            public set_startDate(value: Date): Date;
+            get_startDate(): Date;
+            set_startDate(value: Date): Date;
 
-            public get_endDate(): Date;
-            public set_endDate(value: Date): Date;
+            get_endDate(): Date;
+            set_endDate(value: Date): Date;
 
-            public schedule(approvalComment: string): void;
+            schedule(approvalComment: string): void;
         }
 
-        export class PublishingSite extends ClientObject {
+        class PublishingSite extends ClientObject {
             static createPageLayout(context: ClientContext, parameters: PageLayoutCreationInformation): void;
         }
 
-        export class PageLayoutCreationInformation extends ClientValueObject {
-            public get_web(): Web;
-            public set_web(value: Web): Web;
+        class PageLayoutCreationInformation extends ClientValueObject {
+            get_web(): Web;
+            set_web(value: Web): Web;
 
-            public get_associatedContentTypeId(): string;
-            public set_associatedContentTypeId(value: string): string;
+            get_associatedContentTypeId(): string;
+            set_associatedContentTypeId(value: string): string;
 
-            public get_masterPageUrl(): string;
-            public set_masterPageUrl(value: string): string;
+            get_masterPageUrl(): string;
+            set_masterPageUrl(value: string): string;
 
-            public get_newPageLayoutNameWithoutExtension(): string;
-            public set_newPageLayoutNameWithoutExtension(value: string): string;
+            get_newPageLayoutNameWithoutExtension(): string;
+            set_newPageLayoutNameWithoutExtension(value: string): string;
 
-            public get_newPageLayoutEditablePath(): string;
-            public set_newPageLayoutEditablePath(value: string): string;
+            get_newPageLayoutEditablePath(): string;
+            set_newPageLayoutEditablePath(value: string): string;
         }
 
-        export class SiteServicesAddins {
+        class SiteServicesAddins {
             static getSettings(context: ClientContext, addinId: Guid): AddinSettings;
             static setSettings(context: ClientContext, addin: AddinSettings): void;
             static deleteSettings(context: ClientContext, addinId: Guid): void;
@@ -8680,52 +8632,50 @@ declare namespace SP {
             static deletePlugin(context: ClientContext, pluginName: string): void;
         }
 
-        export class AddinSettings extends ClientObject {
+        class AddinSettings extends ClientObject {
             constructor(ctx: ClientContext, id: Guid);
 
-            public get_id(): Guid;
+            get_id(): Guid;
 
-            public get_title(): string;
-            public set_title(value: string): string;
+            get_title(): string;
+            set_title(value: string): string;
 
-            public get_description(): string;
-            public set_description(value: string): string;
+            get_description(): string;
+            set_description(value: string): string;
 
-            public get_enabled(): boolean;
-            public set_enabled(value: boolean): boolean;
+            get_enabled(): boolean;
+            set_enabled(value: boolean): boolean;
 
-            public get_namespace(): boolean;
-            public set_namespace(value: boolean): boolean;
+            get_namespace(): boolean;
+            set_namespace(value: boolean): boolean;
 
-            public get_headScript(): string;
-            public set_headScript(value: string): string;
+            get_headScript(): string;
+            set_headScript(value: string): string;
 
-            public get_htmlStartBody(): string;
-            public set_htmlStartBody(value: string): string;
+            get_htmlStartBody(): string;
+            set_htmlStartBody(value: string): string;
 
-            public get_htmlEndBody(): string;
-            public set_htmlEndBody(value: string): string;
+            get_htmlEndBody(): string;
+            set_htmlEndBody(value: string): string;
 
-            public get_metaTagPagePropertyMappings(): { [key: string]: string };
-            public set_metaTagPagePropertyMappings(value: { [key: string]: string }): { [key: string]: string };
-
+            get_metaTagPagePropertyMappings(): { [key: string]: string };
+            set_metaTagPagePropertyMappings(value: { [key: string]: string }): { [key: string]: string };
         }
 
-        export class AddinPlugin extends ClientObject {
+        class AddinPlugin extends ClientObject {
             constructor(ctx: ClientContext);
 
-            public get_description(): string;
-            public set_description(value: string): string;
+            get_description(): string;
+            set_description(value: string): string;
 
-            public get_markup(): string;
-            public set_markup(value: string): string;
+            get_markup(): string;
+            set_markup(value: string): string;
 
-            public get_title(): string;
-            public set_title(value: string): string;
+            get_title(): string;
+            set_title(value: string): string;
         }
 
-
-        export class DesignPackage {
+        class DesignPackage {
             static install(context: ClientContext, site: Site, info: DesignPackageInfo, path: string): void;
             static uninstall(context: ClientContext, site: Site, info: DesignPackageInfo): void;
             static apply(context: ClientContext, site: Site, info: DesignPackageInfo): void;
@@ -8733,243 +8683,238 @@ declare namespace SP {
             static exportSmallBusiness(context: ClientContext, site: Site, packageName: string, includeSearchConfiguration: boolean): ClientResult<DesignPackageInfo>;
         }
 
-        export class DesignPackageInfo extends ClientValueObject {
-            public get_packageName(): string;
-            public set_packageName(value: string): string;
+        class DesignPackageInfo extends ClientValueObject {
+            get_packageName(): string;
+            set_packageName(value: string): string;
 
-            public get_packageGuid(): Guid;
-            public set_packageGuid(value: Guid): Guid;
+            get_packageGuid(): Guid;
+            set_packageGuid(value: Guid): Guid;
 
-            public get_majorVersion(): number;
-            public set_majorVersion(value: number): number;
+            get_majorVersion(): number;
+            set_majorVersion(value: number): number;
 
-            public get_minorVersion(): number;
-            public set_minorVersion(value: number): number;
+            get_minorVersion(): number;
+            set_minorVersion(value: number): number;
         }
 
-        export class SiteImageRenditions {
+        class SiteImageRenditions {
             static getRenditions(context: ClientContext): ImageRendition[];
             static setRenditions(context: ClientContext, renditions: ImageRendition[]): void;
         }
 
-        export class ImageRendition extends ClientValueObject {
-            public get_id(): number;
-            public get_version(): number;
+        class ImageRendition extends ClientValueObject {
+            get_id(): number;
+            get_version(): number;
 
-            public get_name(): string;
-            public set_name(value: string): string;
+            get_name(): string;
+            set_name(value: string): string;
 
-            public get_width(): number;
-            public set_width(value: number): number;
+            get_width(): number;
+            set_width(value: number): number;
 
-            public get_height(): number;
-            public set_height(value: number): number;
+            get_height(): number;
+            set_height(value: number): number;
         }
 
-        export class Variations extends ClientObject {
+        class Variations extends ClientObject {
             static getLabels(context: ClientContext): ClientObjectList<VariationLabel>;
             static getPeerUrl(context: ClientContext, currentUrl: string, labelTitle: string): StringResult;
             static updateListItems(context: ClientContext, listId: Guid, itemIds: number[]): void;
         }
 
-        export class VariationLabel extends ClientObject {
-            public get_displayName(): string;
-            public set_displayName(value: string): string;
+        class VariationLabel extends ClientObject {
+            get_displayName(): string;
+            set_displayName(value: string): string;
 
-            public get_isSource(): boolean;
-            public set_isSource(value: boolean): boolean;
+            get_isSource(): boolean;
+            set_isSource(value: boolean): boolean;
 
-            public get_language(): string;
-            public set_language(value: string): string;
+            get_language(): string;
+            set_language(value: string): string;
 
-            public get_locale(): string;
-            public set_locale(value: string): string;
+            get_locale(): string;
+            set_locale(value: string): string;
 
-            public get_title(): string;
-            public set_title(value: string): string;
+            get_title(): string;
+            set_title(value: string): string;
 
-            public get_topWebUrl(): string;
-            public set_topWebUrl(value: string): string;
+            get_topWebUrl(): string;
+            set_topWebUrl(value: string): string;
         }
 
-        export class CustomizableString extends ClientObject {
-            public get_defaultValue(): string;
+        class CustomizableString extends ClientObject {
+            get_defaultValue(): string;
 
-            public get_value(): string;
-            public set_value(value: string): string;
+            get_value(): string;
+            set_value(value: string): string;
 
-            public get_usesDefaultValue(): boolean;
-            public set_usesDefaultValue(value: boolean): boolean;
-
+            get_usesDefaultValue(): boolean;
+            set_usesDefaultValue(value: boolean): boolean;
         }
 
-
-        export module Navigation {
-            export enum NavigationLinkType {
+        namespace Navigation {
+            enum NavigationLinkType {
                 root,
                 friendlyUrl,
                 simpleLink
             }
 
-            export enum StandardNavigationSource {
+            enum StandardNavigationSource {
                 unknown,
                 portalProvider,
                 taxonomyProvider,
                 inheritFromParentWeb
             }
 
-            export class NavigationTermSetItem extends ClientObject {
-                public get_id(): Guid;
+            class NavigationTermSetItem extends ClientObject {
+                get_id(): Guid;
 
-                public get_isReadOnly(): boolean;
+                get_isReadOnly(): boolean;
 
-                public get_linkType(): NavigationLinkType;
-                public set_linkType(value: NavigationLinkType): NavigationLinkType;
+                get_linkType(): NavigationLinkType;
+                set_linkType(value: NavigationLinkType): NavigationLinkType;
 
-                public get_targetUrlForChildTerms(): CustomizableString;
+                get_targetUrlForChildTerms(): CustomizableString;
 
-                public get_catalogTargetUrlForChildTerms(): CustomizableString;
+                get_catalogTargetUrlForChildTerms(): CustomizableString;
 
-                public get_taxonomyName(): string;
+                get_taxonomyName(): string;
 
-                public get_title(): CustomizableString;
+                get_title(): CustomizableString;
 
-                public get_terms(): NavigationTermCollection;
+                get_terms(): NavigationTermCollection;
 
-                public get_view(): NavigationTermSetView;
+                get_view(): NavigationTermSetView;
 
-                public createTerm(termName: string, linkType: NavigationLinkType, termId: Guid): Taxonomy.Term;
+                createTerm(termName: string, linkType: NavigationLinkType, termId: Guid): Taxonomy.Term;
 
-                public getTaxonomyTermStore(): Taxonomy.TermStore;
+                getTaxonomyTermStore(): Taxonomy.TermStore;
 
-                public getResolvedDisplayUrl(browserQueryString: string): StringResult;
+                getResolvedDisplayUrl(browserQueryString: string): StringResult;
             }
 
-            export class NavigationTermCollection extends ClientObjectCollection<NavigationTerm> {
-
+            interface NavigationTermCollection extends ClientObjectCollection<NavigationTerm> {
             }
 
-            export class NavigationTerm extends NavigationTermSetItem {
-                public get_associatedFolderUrl(): string;
-                public set_associatedFolderUrl(value: string): string;
+            class NavigationTerm extends NavigationTermSetItem {
+                get_associatedFolderUrl(): string;
+                set_associatedFolderUrl(value: string): string;
 
-                public get_catalogTargetUrl(): CustomizableString;
+                get_catalogTargetUrl(): CustomizableString;
 
-                public get_categoryImageUrl(): string;
-                public set_categoryImageUrl(value: string): string;
+                get_categoryImageUrl(): string;
+                set_categoryImageUrl(value: string): string;
 
-                public get_excludedProviders(): NavigationTermProviderNameCollection;
+                get_excludedProviders(): NavigationTermProviderNameCollection;
 
-                public get_excludeFromCurrentNavigation(): boolean;
-                public set_excludeFromCurrentNavigation(value: boolean): boolean;
+                get_excludeFromCurrentNavigation(): boolean;
+                set_excludeFromCurrentNavigation(value: boolean): boolean;
 
-                public get_excludeFromGlobalNavigation(): boolean;
-                public set_excludeFromGlobalNavigation(value: boolean): boolean;
+                get_excludeFromGlobalNavigation(): boolean;
+                set_excludeFromGlobalNavigation(value: boolean): boolean;
 
-                public get_friendlyUrlSegment(): CustomizableString;
+                get_friendlyUrlSegment(): CustomizableString;
 
-                public get_hoverText(): string;
-                public set_hoverText(value: string): string;
+                get_hoverText(): string;
+                set_hoverText(value: string): string;
 
-                public get_isDeprecated(): boolean;
-                public get_isPinned(): boolean;
-                public get_isPinnedRoot(): boolean;
+                get_isDeprecated(): boolean;
+                get_isPinned(): boolean;
+                get_isPinnedRoot(): boolean;
 
-                public get_parent(): NavigationTerm;
+                get_parent(): NavigationTerm;
 
-                public get_simpleLinkUrl(): string;
+                get_simpleLinkUrl(): string;
 
-                public set_simpleLinkUrl(value: string): string;
+                set_simpleLinkUrl(value: string): string;
 
-                public get_targetUrl(): CustomizableString;
+                get_targetUrl(): CustomizableString;
 
-                public get_termSet(): NavigationTermSet;
+                get_termSet(): NavigationTermSet;
 
-                public getAsEditable(taxonomySession: Taxonomy.TaxonomySession): NavigationTerm;
+                getAsEditable(taxonomySession: Taxonomy.TaxonomySession): NavigationTerm;
 
-                public getWithNewView(newView: NavigationTermSetView): NavigationTerm;
+                getWithNewView(newView: NavigationTermSetView): NavigationTerm;
 
-                public getResolvedTargetUrl(browserQueryString: string, remainingUrlSegments: string[]): StringResult;
+                getResolvedTargetUrl(browserQueryString: string, remainingUrlSegments: string[]): StringResult;
 
-                public getResolvedTargetUrlWithoutQuery(): StringResult;
+                getResolvedTargetUrlWithoutQuery(): StringResult;
 
-                public getResolvedAssociatedFolderUrl(): StringResult;
+                getResolvedAssociatedFolderUrl(): StringResult;
 
-                public getWebRelativeFriendlyUrl(): StringResult;
+                getWebRelativeFriendlyUrl(): StringResult;
 
-                public getAllParentTerms(): NavigationTermCollection;
+                getAllParentTerms(): NavigationTermCollection;
 
-                public getTaxonomyTerm(): Taxonomy.Term;
+                getTaxonomyTerm(): Taxonomy.Term;
 
-                public move(newParent: NavigationTermSetItem): void;
+                move(newParent: NavigationTermSetItem): void;
 
-                public deleteObject(): void;
+                deleteObject(): void;
 
                 static getAsResolvedByWeb(context: ClientContext, term: Taxonomy.Term, web: Web, siteMapProviderName: string): NavigationTerm;
                 static getAsResolvedByView(context: ClientContext, term: Taxonomy.Term, view: NavigationTermSetView): NavigationTerm;
             }
 
+            class NavigationTermSet extends NavigationTermSetItem {
+                get_isNavigationTermSet(): boolean;
+                set_isNavigationTermSet(value: boolean): boolean;
 
-            export class NavigationTermSet extends NavigationTermSetItem {
-                public get_isNavigationTermSet(): boolean;
-                public set_isNavigationTermSet(value: boolean): boolean;
+                get_lcid(): number;
 
-                public get_lcid(): number;
+                get_loadedFromPersistedData(): boolean;
 
-                public get_loadedFromPersistedData(): boolean;
+                get_termGroupId(): Guid;
+                get_termStoreId(): Guid;
 
-                public get_termGroupId(): Guid;
-                public get_termStoreId(): Guid;
+                getAsEditable(taxonomySession: Taxonomy.TaxonomySession): NavigationTermSet;
 
-                public getAsEditable(taxonomySession: Taxonomy.TaxonomySession): NavigationTermSet;
+                getWithNewView(newView: NavigationTermSetView): NavigationTermSet;
 
-                public getWithNewView(newView: NavigationTermSetView): NavigationTermSet;
+                getTaxonomyTermSet(): Taxonomy.TermSet;
 
-                public getTaxonomyTermSet(): Taxonomy.TermSet;
+                getAllTerms(): NavigationTermCollection;
 
-                public getAllTerms(): NavigationTermCollection;
-
-                public findTermForUrl(url: string): NavigationTerm;
+                findTermForUrl(url: string): NavigationTerm;
 
                 static getAsResolvedByWeb(context: ClientContext, termSet: Taxonomy.TermSet, web: Web, siteMapProviderName: string): NavigationTermSet;
                 static getAsResolvedByView(context: ClientContext, termSet: Taxonomy.TermSet, view: NavigationTermSetView): NavigationTermSet;
             }
 
-
-            export class NavigationTermProviderNameCollection extends ClientObjectCollection<string> {
-                public Add(item: string): void;
-                public Clear(): void;
-                public Remove(item: string): BooleanResult;
+            interface NavigationTermProviderNameCollection extends ClientObjectCollection<string> {
+                Add(item: string): void;
+                Clear(): void;
+                Remove(item: string): BooleanResult;
             }
 
-            export class NavigationTermSetView extends ClientObject {
+            class NavigationTermSetView extends ClientObject {
                 constructor(context: ClientContext, web: Web, siteMapProviderName: string);
 
-                public get_excludeDeprecatedTerms(): boolean;
-                public set_excludeDeprecatedTerms(value: boolean): boolean;
+                get_excludeDeprecatedTerms(): boolean;
+                set_excludeDeprecatedTerms(value: boolean): boolean;
 
-                public get_excludeTermsByPermissions(): boolean;
-                public set_excludeTermsByPermissions(value: boolean): boolean;
+                get_excludeTermsByPermissions(): boolean;
+                set_excludeTermsByPermissions(value: boolean): boolean;
 
-                public get_excludeTermsByProvider(): boolean;
-                public set_excludeTermsByProvider(value: boolean): boolean;
+                get_excludeTermsByProvider(): boolean;
+                set_excludeTermsByProvider(value: boolean): boolean;
 
-                public get_serverRelativeSiteUrl(): string;
+                get_serverRelativeSiteUrl(): string;
 
-                public get_serverRelativeWebUrl(): string;
+                get_serverRelativeWebUrl(): string;
 
-                public get_siteMapProviderName(): string;
-                public set_siteMapProviderName(value: string): string;
+                get_siteMapProviderName(): string;
+                set_siteMapProviderName(value: string): string;
 
-                public get_webId(): Guid;
-                public get_webTitle(): string;
+                get_webId(): Guid;
+                get_webTitle(): string;
 
-                public getCopy(): NavigationTermSetView;
+                getCopy(): NavigationTermSetView;
 
                 static createEmptyInstance(context: ClientContext): NavigationTermSetView;
             }
 
-            export class TaxonomyNavigation {
+            class TaxonomyNavigation {
                 static getWebNavigationSettings(context: ClientContext, web: Web): WebNavigationSettings;
                 static getTermSetForWeb(context: ClientContext, web: Web, siteMapProviderName: string, includeInheritedSettings: boolean): NavigationTermSet;
                 static setCrawlAsFriendlyUrlPage(context: ClientContext, navigationTerm: Taxonomy.Term, crawlAsFriendlyUrlPage: boolean): BooleanResult;
@@ -8979,47 +8924,46 @@ declare namespace SP {
                 static flushTermSetFromCache(context: ClientContext, webForPermissions: Web, termStoreId: Guid, termSetId: Guid): void;
             }
 
-            export class WebNavigationSettings extends ClientObject {
+            class WebNavigationSettings extends ClientObject {
                 constructor(context: ClientContext, web: Web);
 
-                public get_addNewPagesToNavigation(): boolean;
-                public set_addNewPagesToNavigation(value: boolean): boolean;
+                get_addNewPagesToNavigation(): boolean;
+                set_addNewPagesToNavigation(value: boolean): boolean;
 
-                public get_createFriendlyUrlsForNewPages(): boolean;
-                public set_createFriendlyUrlsForNewPages(value: boolean): boolean;
+                get_createFriendlyUrlsForNewPages(): boolean;
+                set_createFriendlyUrlsForNewPages(value: boolean): boolean;
 
-                public get_currentNavigation(): StandardNavigationSettings;
-                public get_globalNavigation(): StandardNavigationSettings;
+                get_currentNavigation(): StandardNavigationSettings;
+                get_globalNavigation(): StandardNavigationSettings;
 
-                public update(taxonomySession: Taxonomy.TaxonomySession): void;
-                public resetToDefaults(): void;
+                update(taxonomySession: Taxonomy.TaxonomySession): void;
+                resetToDefaults(): void;
             }
 
-            export class StandardNavigationSettings extends ClientObject {
-                public get_termSetId(): Guid;
-                public set_termSetId(value: Guid): Guid;
+            class StandardNavigationSettings extends ClientObject {
+                get_termSetId(): Guid;
+                set_termSetId(value: Guid): Guid;
 
-                public get_termStoreId(): Guid;
-                public set_termStoreId(value: Guid): Guid;
+                get_termStoreId(): Guid;
+                set_termStoreId(value: Guid): Guid;
 
-                public get_source(): StandardNavigationSource;
+                get_source(): StandardNavigationSource;
 
-                public set_source(value: StandardNavigationSource): StandardNavigationSource;
+                set_source(value: StandardNavigationSource): StandardNavigationSource;
             }
-
         }
     }
 }
 
 declare namespace SP {
-    export module CompliancePolicy {
-        export enum SPContainerType {
-            site,//: 0,
-            web,//: 1,
-            list//: 2
+    namespace CompliancePolicy {
+        enum SPContainerType {
+            site, // : 0,
+            web, // : 1,
+            list // : 2
         }
 
-        export class SPContainerId extends ClientObject {
+        class SPContainerId extends ClientObject {
             static createFromList(context: ClientRuntimeContext, list: List): SPContainerId;
             static createFromWeb(context: ClientRuntimeContext, web: Web): SPContainerId;
             static createFromSite(context: ClientRuntimeContext, site: Site): SPContainerId;
@@ -9052,8 +8996,7 @@ declare namespace SP {
             serialize(): SP.StringResult;
         }
 
-        export class SPPolicyAssociation extends ClientObject {
-
+        class SPPolicyAssociation extends ClientObject {
             get_allowOverride(): boolean;
             set_allowOverride(value: boolean): boolean;
 
@@ -9097,8 +9040,7 @@ declare namespace SP {
             set_whenCreatedUTC(value: Date): Date;
         }
 
-        export class SPPolicyBinding extends ClientObject {
-
+        class SPPolicyBinding extends ClientObject {
             get_identity(): any;
             set_identity(value: any): any;
 
@@ -9142,8 +9084,7 @@ declare namespace SP {
             set_whenCreatedUTC(value: Date): Date;
         }
 
-        export class SPPolicyDefinition extends ClientObject {
-
+        class SPPolicyDefinition extends ClientObject {
             get_comment(): string;
             set_comment(value: string): string;
 
@@ -9185,12 +9126,9 @@ declare namespace SP {
 
             get_whenCreatedUTC(): Date;
             set_whenCreatedUTC(value: Date): Date;
-
-
         }
 
-        export class SPPolicyRule extends ClientObject {
-
+        class SPPolicyRule extends ClientObject {
             get_comment(): string;
             set_comment(value: string): string;
 
@@ -9230,14 +9168,13 @@ declare namespace SP {
             set_whenCreatedUTC(value: Date): Date;
         }
 
-        export class SPPolicyStore extends ClientObject {
+        class SPPolicyStore extends ClientObject {
             constructor(context: ClientRuntimeContext, web: Web);
 
             static createPolicyDefinition(context: ClientRuntimeContext): SPPolicyDefinition;
             static createPolicyBinding(context: ClientRuntimeContext): SPPolicyBinding;
             static createPolicyAssociation(context: ClientRuntimeContext): SPPolicyAssociation;
             static createPolicyRule(context: ClientRuntimeContext): SPPolicyRule;
-
 
             updatePolicyRule(policyRule: SPPolicyRule): void;
 
@@ -9270,28 +9207,26 @@ declare namespace SP {
             deletePolicyAssociation(policyAssociationId: any): void;
         }
 
-        export class SPPolicyStoreProxy extends ClientObject {
+        class SPPolicyStoreProxy extends ClientObject {
             constructor(context: ClientRuntimeContext, web: Web);
 
             get_policyStoreUrl(): string;
         }
-
     }
 
-    export module Discovery {
-
-        export enum ExportStatus {
-            notStarted,//: 0,
-            started,//: 1,
-            complete,//: 2,
-            failed//: 3
+    namespace Discovery {
+        enum ExportStatus {
+            notStarted, // : 0,
+            started, // : 1,
+            complete, // : 2,
+            failed // : 3
         }
 
-        export class Case extends ClientObject {
+        class Case extends ClientObject {
             constructor(context: ClientRuntimeContext, web: Web);
             getExportContent(sourceIds: number[]): SP.StringResult;
         }
-        export class Export extends ClientObject {
+        class Export extends ClientObject {
             constructor(context: ClientRuntimeContext, item: ListItem);
             get_status(): ExportStatus;
             set_status(value: ExportStatus): ExportStatus;
@@ -9300,8 +9235,8 @@ declare namespace SP {
         }
     }
 
-    export module InformationPolicy {
-        export class ProjectPolicy extends SP.ClientObject {
+    namespace InformationPolicy {
+        class ProjectPolicy extends SP.ClientObject {
             constructor(context: ClientRuntimeContext, objectPath: ObjectPath);
             get_description(): string;
 
@@ -9316,7 +9251,6 @@ declare namespace SP {
 
             get_name(): string;
             savePolicy(): void;
-
 
             static getProjectPolicies(context: ClientRuntimeContext, web: Web): ClientObjectList<ProjectPolicy>;
             static getCurrentlyAppliedProject(context: ClientRuntimeContext, web: Web): ProjectPolicy;
@@ -9337,30 +9271,30 @@ declare class SPClientAutoFill {
         Footer: number;
         Separator: number;
         Loading: number;
-    }
+    };
 
-    static KeyProperty: string; //= 'AutoFillKey';
-    static DisplayTextProperty: string;// = 'AutoFillDisplayText';
-    static SubDisplayTextProperty: string; //= 'AutoFillSubDisplayText';
-    static TitleTextProperty: string; //= 'AutoFillTitleText';
-    static MenuOptionTypeProperty: string;//= 'AutoFillMenuOptionType';
+    static KeyProperty: string; // = 'AutoFillKey';
+    static DisplayTextProperty: string; // = 'AutoFillDisplayText';
+    static SubDisplayTextProperty: string; // = 'AutoFillSubDisplayText';
+    static TitleTextProperty: string; // = 'AutoFillTitleText';
+    static MenuOptionTypeProperty: string; // = 'AutoFillMenuOptionType';
 
     static GetAutoFillObjFromInput(elmText: HTMLInputElement): SPClientAutoFill;
     static GetAutoFillObjFromContainer(elmChild: HTMLElement): SPClientAutoFill;
     static GetAutoFillMenuItemFromOption(elmChild: HTMLElement): HTMLElement;
 
     constructor(elmTextId: string, elmContainerId: string, fnPopulateAutoFill: (targetElement: HTMLInputElement) => void);
-    public TextElementId: string;
-    public AutoFillContainerId: string;
-    public AutoFillMenuId: string;
-    public VisibleItemCount: number;
-    public CurrentFocusOption: number;
-    public AutoFillMinTextLength: number;
-    public AutoFillTimeout: number;
-    public AutoFillCallbackTimeoutID: string;
-    public FuncOnAutoFillClose: (elmTextId: string, ojData: ISPClientAutoFillData) => void;
-    public FuncPopulateAutoFill: (targetElement: HTMLElement) => void;
-    public AllOptionData: { [key: string]: ISPClientAutoFillData };
+    TextElementId: string;
+    AutoFillContainerId: string;
+    AutoFillMenuId: string;
+    VisibleItemCount: number;
+    CurrentFocusOption: number;
+    AutoFillMinTextLength: number;
+    AutoFillTimeout: number;
+    AutoFillCallbackTimeoutID: string;
+    FuncOnAutoFillClose: (elmTextId: string, ojData: ISPClientAutoFillData) => void;
+    FuncPopulateAutoFill: (targetElement: HTMLElement) => void;
+    AllOptionData: { [key: string]: ISPClientAutoFillData };
 
     PopulateAutoFill(jsonObjSuggestions: ISPClientAutoFillData[], fnOnAutoFillCloseFuncName: (elmTextId: string, objData: ISPClientAutoFillData) => void): void;
     IsAutoFillOpen(): boolean;
@@ -9373,6 +9307,7 @@ declare class SPClientAutoFill {
     UpdateAutoFillPosition(): void;
 }
 
+// tslint:disable-next-line: interface-name
 interface ISPClientAutoFillData {
     AutoFillKey?: any;
     AutoFillDisplayText?: string;
@@ -9380,7 +9315,6 @@ interface ISPClientAutoFillData {
     AutoFillTitleText?: string;
     AutoFillMenuOptionType?: number;
 }
-
 
 declare class SPClientPeoplePicker {
     static ValueName: string; // = 'Key';
@@ -9413,102 +9347,102 @@ declare class SPClientPeoplePicker {
     static IsUserEntity(entity: ISPClientPeoplePickerEntity): boolean;
     static CreateSPPrincipalType(acctStr: string): number;
 
+    TopLevelElementId: string; // '',
+    EditorElementId: string; // '',
+    AutoFillElementId: string; // '',
+    ResolvedListElementId: string; // '',
+    InitialHelpTextElementId: string; // '',
+    WaitImageId: string; // '',
+    HiddenInputId: string; // '',
+    AllowEmpty: boolean; // true,
+    ForceClaims: boolean; // false,
+    AutoFillEnabled: boolean; // true,
+    AllowMultipleUsers: boolean; // false,
+    OnValueChangedClientScript: (pickerElementId: string, users: ISPClientPeoplePickerEntity[]) => void;
+    OnUserResolvedClientScript: (pickerElementId: string, users: ISPClientPeoplePickerEntity[]) => void;
+    OnControlValidateClientScript: (pickerElementId: string, users: ISPClientPeoplePickerEntity[]) => void;
+    UrlZone: SP.UrlZone; // null,
+    AllUrlZones: boolean; // false,
+    SharePointGroupID: number; // 0,
+    AllowEmailAddresses: boolean; // false,
+    PPMRU: SPClientPeoplePickerMRU;
+    UseLocalSuggestionCache: boolean; // true,
+    CurrentQueryStr: string; // '',
+    LatestSearchQueryStr: string; // '',
+    InitialSuggestions: ISPClientPeoplePickerEntity[];
+    CurrentLocalSuggestions: ISPClientPeoplePickerEntity[];
+    CurrentLocalSuggestionsDict: ISPClientPeoplePickerEntity;
+    VisibleSuggestions: number; // 5,
+    PrincipalAccountType: string; // '',
+    PrincipalAccountTypeEnum: SP.Utilities.PrincipalType;
+    EnabledClaimProviders: string; // '',
+    SearchPrincipalSource: SP.Utilities.PrincipalSource; // null,
+    ResolvePrincipalSource: SP.Utilities.PrincipalSource; // null,
+    MaximumEntitySuggestions: number; // 30,
+    EditorWidthSet: boolean; // false,
+    QueryScriptInit: boolean; // false,
+    AutoFillControl: SPClientAutoFill; // null,
+    TotalUserCount: number; // 0,
+    UnresolvedUserCount: number; // 0,
+    UserQueryDict: { [index: string]: SP.StringResult };
+    ProcessedUserList: { [index: string]: SPClientPeoplePickerProcessedUser };
+    HasInputError: boolean; // false,
+    HasServerError: boolean; // false,
+    ShowUserPresence: boolean; // true,
+    TerminatingCharacter: string; // ';',
+    UnresolvedUserElmIdToReplace: string; // '',
+    WebApplicationID: SP.Guid; // '{00000000-0000-0000-0000-000000000000}',
+    GetAllUserInfo(): ISPClientPeoplePickerEntity[];
 
-    public TopLevelElementId: string; // '',
-    public EditorElementId: string; //'',
-    public AutoFillElementId: string; //'',
-    public ResolvedListElementId: string; //'',
-    public InitialHelpTextElementId: string; //'',
-    public WaitImageId: string; //'',
-    public HiddenInputId: string; //'',
-    public AllowEmpty: boolean; //true,
-    public ForceClaims: boolean; //false,
-    public AutoFillEnabled: boolean; //true,
-    public AllowMultipleUsers: boolean; //false,
-    public OnValueChangedClientScript: (pickerElementId: string, users: ISPClientPeoplePickerEntity[]) => void;
-    public OnUserResolvedClientScript: (pickerElementId: string, users: ISPClientPeoplePickerEntity[]) => void;
-    public OnControlValidateClientScript: (pickerElementId: string, users: ISPClientPeoplePickerEntity[]) => void;
-    public UrlZone: SP.UrlZone; //null,
-    public AllUrlZones: boolean; //false,
-    public SharePointGroupID: number; //0,
-    public AllowEmailAddresses: boolean; //false,
-    public PPMRU: SPClientPeoplePickerMRU;
-    public UseLocalSuggestionCache: boolean; //true,
-    public CurrentQueryStr: string; //'',
-    public LatestSearchQueryStr: string; // '',
-    public InitialSuggestions: ISPClientPeoplePickerEntity[];
-    public CurrentLocalSuggestions: ISPClientPeoplePickerEntity[];
-    public CurrentLocalSuggestionsDict: ISPClientPeoplePickerEntity;
-    public VisibleSuggestions: number; //5,
-    public PrincipalAccountType: string; //'',
-    public PrincipalAccountTypeEnum: SP.Utilities.PrincipalType;
-    public EnabledClaimProviders: string; //'',
-    public SearchPrincipalSource: SP.Utilities.PrincipalSource; //null,
-    public ResolvePrincipalSource: SP.Utilities.PrincipalSource; //null,
-    public MaximumEntitySuggestions: number; //30,
-    public EditorWidthSet: boolean; //false,
-    public QueryScriptInit: boolean; //false,
-    public AutoFillControl: SPClientAutoFill; //null,
-    public TotalUserCount: number; //0,
-    public UnresolvedUserCount: number; //0,
-    public UserQueryDict: { [index: string]: SP.StringResult };
-    public ProcessedUserList: { [index: string]: SPClientPeoplePickerProcessedUser };
-    public HasInputError: boolean; //false,
-    public HasServerError: boolean; //false,
-    public ShowUserPresence: boolean; //true,
-    public TerminatingCharacter: string; //';',
-    public UnresolvedUserElmIdToReplace: string; //'',
-    public WebApplicationID: SP.Guid; //'{00000000-0000-0000-0000-000000000000}',
-    public GetAllUserInfo(): ISPClientPeoplePickerEntity[];
-
-    public SetInitialValue(entities: ISPClientPeoplePickerEntity[], initialErrorMsg?: string): void
-    public AddUserKeys(userKeys: string, bSearch: boolean): void;
-    public BatchAddUserKeysOperation(allKeys: string[], numProcessed: number): void;
-    public ResolveAllUsers(fnContinuation: () => void): void;
-    public ExecutePickerQuery(queryIds: string, onSuccess: (queryId: string, result: SP.StringResult) => void, onFailure: (queryId: string, result: SP.StringResult) => void, fnContinuation: () => void): void;
-    public AddUnresolvedUserFromEditor(bRunQuery?: boolean): void;
-    public AddUnresolvedUser(unresolvedUserObj: ISPClientPeoplePickerEntity, bRunQuery?: boolean): void;
-    public UpdateUnresolvedUser(results: SP.StringResult, user: ISPClientPeoplePickerEntity): void;
-    public AddPickerSearchQuery(queryStr: string): string;
-    public AddPickerResolveQuery(queryStr: string): string;
-    public GetPeoplePickerQueryParameters(): SP.UI.ApplicationPages.ClientPeoplePickerQueryParameters;
-    public AddProcessedUser(userObject: ISPClientPeoplePickerEntity, fResolved?: boolean): string;
-    public DeleteProcessedUser(elmToRemove: HTMLElement): void;
-    public OnControlValueChanged(): void;
-    public OnControlResolvedUserChanged(): void;
-    public EnsureAutoFillControl(): void;
-    public ShowAutoFill(resultsTable: ISPClientAutoFillData[]): void;
-    public FocusAutoFill(): void;
-    public BlurAutoFill(): void;
-    public IsAutoFillOpen(): boolean;
-    public EnsureEditorWidth(): void;
-    public SetFocusOnEditorEnd(): void;
-    public ToggleWaitImageDisplay(bShowImage?: boolean): void;
-    public SaveAllUserKeysToHiddenInput(): void;
-    public GetCurrentEditorValue(): string;
-    public GetControlValueAsJSObject(): ISPClientPeoplePickerEntity[];
-    public GetAllUserKeys(): string;
-    public GetControlValueAsText(): string;
-    public IsEmpty(): boolean;
-    public IterateEachProcessedUser(fnCallback: (index: number, user: SPClientPeoplePickerProcessedUser) => void): void;
-    public HasResolvedUsers(): boolean;
-    public Validate(): void;
-    public ValidateCurrentState(): void
-    public GetUnresolvedEntityErrorMessage(): string;
-    public ShowErrorMessage(msg: string): void;
-    public ClearServerError(): void;
-    public SetServerError(): void;
-    public OnControlValidate(): void;
-    public SetEnabledState(bEnabled: boolean): void;
-    public DisplayLocalSuggestions(): void;
-    public CompileLocalSuggestions(input: string): void;
-    public PlanningGlobalSearch(): boolean;
-    public AddLoadingSuggestionMenuOption(): void;
-    public ShowingLocalSuggestions(): boolean;
-    public ShouldUsePPMRU(): boolean;
-    public AddResolvedUserToLocalCache(resolvedEntity: ISPClientPeoplePickerEntity, resolveText: string): void;
+    SetInitialValue(entities: ISPClientPeoplePickerEntity[], initialErrorMsg?: string): void;
+    AddUserKeys(userKeys: string, bSearch: boolean): void;
+    BatchAddUserKeysOperation(allKeys: string[], numProcessed: number): void;
+    ResolveAllUsers(fnContinuation: () => void): void;
+    ExecutePickerQuery(queryIds: string, onSuccess: (queryId: string, result: SP.StringResult) => void, onFailure: (queryId: string, result: SP.StringResult) => void, fnContinuation: () => void): void;
+    AddUnresolvedUserFromEditor(bRunQuery?: boolean): void;
+    AddUnresolvedUser(unresolvedUserObj: ISPClientPeoplePickerEntity, bRunQuery?: boolean): void;
+    UpdateUnresolvedUser(results: SP.StringResult, user: ISPClientPeoplePickerEntity): void;
+    AddPickerSearchQuery(queryStr: string): string;
+    AddPickerResolveQuery(queryStr: string): string;
+    GetPeoplePickerQueryParameters(): SP.UI.ApplicationPages.ClientPeoplePickerQueryParameters;
+    AddProcessedUser(userObject: ISPClientPeoplePickerEntity, fResolved?: boolean): string;
+    DeleteProcessedUser(elmToRemove: HTMLElement): void;
+    OnControlValueChanged(): void;
+    OnControlResolvedUserChanged(): void;
+    EnsureAutoFillControl(): void;
+    ShowAutoFill(resultsTable: ISPClientAutoFillData[]): void;
+    FocusAutoFill(): void;
+    BlurAutoFill(): void;
+    IsAutoFillOpen(): boolean;
+    EnsureEditorWidth(): void;
+    SetFocusOnEditorEnd(): void;
+    ToggleWaitImageDisplay(bShowImage?: boolean): void;
+    SaveAllUserKeysToHiddenInput(): void;
+    GetCurrentEditorValue(): string;
+    GetControlValueAsJSObject(): ISPClientPeoplePickerEntity[];
+    GetAllUserKeys(): string;
+    GetControlValueAsText(): string;
+    IsEmpty(): boolean;
+    IterateEachProcessedUser(fnCallback: (index: number, user: SPClientPeoplePickerProcessedUser) => void): void;
+    HasResolvedUsers(): boolean;
+    Validate(): void;
+    ValidateCurrentState(): void;
+    GetUnresolvedEntityErrorMessage(): string;
+    ShowErrorMessage(msg: string): void;
+    ClearServerError(): void;
+    SetServerError(): void;
+    OnControlValidate(): void;
+    SetEnabledState(bEnabled: boolean): void;
+    DisplayLocalSuggestions(): void;
+    CompileLocalSuggestions(input: string): void;
+    PlanningGlobalSearch(): boolean;
+    AddLoadingSuggestionMenuOption(): void;
+    ShowingLocalSuggestions(): boolean;
+    ShouldUsePPMRU(): boolean;
+    AddResolvedUserToLocalCache(resolvedEntity: ISPClientPeoplePickerEntity, resolveText: string): void;
 }
 
+// tslint:disable-next-line: interface-name
 interface ISPClientPeoplePickerSchema {
     TopLevelElementId?: string;
     EditorElementId?: string;
@@ -9535,7 +9469,6 @@ interface ISPClientPeoplePickerSchema {
 
     InitialSuggestions?: ISPClientPeoplePickerEntity[];
 
-
     UrlZone?: SP.UrlZone;
     WebApplicationID?: SP.Guid;
     SharePointGroupID?: number;
@@ -9547,27 +9480,27 @@ interface ISPClientPeoplePickerSchema {
     ResolvePrincipalSource?: SP.Utilities.PrincipalSource;
     SearchPrincipalSource?: SP.Utilities.PrincipalSource;
 
-    OnUserResolvedClientScript?: (pickerElementId: string, users: ISPClientPeoplePickerEntity[]) => void;
-    OnValueChangedClientScript?: (pickerElementId: string, users: ISPClientPeoplePickerEntity[]) => void;
+    OnUserResolvedClientScript?(pickerElementId: string, users: ISPClientPeoplePickerEntity[]): void;
+    OnValueChangedClientScript?(pickerElementId: string, users: ISPClientPeoplePickerEntity[]): void;
 
     /** Number or '100%'*/
     Width?: any;
 
     Rows?: number;
-
 }
 
 declare class SPClientPeoplePickerMRU {
-    static PPMRUVersion: number;// = 1;
-    static MaxPPMRUItems: number;// = 200;
-    static PPMRUDomLocalStoreKey: string;// = "ClientPeoplePickerMRU";
+    static PPMRUVersion: number; // = 1;
+    static MaxPPMRUItems: number; // = 200;
+    static PPMRUDomLocalStoreKey: string; // = "ClientPeoplePickerMRU";
     static GetSPClientPeoplePickerMRU(): SPClientPeoplePickerMRU;
 
-    GetItems(strKey: string): Object[];
-    SetItem(strSearchTerm: string, objEntity: Object): void;
+    GetItems(strKey: string): { Key: string, [name: string]: any };
+    SetItem<T extends { Key: string }>(strSearchTerm: string, objEntity: T): void;
     ResetCache(): void;
 }
 
+// tslint:disable-next-line: interface-name
 interface ISPClientPeoplePickerEntity {
     Key?: string;
     Description?: string;
@@ -9588,23 +9521,23 @@ interface ISPClientPeoplePickerEntity {
 }
 
 declare class SPClientPeoplePickerProcessedUser {
-    UserContainerElementId: string;// '',
-    DisplayElementId: string;// '',
-    PresenceElementId: string;// '',
-    DeleteUserElementId: string;// '',
-    SID: string;// '',
-    DisplayName: string;// '',
-    SIPAddress: string;// '',
-    UserInfo: ISPClientPeoplePickerEntity;// null,
-    ResolvedUser: boolean;// true,
-    Suggestions: ISPClientAutoFillData[];// null,
-    ErrorDescription: string;// '',
-    ResolveText: string;// '',
-    public UpdateResolvedUser(newUserInfo: ISPClientPeoplePickerEntity, strNewElementId: string): void;
-    public UpdateSuggestions(entity: ISPClientPeoplePickerEntity): void;
-    public BuildUserHTML(): string;
-    public UpdateUserMaxWidth(): void;
-    public ResolvedAsUnverifiedEmail(): string;
+    UserContainerElementId: string; // '',
+    DisplayElementId: string; // '',
+    PresenceElementId: string; // '',
+    DeleteUserElementId: string; // '',
+    SID: string; // '',
+    DisplayName: string; // '',
+    SIPAddress: string; // '',
+    UserInfo: ISPClientPeoplePickerEntity; // null,
+    ResolvedUser: boolean; // true,
+    Suggestions: ISPClientAutoFillData[]; // null,
+    ErrorDescription: string; // '',
+    ResolveText: string; // '',
+    UpdateResolvedUser(newUserInfo: ISPClientPeoplePickerEntity, strNewElementId: string): void;
+    UpdateSuggestions(entity: ISPClientPeoplePickerEntity): void;
+    BuildUserHTML(): string;
+    UpdateUserMaxWidth(): void;
+    ResolvedAsUnverifiedEmail(): string;
 
     static BuildUserPresenceHtml(elmId: string, strSip: string, bResolved?: boolean): string;
     static GetUserContainerElement(elmChild: HTMLElement): HTMLElement;
@@ -9615,10 +9548,10 @@ declare class SPClientPeoplePickerProcessedUser {
 }
 
 declare namespace Microsoft {
-    export module Office {
-        export module Server {
-            export module ReputationModel {
-                export class Reputation {
+    namespace Office {
+        namespace Server {
+            namespace ReputationModel {
+                class Reputation {
                     constructor();
                     static setLike(context: SP.ClientContext, listId: string, itemId: number, like: boolean): void;
                     static setRating(context: SP.ClientContext, listId: string, itemId: number, rating: number): void;
@@ -9630,24 +9563,23 @@ declare namespace Microsoft {
 
 /** Available only in SharePoint Online*/
 declare namespace Define {
-    export function loadScript(url: string, successCallback: () => void, errCallback: () => void): void;
+    function loadScript(url: string, successCallback: () => void, errCallback: () => void): void;
     /** Loads script from _layouts/15/[req].js */
-    export function require(req: string, callback: Function): void;
+    function require(req: string, callback: (arg: any[]) => void): void;
     /** Loads script from _layouts/15/[req].js */
-    export function require(req: string[], callback: Function): void;
-    export function define(name: string, deps: string[], def: Function): void;
+    function require(req: string[], callback: (...args: any[]) => void): void;
+    function define(name: string, deps: string[], def: (...args: any[]) => any): void;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace Verify {
-    export function ArgumentType(arg: string, expected: any): void;
+    function ArgumentType(arg: string, expected: any): void;
 }
-
 
 /** Available only in SharePoint Online*/
 declare namespace BrowserStorage {
-    export var local: CachedStorage;
-    export var session: CachedStorage;
+    const local: CachedStorage;
+    const session: CachedStorage;
 
     /** Available only in SharePoint Online*/
     interface CachedStorage {
@@ -9661,267 +9593,263 @@ declare namespace BrowserStorage {
 
 /** Available only in SharePoint Online*/
 declare namespace BrowserDetection {
-    export var browseris: Browseris;
+    const browseris: Browseris;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace CSSUtil {
-    export function HasClass(elem: HTMLElement, className: string): boolean;
-    export function AddClass(elem: HTMLElement, className: string): void;
-    export function RemoveClass(elem: HTMLElement, className: string): void;
-    export function pxToFloat(pxString: string): number;
-    export function pxToNum(px: string): number;
-    export function numToPx(n: number): string;
-    export function getCurrentEltStyleByNames(elem: HTMLElement, styleNames: string[]): string;
-    export function getCurrentStyle(elem: HTMLElement, cssStyle: string): string;
-    export function getCurrentStyleCorrect(element: HTMLElement, camelStyleName: string, dashStyleName: string): string;
-    export function getOpacity(element: HTMLElement): number;
-    export function setOpacity(element: HTMLElement, value: number): void;
+    function HasClass(elem: HTMLElement, className: string): boolean;
+    function AddClass(elem: HTMLElement, className: string): void;
+    function RemoveClass(elem: HTMLElement, className: string): void;
+    function pxToFloat(pxString: string): number;
+    function pxToNum(px: string): number;
+    function numToPx(n: number): string;
+    function getCurrentEltStyleByNames(elem: HTMLElement, styleNames: string[]): string;
+    function getCurrentStyle(elem: HTMLElement, cssStyle: string): string;
+    function getCurrentStyleCorrect(element: HTMLElement, camelStyleName: string, dashStyleName: string): string;
+    function getOpacity(element: HTMLElement): number;
+    function setOpacity(element: HTMLElement, value: number): void;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace DOM {
-    export var rightToLeft: boolean;
-    export function cancelDefault(evt: Event): void;
-    export function AbsLeft(el: HTMLElement): number;
-    export function AbsTop(el: HTMLElement): number;
-    export function CancelEvent(evt: Event): void;
-    export function GetElementsByName(nae: string): NodeList;
-    export function GetEventCoords(evt: Event): { x: number; y: number; };
-    export function GetEventSrcElement(evt: Event): HTMLElement;
-    export function GetInnerText(el: HTMLElement): string;
-    export function PreventDefaultNavigation(evt: Event): void;
-    export function SetEvent(eventName: string, eventFunc: Function, el: HTMLElement): void;
+    const rightToLeft: boolean;
+    function cancelDefault(evt: Event): void;
+    function AbsLeft(el: HTMLElement): number;
+    function AbsTop(el: HTMLElement): number;
+    function CancelEvent(evt: Event): void;
+    function GetElementsByName(nae: string): NodeList;
+    function GetEventCoords(evt: Event): { x: number; y: number; };
+    function GetEventSrcElement(evt: Event): HTMLElement;
+    function GetInnerText(el: HTMLElement): string;
+    function PreventDefaultNavigation(evt: Event): void;
+    function SetEvent(eventName: string, eventFunc: (eventName: string, fnContent: (evt: Event) => void, window?: Window) => void, el: HTMLElement): void;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace Encoding {
-    export function EncodeScriptQuote(str: string): string;
-    export function HtmlEncode(str: string): string;
-    export function HtmlDecode(str: string): string;
-    export function AttrQuote(str: string): string;
-    export function ScriptEncode(str: string): string;
-    export function ScriptEncodeWithQuote(str: string): string;
-    export function CanonicalizeUrlEncodingCase(str: string): string;
+    function EncodeScriptQuote(str: string): string;
+    function HtmlEncode(str: string): string;
+    function HtmlDecode(str: string): string;
+    function AttrQuote(str: string): string;
+    function ScriptEncode(str: string): string;
+    function ScriptEncodeWithQuote(str: string): string;
+    function CanonicalizeUrlEncodingCase(str: string): string;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace IE8Support {
-    export function arrayIndexOf<T>(array: T[], item: T, startIdx?: number): number;
-    export function attachDOMContentLoaded(handler: Function): void;
-    export function getComputedStyle(domObj: HTMLElement, camelStyleName: string, dashStyleName: string): string;
-    export function stopPropagation(evt: Event): void;
+    function arrayIndexOf<T>(array: T[], item: T, startIdx?: number): number;
+    function attachDOMContentLoaded(handler: () => void): void;
+    function getComputedStyle(domObj: HTMLElement, camelStyleName: string, dashStyleName: string): string;
+    function stopPropagation(evt: Event): void;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace StringUtil {
-    export function BuildParam(stPattern: string, ...params: any[]): string;
-    export function ApplyStringTemplate(str: string, ...params: any[]): string;
+    function BuildParam(stPattern: string, ...params: any[]): string;
+    function ApplyStringTemplate(str: string, ...params: any[]): string;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace TypeUtil {
-    export function IsArray(value: any): boolean;
-    export function IsNullOrUndefined(value: any): boolean;
+    function IsArray(value: any): boolean;
+    function IsNullOrUndefined(value: any): boolean;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace Nav {
-    export var ajaxNavigate: AjaxNavigate;
-    export function convertRegularURLtoMDSURL(webUrl: string, fullPath: string): string;
-    export function isMDSUrl(url: string): boolean;
-    export function isPageUrlValid(url: string): boolean;
-    export function isPortalTemplatePage(url: string): boolean;
-    export function getAjaxLocationWindow(): string;
-    export function getSource(defaultSource?: string): string;
-    export function getUrlKeyValue(keyName: string, bNoDecode: boolean, url: string, bCaseInsensitive: boolean): string;
-    export function getWindowLocationNoHash(hre: string): string;
-    export function goToHistoryLink(el: HTMLAnchorElement, strVersion: string): void;
-    export function getGoToLinkUrl(el: HTMLAnchorElement): string;
-    export function goToLink(el: HTMLAnchorElement): void;
-    export function goToLinkOrDialogNewWindow(el: HTMLAnchorElement): void;
-    export function goToDiscussion(url: string): void;
-    export function onClickHook(evt: Event, topElm: HTMLElement): void;
-    export function pageUrlValidation(url: string, alertString: string): string;
-    export function parseHash(hash: string): Object;
-    export function navigate(url: string): void;
-    export function removeMDSQueryParametersFromUrl(url: string): string;
-    export function urlFromHashBag(hashObject: Object): string;
-    export function wantsNewTab(evt: Event): boolean;
+    const ajaxNavigate: AjaxNavigate;
+    function convertRegularURLtoMDSURL(webUrl: string, fullPath: string): string;
+    function isMDSUrl(url: string): boolean;
+    function isPageUrlValid(url: string): boolean;
+    function isPortalTemplatePage(url: string): boolean;
+    function getAjaxLocationWindow(): string;
+    function getSource(defaultSource?: string): string;
+    function getUrlKeyValue(keyName: string, bNoDecode: boolean, url: string, bCaseInsensitive: boolean): string;
+    function getWindowLocationNoHash(hre: string): string;
+    function goToHistoryLink(el: HTMLAnchorElement, strVersion: string): void;
+    function getGoToLinkUrl(el: HTMLAnchorElement): string;
+    function goToLink(el: HTMLAnchorElement): void;
+    function goToLinkOrDialogNewWindow(el: HTMLAnchorElement): void;
+    function goToDiscussion(url: string): void;
+    function onClickHook(evt: Event, topElm: HTMLElement): void;
+    function pageUrlValidation(url: string, alertString: string): string;
+    function parseHash(hash: string): { [name: string]: string };
+    function navigate(url: string): void;
+    function removeMDSQueryParametersFromUrl(url: string): string;
+    function urlFromHashBag(hashObject: { [name: string]: string }): string;
+    function wantsNewTab(evt: Event): boolean;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace URI_Encoding {
-    export function encodeURIComponent(str: string, bAsUrl?: boolean, bForFilterQuery?: boolean, bForCallback?: boolean): string;
-    export function escapeUrlForCallback(str: string): string;
+    function encodeURIComponent(str: string, bAsUrl?: boolean, bForFilterQuery?: boolean, bForCallback?: boolean): string;
+    function escapeUrlForCallback(str: string): string;
 }
 
-interface IListItem {
+interface ListItem {
     ID: number;
     ContentTypeId: string;
 }
 
 /** Available only in SharePoint Online*/
 declare namespace ListModule {
-    export module Util {
-        export function createViewEditUrl(renderCtx: SPClientTemplates.RenderContext, listItem: IListItem, useEditFormUrl?: boolean, appendSource?: boolean): string;
-        export function createItemPropertiesTitle(renderCtx: SPClientTemplates.RenderContext, listItem: IListItem): string;
-        export function clearSelectedItemsDict(context: any): void;
-        export function ctxInitItemState(context: any): void;
-        export function getAttributeFromItemTable(itemTableParam: HTMLElement, strAttributeName: string, strAttributeOldName: string): string
-        export function getSelectedItemsDict(context: any): any;
-        export function removeOnlyPagingArgs(url: string): string;
-        export function removePagingArgs(url: string): string;
-        export function showAttachmentRows(): void;
+    namespace Util {
+        function createViewEditUrl(renderCtx: SPClientTemplates.RenderContext, listItem: ListItem, useEditFormUrl?: boolean, appendSource?: boolean): string;
+        function createItemPropertiesTitle(renderCtx: SPClientTemplates.RenderContext, listItem: ListItem): string;
+        function clearSelectedItemsDict(context: any): void;
+        function ctxInitItemState(context: any): void;
+        function getAttributeFromItemTable(itemTableParam: HTMLElement, strAttributeName: string, strAttributeOldName: string): string;
+        function getSelectedItemsDict(context: any): any;
+        function removeOnlyPagingArgs(url: string): string;
+        function removePagingArgs(url: string): string;
+        function showAttachmentRows(): void;
     }
 }
 
 /** Available only in SharePoint Online*/
 declare namespace SPThemeUtils {
-    export function ApplyCurrentTheme(): void;
-    export function WithCurrentTheme(resultCallback: Function): void;
-    export function UseClientSideTheming(): boolean;
-    export function Suspend(): void;
+    function ApplyCurrentTheme(): void;
+    function WithCurrentTheme(resultCallback: (themesCache: any) => void): void;
+    function UseClientSideTheming(): boolean;
+    function Suspend(): void;
 }
 
 declare namespace SP {
-    export module JsGrid {
-
-        export enum TextDirection {
-            Default, //0,
-            RightToLeft, //1,
-            LeftToRight //2
+    namespace JsGrid {
+        enum TextDirection {
+            Default, // 0,
+            RightToLeft, // 1,
+            LeftToRight // 2
         }
 
-        export enum PaneId {
-            MainGrid, //0,
-            PivotedGrid, //1,
-            Gantt //2
+        enum PaneId {
+            MainGrid, // 0,
+            PivotedGrid, // 1,
+            Gantt // 2
         }
 
-        export enum PaneLayout {
-            GridOnly, //0,
-            GridAndGantt, //1,
-            GridAndPivotedGrid //2
-
+        enum PaneLayout {
+            GridOnly, // 0,
+            GridAndGantt, // 1,
+            GridAndPivotedGrid // 2
         }
-        export enum EditMode {
-            ReadOnly, //0,
-            ReadWrite, //1,
-            ReadOnlyDefer, //2,
-            ReadWriteDefer, //3,
-            Defer //4
-        }
-
-        export enum GanttDrawBarFlags {
-            LeftLink, //0x01,
-            RightLink //0x02
-
-        }
-        export enum GanttBarDateType {
-            Start, //0,
-            End //1
+        enum EditMode {
+            ReadOnly, // 0,
+            ReadWrite, // 1,
+            ReadOnlyDefer, // 2,
+            ReadWriteDefer, // 3,
+            Defer // 4
         }
 
-        export enum ValidationState {
-            Valid, //0,
-            Pending, //1,
-            Invalid //2
+        enum GanttDrawBarFlags {
+            LeftLink, // 0x01,
+            RightLink // 0x02
+        }
+        enum GanttBarDateType {
+            Start, // 0,
+            End // 1
         }
 
-        export enum HierarchyMode {
-            None, //0,
-            Standard, //1,
-            Grouping //2
+        enum ValidationState {
+            Valid, // 0,
+            Pending, // 1,
+            Invalid // 2
         }
 
-        export enum EditActorWriteType {
-            Both, //1,
-            LocalizedOnly, //2,
-            DataOnly, //3,
-            Either //4
+        enum HierarchyMode {
+            None, // 0,
+            Standard, // 1,
+            Grouping // 2
         }
 
-        export enum EditActorReadType {
-            Both, //1,
-            LocalizedOnly, //2,
-            DataOnly //3
+        enum EditActorWriteType {
+            Both, // 1,
+            LocalizedOnly, // 2,
+            DataOnly, // 3,
+            Either // 4
         }
 
-        export enum EditActorUpdateType {
-            Committed, //0,
-            Uncommitted, //1
+        enum EditActorReadType {
+            Both, // 1,
+            LocalizedOnly, // 2,
+            DataOnly // 3
         }
 
-        export enum SortMode {
-            Ascending, //1,
-            Descending, //-1,
-            None //0
+        enum EditActorUpdateType {
+            Committed, // 0,
+            Uncommitted, // 1
         }
 
-        export module RowHeaderStyleId {
-            export var Transfer: string; //'Transfer',
-            export var Conflict: string; //'Conflict'
-
+        enum SortMode {
+            Ascending, // 1,
+            Descending, // -1,
+            None // 0
         }
 
-        export module RowHeaderAutoStyleId {
-            export var Dirty: string; //'Dirty',
-            export var Error: string; //'Error',
-            export var NewRow: string; //'NewRow'
+        namespace RowHeaderStyleId {
+            const Transfer: string; // 'Transfer',
+            const Conflict: string; // 'Conflict'
         }
 
-        export enum RowHeaderStatePriorities {
-            Dirty, //10,
-            Transfer, //30,
-            CellError, //40,
-            Conflict, //50,
-            RowError, //60,
-            NewRow //90
+        namespace RowHeaderAutoStyleId {
+            const Dirty: string; // 'Dirty',
+            const Error: string; // 'Error',
+            const NewRow: string; // 'NewRow'
         }
 
-        export enum UpdateSerializeMode {
-            Cancel, //0,
-            Default, //1,
-            PropDataOnly, //2,
-            PropLocalizedOnly, //3,
-            PropBoth //4
+        enum RowHeaderStatePriorities {
+            Dirty, // 10,
+            Transfer, // 30,
+            CellError, // 40,
+            Conflict, // 50,
+            RowError, // 60,
+            NewRow // 90
         }
 
-        export enum UpdateTrackingMode {
-            PropData, //2,
-            PropLocalized, //3,
-            PropBoth //4
+        enum UpdateSerializeMode {
+            Cancel, // 0,
+            Default, // 1,
+            PropDataOnly, // 2,
+            PropLocalizedOnly, // 3,
+            PropBoth // 4
         }
 
-        export module UserAction {
-            export var UserEdit: string; //'User Edit':string;
-            export var DeleteRecord: string; //'Delete Record':string;
-            export var InsertRecord: string; //'Insert Record':string;
-            export var Indent: string; //'Indent':string;
-            export var Outdent: string; //'Outdent':string;
-            export var Fill: string; //'Fill':string;
-            export var Paste: string; //'Paste':string;
-            export var CutPaste: string; //'Cut/Paste'
+        enum UpdateTrackingMode {
+            PropData, // 2,
+            PropLocalized, // 3,
+            PropBoth // 4
         }
 
-        export enum ReadOnlyActiveState {
-            ReadOnlyActive, //0,
-            ReadOnlyDisabled, //1
+        namespace UserAction {
+            const UserEdit: string; // 'User Edit':string;
+            const DeleteRecord: string; // 'Delete Record':string;
+            const InsertRecord: string; // 'Insert Record':string;
+            const Indent: string; // 'Indent':string;
+            const Outdent: string; // 'Outdent':string;
+            const Fill: string; // 'Fill':string;
+            const Paste: string; // 'Paste':string;
+            const CutPaste: string; // 'Cut/Paste'
         }
 
-        export interface IValue {
+        enum ReadOnlyActiveState {
+            ReadOnlyActive, // 0,
+            ReadOnlyDisabled, // 1
+        }
+
+        // tslint:disable-next-line: interface-name
+        interface IValue {
             data?: any;
             localized?: string;
         }
-        export enum SelectionTypeFlags {
+        enum SelectionTypeFlags {
             MultipleCellRanges,
             MultipleRowRanges,
             MultipleColRanges
         }
 
-
-        export class JsGridControl {
+        class JsGridControl {
             constructor(parentNode: HTMLElement, bShowLoadingBanner: boolean);
             /** Returns true if Init method has been executed successfully */
             IsInitialized(): boolean;
@@ -9970,20 +9898,19 @@ declare namespace SP {
             /** Switches the currently selected cell into edit mode: displays edit control and sets focus into it.
                 Returns true if success. */
             TryBeginEdit(): boolean;
-            FinalizeEditing(fnContinue: Function, fnError: Function): void;
+            FinalizeEditing(fnContinue: () => void, fnError: () => void): void;
             /** Get diff tracker object that tracks changes to the grid data. */
             GetDiffTracker(): SP.JsGrid.Internal.DiffTracker;
             /** Moves focus to the JsGrid control */
             Focus(): void;
 
             /** Try saving the new record row (aka entry row) if it was edited. */
-            TryCommitFirstEntryRecords(fnCommitComplete: { (): void }): void;
+            TryCommitFirstEntryRecords(fnCommitComplete: () => void): void;
             /** Removes all new record rows (aka entry rows), including unsaved and even empty ones.
                 The latter seems to be a bug, as I haven't found any easy way to restore the empty entry row. */
             ClearUncommitedEntryRecords(): void;
             /** Returns true if there are any unsaved new record rows (aka entry rows). */
             AnyUncommitedEntryRecords(): boolean;
-
 
             // todo
             AnyUncomittedProvisionalRecords(): boolean;
@@ -10032,7 +9959,7 @@ declare namespace SP {
             ToggleExpandCollapse(recordKey: number): void;
 
             /** Attach event handler to a particular event type */
-            AttachEvent(eventType: JsGrid.EventType, fnOnEvent: { (args: IEventArgs): void }): void;
+            AttachEvent(eventType: JsGrid.EventType, fnOnEvent: (args: IEventArgs) => void): void;
             /** Detach a previously set event handler */
             DetachEvent(eventType: JsGrid.EventType, fnOnEvent: any): void;
 
@@ -10099,7 +10026,6 @@ declare namespace SP {
             /** Shows a dialog where user can reorder columns and change their widths. */
             ShowColumnConfigurationDialog(): void;
 
-
             /** Returns true, if there are any errors in the JsGrid */
             AnyErrors(): boolean;
             /** Returns true, if there are any errors in a specified row */
@@ -10134,11 +10060,11 @@ declare namespace SP {
                 If minId is specified, method searches for an error with first id which is greater than minId.
                 Scrolls to the Returns the id of the found record.
                 If there aren't any errors, that satisfy the conditions, method does nothing and returns null. */
-            ScrollToAndExpandNextError(minId?: number, fnFilter?: { (recordKey: number, fieldKey: string, id: number): boolean }): any;
+            ScrollToAndExpandNextError(minId?: number, fnFilter?: (recordKey: number, fieldKey: string, id: number) => boolean): any;
             /** Same as ScrollToAndExpandNextError, but searches within the specified record.
                 recordKey should be not null, otherwise you'll get an exception.
                 bDontExpand controls whether the error tooltip will be shown (if bDontExpand=true, tooltip will not be shown). */
-            ScrollToAndExpandNextErrorOnRecord(minId?: number, recordKey?: number, fnFilter?: { (recordKey: number, fieldKey: string, id: number): boolean }, bDontExpand?: boolean): any;
+            ScrollToAndExpandNextErrorOnRecord(minId?: number, recordKey?: number, fnFilter?: (recordKey: number, fieldKey: string, id: number) => boolean, bDontExpand?: boolean): any;
 
             GetFocusedItem(): any;
             SendKeyDownEvent(eventInfo: Sys.UI.DomEvent): any;
@@ -10188,14 +10114,15 @@ declare namespace SP {
             GetSpCsrRenderCtx(): any;
         }
 
-        export interface IChangeKey {
+        // tslint:disable-next-line: interface-name
+        interface IChangeKey {
             Reserve(): void;
             Release(): void;
             GetVersionNumber(): number;
             CompareTo(changeKey: IChangeKey): number;
         }
 
-        export enum EventType {
+        enum EventType {
             OnCellFocusChanged,
             OnRowFocusChanged,
             OnCellEditBegin,
@@ -10228,7 +10155,7 @@ declare namespace SP {
             OnBeginUndoDataUpdateChange
         }
 
-        export enum DelegateType {
+        enum DelegateType {
             ExpandColumnMenu,
             AddColumnMenuItems,
             Sort,
@@ -10263,7 +10190,7 @@ declare namespace SP {
             OnBeforeRecordReordered
         }
 
-        export enum ClickContext {
+        enum ClickContext {
             SelectAllSquare,
             RowHeader,
             ColumnHeader,
@@ -10272,17 +10199,17 @@ declare namespace SP {
             Other
         }
 
-        export class RowHeaderState {
-            constructor(id: string, img: SP.JsGrid.Image, priority: SP.JsGrid.RowHeaderStatePriorities, tooltip: string, fnOnClick: { (eventInfo: Sys.UI.DomEvent, recordKey: number): void });
+        class RowHeaderState {
+            constructor(id: string, img: SP.JsGrid.Image, priority: SP.JsGrid.RowHeaderStatePriorities, tooltip: string, fnOnClick: (eventInfo: Sys.UI.DomEvent, recordKey: number) => void);
             GetId(): string;
             GetImg(): SP.JsGrid.Image;
             GetPriority(): SP.JsGrid.RowHeaderStatePriorities;
-            GetOnClick(): { (eventInfo: Sys.UI.DomEvent, recordKey: number): void };
+            GetOnClick(): (eventInfo: Sys.UI.DomEvent, recordKey: number) => void;
             GetTooltip(): string;
             toString(): string;
         }
 
-        export class Image {
+        class Image {
             /** optOuterCssNames and optImgCssNames are strings that contain css class names separated by spaces.
                 optImgCssNames are applied to the img tag.
                 if bIsClustered, image is rendered inside div, and optOuterCssNames are applied to the div. */
@@ -10294,48 +10221,48 @@ declare namespace SP {
             bIsAnimated: boolean;
             /** Renders the image with specified alternative text and on-click handler.
                 If bHideTooltip == false, then alternative text is also shown as the tooltip (title attribute). */
-            Render(altText: string, clickFn: { (eventInfo: Sys.UI.DomEvent): void }, bHideTooltip: boolean): HTMLElement;
+            Render(altText: string, clickFn: (eventInfo: Sys.UI.DomEvent) => void, bHideTooltip: boolean): HTMLElement;
         }
-
-        export interface IEventArgs { }
-        export module EventArgs {
-            export class OnEntryRecordAdded implements IEventArgs {
+        // tslint:disable-next-line: interface-name no-empty-interface
+        interface IEventArgs { }
+        namespace EventArgs {
+            class OnEntryRecordAdded implements IEventArgs {
                 constructor(recordKey: number);
                 recordKey: number;
             }
 
-            export class CellFocusChanged implements IEventArgs {
+            class CellFocusChanged implements IEventArgs {
                 constructor(newRecordKey: number, newFieldKey: string, oldRecordKey: number, oldFieldKey: string);
                 newRecordKey: number;
                 newFieldKey: string;
                 oldRecordKey: number;
                 oldFieldKey: string;
             }
-            export class RowFocusChanged implements IEventArgs {
+            class RowFocusChanged implements IEventArgs {
                 constructor(newRecordKey: number, oldRecordKey: number);
                 newRecordKey: number;
                 oldRecordKey: number;
             }
-            export class CellEditBegin implements IEventArgs {
+            class CellEditBegin implements IEventArgs {
                 constructor(recordKey: number, fieldKey: string);
                 recordKey: number;
                 fieldKey: string;
             }
-            export class CellEditCompleted implements IEventArgs {
+            class CellEditCompleted implements IEventArgs {
                 constructor(recordKey: number, fieldKey: string, changeKey: JsGrid.IChangeKey, bCancelled: boolean);
                 recordKey: number;
                 fieldKey: string;
                 changeKey: JsGrid.IChangeKey;
                 bCancelled: boolean;
             }
-            export class Click implements IEventArgs {
+            class Click implements IEventArgs {
                 constructor(eventInfo: Sys.UI.DomEvent, context: JsGrid.ClickContext, recordKey: number, fieldKey: string);
                 eventInfo: Sys.UI.DomEvent;
                 context: JsGrid.ClickContext;
                 recordKey: number;
                 fieldKey: string;
             }
-            export class PropertyChanged implements IEventArgs {
+            class PropertyChanged implements IEventArgs {
                 constructor(recordKey: number, fieldKey: string, oldProp: SP.JsGrid.Internal.PropertyUpdate, newProp: SP.JsGrid.Internal.PropertyUpdate, propType: SP.JsGrid.IPropertyType, changeKey: SP.JsGrid.IChangeKey, validationState: SP.JsGrid.ValidationState);
                 recordKey: number;
                 fieldKey: string;
@@ -10345,25 +10272,25 @@ declare namespace SP {
                 changeKey: SP.JsGrid.IChangeKey;
                 validationState: SP.JsGrid.ValidationState;
             }
-            export class RecordInserted implements IEventArgs {
+            class RecordInserted implements IEventArgs {
                 constructor(recordKey: number, recordIdx: number, afterRecordKey: number, changeKey: JsGrid.IChangeKey);
                 recordKey: number;
                 recordIdx: number;
                 afterRecordKey: number;
                 changeKey: JsGrid.IChangeKey;
             }
-            export class RecordDeleted implements IEventArgs {
+            class RecordDeleted implements IEventArgs {
                 constructor(recordKey: number, recordIdx: number, changeKey: JsGrid.IChangeKey);
                 recordKey: number;
                 recordIdx: number;
                 changeKey: JsGrid.IChangeKey;
             }
-            export class RecordChecked implements IEventArgs {
+            class RecordChecked implements IEventArgs {
                 constructor(recordKeySet: SP.Utilities.Set, bChecked: boolean);
                 recordKeySet: SP.Utilities.Set;
                 bChecked: boolean;
             }
-            export class OnCellErrorStateChanged implements IEventArgs {
+            class OnCellErrorStateChanged implements IEventArgs {
                 constructor(recordKey: number, fieldKey: string, bAddingError: boolean, bCellCurrentlyHasError: boolean, bCellHadError: boolean, errorId: number);
                 recordKey: number;
                 fieldKey: string;
@@ -10372,7 +10299,7 @@ declare namespace SP {
                 bCellHadError: boolean;
                 errorId: number;
             }
-            export class OnRowErrorStateChanged implements IEventArgs {
+            class OnRowErrorStateChanged implements IEventArgs {
                 constructor(recordKey: number, bAddingError: boolean, bErrorCurrentlyInRow: boolean, bRowHadError: boolean, errorId: number, message: string);
                 recordKey: number;
                 bAddingError: boolean;
@@ -10381,64 +10308,63 @@ declare namespace SP {
                 errorId: number;
                 message: string;
             }
-            export class OnEntryRecordCommitted implements IEventArgs {
+            class OnEntryRecordCommitted implements IEventArgs {
                 constructor(origRecKey: string, recordKey: number, changeKey: JsGrid.IChangeKey);
                 originalRecordKey: number;
                 recordKey: number;
-                changeKey: JsGrid.IChangeKey
+                changeKey: JsGrid.IChangeKey;
             }
-            export class SingleCellClick implements IEventArgs {
+            class SingleCellClick implements IEventArgs {
                 constructor(eventInfo: Sys.UI.DomEvent, recordKey: number, fieldKey: string);
                 eventInfo: Sys.UI.DomEvent;
                 recordKey: number;
                 fieldKey: string;
             }
-            export class PendingChangeKeyInitiallyComplete implements IEventArgs {
+            class PendingChangeKeyInitiallyComplete implements IEventArgs {
                 constructor(changeKey: JsGrid.IChangeKey);
-                changeKey: JsGrid.IChangeKey
+                changeKey: JsGrid.IChangeKey;
             }
-            export class VacateChange implements IEventArgs {
+            class VacateChange implements IEventArgs {
                 constructor(changeKey: JsGrid.IChangeKey);
-                changeKey: JsGrid.IChangeKey
+                changeKey: JsGrid.IChangeKey;
             }
-            export class GridErrorStateChanged implements IEventArgs {
+            class GridErrorStateChanged implements IEventArgs {
                 constructor(bAnyErrors: boolean);
                 bAnyErrors: boolean;
             }
-            export class SingleCellKeyDown implements IEventArgs {
+            class SingleCellKeyDown implements IEventArgs {
                 constructor(eventInfo: Sys.UI.DomEvent, recordKey: number, fieldKey: string);
                 eventInfo: Sys.UI.DomEvent;
                 recordKey: number;
                 fieldKey: string;
             }
-            export class OnRecordsReordered implements IEventArgs {
+            class OnRecordsReordered implements IEventArgs {
                 constructor(recordKeys: string[], changeKey: JsGrid.IChangeKey);
                 reorderedKeys: string[];
                 changeKey: JsGrid.IChangeKey;
             }
-            export class OnRowEscape implements IEventArgs {
+            class OnRowEscape implements IEventArgs {
                 constructor(recordKey: number);
                 recordKey: number;
             }
-            export class OnEndRenameColumn implements IEventArgs {
+            class OnEndRenameColumn implements IEventArgs {
                 constructor(columnKey: string, originalColumnTitle: string, newColumnTitle: string);
                 columnKey: string;
                 originalColumnTitle: string;
                 newColumnTitle: string;
             }
-            export class OnBeginRedoDataUpdateChange implements IEventArgs {
+            class OnBeginRedoDataUpdateChange implements IEventArgs {
                 constructor(changeKey: JsGrid.IChangeKey);
-                changeKey: JsGrid.IChangeKey
+                changeKey: JsGrid.IChangeKey;
             }
-            export class OnBeginUndoDataUpdateChange implements IEventArgs {
+            class OnBeginUndoDataUpdateChange implements IEventArgs {
                 constructor(changeKey: JsGrid.IChangeKey);
-                changeKey: JsGrid.IChangeKey
+                changeKey: JsGrid.IChangeKey;
             }
-
         }
 
-        export module JsGridControl {
-            export class Parameters {
+        namespace JsGridControl {
+            class Parameters {
                 tableCache: SP.JsGrid.TableCache;
                 name: any; // TODO
                 bNotificationsEnabled: boolean;
@@ -10450,9 +10376,8 @@ declare namespace SP {
                 tableViewParams: TableViewParameters;
                 bEnableDiffTracking: boolean;
                 isRTL: boolean;
-
             }
-            export class TableViewParameters {
+            class TableViewParameters {
                 paneLayout: SP.JsGrid.PaneLayout;
                 defaultEditMode: SP.JsGrid.EditMode;
                 allowedSelectionTypes: SP.JsGrid.SelectionTypeFlags;
@@ -10476,36 +10401,35 @@ declare namespace SP {
                 gridFieldMap: { [name: string]: GridField };
 
                 columns: ColumnInfoCollection;
-                messageOverrides: any; //TODO
-                operationalConstantsFieldKeyMap: any; //TODO
+                messageOverrides: any; // TODO
+                operationalConstantsFieldKeyMap: any; // TODO
 
                 ganttParams: GanttParameters;
                 pivotedGridParams: PivotedGridParameters;
                 rowViewParams: RowViewParameters;
             }
-            export class PivotedGridParameters {
-        	    //this.dateRange = null;
-             //   this.ganttBarStyles = null;
-             //   this.ganttZoomLevel = 3;
-             //   this.fnRenderGanttRow = null;
-             //   this.fnGetGanttBarDate = null;
-             //   this.fnGetGanttBarStyleIds = null;
-             //   this.fnGetPredecessors = null;
-             //   this.workDayStart = _spRegionalSettings.workDayStart;
-             //   this.workDayEnd = _spRegionalSettings.workDayEnd;
-             //   this.fieldKeyRedrawFilter = null;
+            class PivotedGridParameters {
+                // this.dateRange = null;
+                //   this.ganttBarStyles = null;
+                //   this.ganttZoomLevel = 3;
+                //   this.fnRenderGanttRow = null;
+                //   this.fnGetGanttBarDate = null;
+                //   this.fnGetGanttBarStyleIds = null;
+                //   this.fnGetPredecessors = null;
+                //   this.workDayStart = _spRegionalSettings.workDayStart;
+                //   this.workDayEnd = _spRegionalSettings.workDayEnd;
+                //   this.fieldKeyRedrawFilter = null;
             }
 
-            export class GanttParameters {
+            class GanttParameters {
                 columns: ColumnInfoCollection;
             }
 
-            export class RowViewParameters {
+            class RowViewParameters {
                 hierarchyMode: SP.JsGrid.HierarchyMode;
                 view: any;
 
                 topViewIdx: number;
-
 
                 groupingLevel: any;
                 groupingRecordKeyPrefix: any;
@@ -10517,19 +10441,19 @@ declare namespace SP {
                 filterState: any;
                 autoFilterEntries: any;
                 filteredDescCounts: any;
-
             }
         }
 
-        export class CommandManager {
+        class CommandManager {
             // todo
         }
 
-        export class TableCache {
+        class TableCache {
             // todo
         }
 
-        export interface IStyleManager {
+        // tslint:disable-next-line: interface-name
+        interface IStyleManager {
             gridPaneStyle: IStyleType.GridPane;
             columnHeaderStyleCollection: {
                 normal: IStyleType.Header;
@@ -10571,16 +10495,16 @@ declare namespace SP {
             UpdateDefaultCellStyleFromCss(styleObject: IStyleType.Cell, cssClass: string): void;
             UpdateGroupStylesFromCss(styleObject: IStyleType.Cell, prefix: string): void;
         }
-
-        export interface IStyleType { }
-        export module IStyleType {
-            export interface Splitter extends IStyleType {
+        // tslint:disable-next-line: no-empty-interface interface-name
+        interface IStyleType { }
+        namespace IStyleType {
+            interface Splitter extends IStyleType {
                 outerBorderColor: any;
                 leftInnerBorderColor: any;
                 innerBorderColor: any;
                 backgroundColor: any;
             }
-            export interface SplitterHandle extends IStyleType {
+            interface SplitterHandle extends IStyleType {
                 outerBorderColor: any;
                 leftInnerBorderColor: any;
                 innerBorderColor: any;
@@ -10588,7 +10512,7 @@ declare namespace SP {
                 gripUpperColor: any;
                 gripLowerColor: any;
             }
-            export interface GridPane {
+            interface GridPane {
                 verticalBorderColor: any;
                 verticalBorderStyle: any;
                 horizontalBorderColor: any;
@@ -10608,7 +10532,7 @@ declare namespace SP {
                 fillRectBorderColor: any;
                 errorRectBorderColor: any;
             }
-            export interface Header {
+            interface Header {
                 font: any;
                 fontSize: any;
                 fontWeight: any;
@@ -10631,7 +10555,7 @@ declare namespace SP {
                 elementClickColor: any;
                 elementClickBorderColor: any;
             }
-            export interface Cell extends IStyleType {
+            interface Cell extends IStyleType {
                 /** -> CSS font-family */
                 font: any;
                 /** -> CSS font-size */
@@ -10647,16 +10571,16 @@ declare namespace SP {
                 /** -> CSS text-align */
                 textAlign: any;
             }
-            export interface Widget {
+            interface Widget {
                 backgroundColor: any;
                 borderColor: any;
             }
-            export interface RowHeaderStyle {
+            interface RowHeaderStyle {
                 backgroundColor: any;
                 outerBorderColor: any;
                 innerBorderColor: any;
             }
-            export interface TimescaleTier {
+            interface TimescaleTier {
                 font: any;
                 fontSize: any;
                 fontWeight: any;
@@ -10671,8 +10595,7 @@ declare namespace SP {
             }
         }
 
-        export class Style {
-
+        class Style {
             static Type: {
                 Splitter: IStyleType.Splitter;
                 SplitterHandle: IStyleType.SplitterHandle;
@@ -10684,23 +10607,22 @@ declare namespace SP {
                 Widget: IStyleType.Widget;
             };
 
-            static SetRTL: { (rtlObject: any): void; };
-            static MakeJsGridStyleManager: { (): IStyleManager };
-            static CreateStyleFromCss: { (styleType: IStyleType, cssStyleName: string, optExistingStyle?: any, optClassId?: any): any; };
-            static CreateStyle: { (styleType: IStyleType, styleProps: any): any; };
-            static MergeCellStyles: { (majorStyle: any, minorStyle: any): any; };
-            static ApplyCellStyle: { (td: HTMLTableCellElement, style: any): void; };
-            static ApplyRowHeaderStyle: { (domObj: HTMLElement, style: any, fnGetHeaderSibling: Function): void; };
-            static ApplyCornerHeaderBorderStyle: { (domObj: HTMLElement, colStyle: any, rowStyle: any): void; };
-            static ApplyHeaderInnerBorderStyle: { (domObj: HTMLElement, bIsRowHeader: any, headerObject: any): void };
-            static ApplyColumnContextMenuStyle: { (domObj: HTMLElement, style: any): void };
-            static ApplySplitterStyle: { (domObj: HTMLElement, style: any): void };
-            static MakeBorderString: { (width: number, style: string, color: string): string };
-            static GetCellStyleDefaultBackgroundColor: { (): string };
-
+            static SetRTL: (rtlObject: any) => void;
+            static MakeJsGridStyleManager: () => IStyleManager;
+            static CreateStyleFromCss: (styleType: IStyleType, cssStyleName: string, optExistingStyle?: any, optClassId?: any) => any;
+            static CreateStyle: (styleType: IStyleType, styleProps: any) => any;
+            static MergeCellStyles: (majorStyle: any, minorStyle: any) => any;
+            static ApplyCellStyle: (td: HTMLTableCellElement, style: any) => void;
+            static ApplyRowHeaderStyle: (domObj: HTMLElement, style: any, fnGetHeaderSibling: (elem: HTMLElement, previousElem: boolean) => void) => void;
+            static ApplyCornerHeaderBorderStyle: (domObj: HTMLElement, colStyle: any, rowStyle: any) => void;
+            static ApplyHeaderInnerBorderStyle: (domObj: HTMLElement, bIsRowHeader: any, headerObject: any) => void;
+            static ApplyColumnContextMenuStyle: (domObj: HTMLElement, style: any) => void;
+            static ApplySplitterStyle: (domObj: HTMLElement, style: any) => void;
+            static MakeBorderString: (width: number, style: string, color: string) => string;
+            static GetCellStyleDefaultBackgroundColor: () => string;
         }
 
-        export class ColumnInfoCollection {
+        class ColumnInfoCollection {
             constructor(colInfoArray: any[]);
             GetColumnByKey(key: string): any;
             GetColumnArray(bVisibleOnly?: boolean): any[];
@@ -10712,7 +10634,7 @@ declare namespace SP {
             GetColumnPosition(key: string): number;
         }
 
-        export class ColumnInfo {
+        class ColumnInfo {
             constructor(name: string, imgSrc: string, key: string, width: number);
             /** Column title */
             name: string;
@@ -10746,33 +10668,33 @@ declare namespace SP {
             /** false by default */
             isFooter: boolean;
             /** determine whether the cells in this column should be clickable */
-            fnShouldLinkSingleValue: { (record: IRecord, fieldKey: string, dataValue: any, localizedValue: any): boolean };
+            fnShouldLinkSingleValue: (record: IRecord, fieldKey: string, dataValue: any, localizedValue: any) => boolean;
             /** if a particular cell is determined as clickable by fnShouldLinkSingleValue, this function will be called when the cell is clicked */
-            fnSingleValueClicked: { (record: IRecord, fieldKey: string, dataValue: any, localizedValue: any): void };
+            fnSingleValueClicked: (record: IRecord, fieldKey: string, dataValue: any, localizedValue: any) => void;
             /** this is used when you need to make some of the cells in the column readonly, but at the same time keep others editable */
-            fnGetCellEditMode: { (record: IRecord, fieldKey: string): JsGrid.EditMode };
+            fnGetCellEditMode: (record: IRecord, fieldKey: string) => JsGrid.EditMode;
             /** this function should return name of the display control for the given cell in the column
                 the name should be previously associated with the display control via SP.JsGrid.PropertyType.Utils.RegisterDisplayControl method */
-            fnGetDisplayControlName: { (record: IRecord, fieldKey: string): string };
+            fnGetDisplayControlName: (record: IRecord, fieldKey: string) => string;
             /** this function should return name of the edit control for the given cell in the column
                 the name should be previously associated with the edit control via SP.JsGrid.PropertyType.Utils.RegisterEditControl method */
-            fnGetEditControlName: { (record: IRecord, fieldKey: string): string };
+            fnGetEditControlName: (record: IRecord, fieldKey: string) => string;
             /** set widget control names for a particular cell
                 widgets are basically in-cell buttons with associated popup controls, e.g. date selector or address book button
                 standard widget ids are defined in the SP.JsGrid.WidgetControl.Type enumeration
                 it is also possible to create your own widgets
                 usually this function is not used, and instead, widget control names are determined via PropertyType
              */
-            fnGetWidgetControlNames: { (record: IRecord, fieldKey: string): string[] };
+            fnGetWidgetControlNames: (record: IRecord, fieldKey: string) => string[];
             /** this function should return id of the style for the given cell in the column
                 styles and their ids are registered for a JsGridControl via jsGridParams.styleManager.RegisterCellStyle method */
-            fnGetCellStyleId: { (record: IRecord, fieldKey: string, dataValue: any): string };
+            fnGetCellStyleId: (record: IRecord, fieldKey: string, dataValue: any) => string;
             /** set custom tooltip for the given cell in the column. by default, localized value is displayed as the tooltip */
-            fnGetSingleValueTooltip: { (record: IRecord, fieldKey: string, dataValue: any, localizedValue: any): string };
+            fnGetSingleValueTooltip: (record: IRecord, fieldKey: string, dataValue: any, localizedValue: any) => string;
         }
 
-
-        export interface IRecord {
+        // tslint:disable-next-line: interface-name
+        interface IRecord {
             /** True if this is an entry row */
             bIsNewRow: boolean;
 
@@ -10800,15 +10722,15 @@ declare namespace SP {
             RemoveFieldValue(fieldKey: string): void;
         }
 
-
-        export class RecordFactory {
+        class RecordFactory {
             constructor(gridFieldMap: any, keyColumnName: string, fnGetPropType: any);
             gridFieldMap: any;
             /** Create a new record */
             MakeRecord(dataPropMap: any, localizedPropMap: any, bKeepRawData: boolean): IRecord;
         }
 
-        export interface IPropertyBase {
+        // tslint:disable-next-line: interface-name
+        interface IPropertyBase {
             HasLocalizedValue(): boolean;
             HasDataValue(): boolean;
             Clone(): IPropertyBase;
@@ -10818,12 +10740,12 @@ declare namespace SP {
             GetData(): any;
         }
 
-        export class Property {
+        class Property {
             static MakeProperty(dataValue: any, localizedValue: string, bHasDataValue: boolean, bHasLocalizedValue: boolean, propType: any): IPropertyBase;
             static MakePropertyFromGridField(gridField: any, dataValue: any, localizedVal: string, optPropType?: any): IPropertyBase;
         }
 
-        export class GridField {
+        class GridField {
             constructor(key: string, hasDataValue: boolean, hasLocalizedValue: boolean, textDirection: TextDirection, defaultCellStyleId?: any, editMode?: EditMode, dateOnly?: boolean, csrInfo?: any);
             key: string;
             hasDataValue: boolean;
@@ -10843,27 +10765,31 @@ declare namespace SP {
             GetIsMultiValue(): boolean;
         }
 
-        export interface IEditActorGridContext {
+        // tslint:disable-next-line: interface-name
+        interface IEditActorGridContext {
             jsGridObj: JsGridControl;
             parentNode: HTMLElement;
             styleManager: IStyleManager;
             RTL: any;
             emptyValue: any;
             bLightFocus: boolean;
-            OnKeyDown: { (domEvent: Sys.UI.DomEvent): void; };
+            OnKeyDown(domEvent: Sys.UI.DomEvent): void;
         }
 
-        export interface IEditControlGridContext extends IEditActorGridContext {
+        // tslint:disable-next-line: interface-name
+        interface IEditControlGridContext extends IEditActorGridContext {
             OnActivateActor(): void;
             OnDeactivateActor(): void;
         }
 
-        export interface IPropertyType {
+        // tslint:disable-next-line: interface-name
+        interface IPropertyType {
             ID: string;
-            BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: { (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }): void; }, fnError: any): void;
+            BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }) => void, fnError: any): void;
         }
 
-        export interface ILookupPropertyType extends IPropertyType {
+        // tslint:disable-next-line: interface-name
+        interface ILookupPropertyType extends IPropertyType {
             GetItems(fnCallback: any): void;
             DataToLocalized(dataValue: any): string;
             LocalizedToData(localized: string): any;
@@ -10873,7 +10799,8 @@ declare namespace SP {
             GetSerializableLookupPropType(): { items: any[]; id: string; bLimitToList: boolean };
         }
 
-        export interface IMultiValuePropertyType extends IPropertyType {
+        // tslint:disable-next-line: interface-name
+        interface IMultiValuePropertyType extends IPropertyType {
             bMultiValue: boolean;
             separator: string;
             singleValuePropType: string;
@@ -10883,7 +10810,7 @@ declare namespace SP {
             LocStrArrayToLocStr(locStrArray: string[]): string;
         }
 
-        export class PropertyType {
+        class PropertyType {
             /** Lookup property type factory, based on SP.JsGrid.PropertyType.LookupTable class.
                 displayCtrlName should be one of the following: SP.JsGrid.DisplayControl.Type.Image, SP.JsGrid.DisplayControl.Type.ImageText or SP.JsGrid.DisplayControl.Type.Text
              */
@@ -10895,18 +10822,17 @@ declare namespace SP {
             /** Register a custom property type, where display and edit controls, and also widgets, are derived from the specified parent property type. */
             static RegisterNewDerivedCustomPropType(propType: IPropertyType, baseTypeName: string): void;
         }
-
-        export module PropertyType {
-            export class String implements IPropertyType {
+        namespace PropertyType {
+            class String implements IPropertyType {
                 constructor();
                 ID: string;
-                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: { (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }): void; }, fnError: any): void;
+                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }) => void, fnError: any): void;
                 toString(): string;
             }
-            export class LookupTable implements ILookupPropertyType {
+            class LookupTable implements ILookupPropertyType {
                 constructor(items: any[], id: string, bLimitToList: boolean);
                 ID: string;
-                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: { (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }): void; }, fnError: any): void;
+                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }) => void, fnError: any): void;
                 GetItems(fnCallback: any): void;
                 DataToLocalized(dataValue: any): string;
                 LocalizedToData(localized: string): any;
@@ -10914,27 +10840,26 @@ declare namespace SP {
                 GetStyleId(dataValue: any): string;
                 GetIsLimitedToList(): boolean;
                 GetSerializableLookupPropType(): { items: any[]; id: string; bLimitToList: boolean };
-
             }
-            export class CheckBoxBoolean implements IPropertyType {
+            class CheckBoxBoolean implements IPropertyType {
                 constructor();
                 ID: string;
-                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: { (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }): void; }, fnError: any): void;
+                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }) => void, fnError: any): void;
                 DataToLocalized(dataValue: any): string;
                 GetBool(dataValue: any): boolean;
                 toString(): string;
             }
-            export class DropDownBoolean implements IPropertyType {
+            class DropDownBoolean implements IPropertyType {
                 constructor();
                 ID: string;
-                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: { (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }): void; }, fnError: any): void;
+                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }) => void, fnError: any): void;
                 DataToLocalized(dataValue: any): string;
                 GetBool(dataValue: any): boolean;
                 toString(): string;
             }
-            export class MultiValuePropType implements IMultiValuePropertyType {
+            class MultiValuePropType implements IMultiValuePropertyType {
                 ID: string;
-                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: { (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }): void; }, fnError: any): void;
+                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }) => void, fnError: any): void;
                 bMultiValue: boolean;
                 separator: string;
                 singleValuePropType: string;
@@ -10943,29 +10868,28 @@ declare namespace SP {
                 LocStrToLocStrArray(locStr: string): string[];
                 LocStrArrayToLocStr(locStrArray: string[]): string;
             }
-            export class HyperLink implements IPropertyType {
+            class HyperLink implements IPropertyType {
                 ID: string;
-                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: { (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }): void; }, fnError: any): void;
+                BeginValidateNormalizeConvert(recordKey: number, fieldKey: string, newValue: any, bIsLocalized: boolean, fnCallback: (args: { isValid: boolean; dataValue: any; normalizedLocValue: string }) => void, fnError: any): void;
                 bHyperlink: boolean;
                 DataToLocalized(dataValue: any): string;
                 GetAddress(dataValue: any): string;
-                /** Returns string like this: '"http://site.com, Site title"' */
+                /** Returns string like this: '"http:// site.com, Site title"' */
                 GetCopyValue(record: IRecord, dataValue: any, locValue: string): string;
                 toString(): string;
             }
 
-
-            export class Utils {
+            class Utils {
                 static RegisterDisplayControl(name: string, singleton: any, requiredFunctionNames: string[]): void;
                 static RegisterEditControl(name: string, factory: (gridContext: IEditControlGridContext, gridTextInputElement: HTMLElement) => IEditControl, requiredFunctionNames: string[]): void;
-                static RegisterWidgetControl(name: string, factory: { (ddContext: any): IPropertyType; }, requiredFunctionNames: string[]): void;
+                static RegisterWidgetControl(name: string, factory: (ddContext: any) => IPropertyType, requiredFunctionNames: string[]): void;
 
                 static UpdateDisplayControlForPropType(propTypeName: string, displayControlType: string): void;
             }
         }
 
-        export module WidgetControl {
-            export class Type {
+        namespace WidgetControl {
+            class Type {
                 static Demo: string;
                 static Date: string;
                 static AddressBook: string;
@@ -10973,9 +10897,9 @@ declare namespace SP {
             }
         }
 
-        export module Internal {
-            export class DiffTracker {
-                constructor(objBag: any, fnGetChange: Function);
+        namespace Internal {
+            class DiffTracker {
+                constructor(objBag: any, fnGetChange: (version: any, keys: any[], synchronized: boolean, includeInvalidPropUpdates: boolean) => any);
                 ExternalAPI: {
                     AnyChanges(): boolean;
                     ChangeKeySliceInfo(): any;
@@ -10993,14 +10917,15 @@ declare namespace SP {
                 NotifyVacateChange(changeKey: IChangeKey): void;
             }
 
-            export class PropertyUpdate implements IValue {
+            class PropertyUpdate implements IValue {
                 constructor(data: any, localized: string);
                 data: any;
                 localized: string;
             }
         }
 
-        export interface IEditActorCellContext {
+        // tslint:disable-next-line: interface-name
+        interface IEditActorCellContext {
             propType: IPropertyType;
             originalValue: IValue;
             record: IRecord;
@@ -11011,10 +10936,11 @@ declare namespace SP {
             SetCurrentValue(value: any): void;
         }
 
-        export interface IEditControlCellContext extends IEditActorCellContext {
+        // tslint:disable-next-line: interface-name
+        interface IEditControlCellContext extends IEditActorCellContext {
             cellWidth: number;
             cellHeight: number;
-            cellStyle: any; //TODO: Determine correct type
+            cellStyle: any; // TODO: Determine correct type
             cellRect: any;
             NotifyExpandControl(): void;
             NotifyEditComplete(): void;
@@ -11022,12 +10948,11 @@ declare namespace SP {
             Hide(element: HTMLElement): void;
         }
 
-
-        export module EditControl {
-
+        namespace EditControl {
         }
 
-        export interface IEditControl {
+        // tslint:disable-next-line: interface-name
+        interface IEditControl {
             SupportedWriteMode?: SP.JsGrid.EditActorWriteType;
             SupportedReadMode?: SP.JsGrid.EditActorReadType;
             GetCellContext?(): IEditControlCellContext;
@@ -11046,16 +10971,16 @@ declare namespace SP {
             SetSize?(width: number, height: number): void;
         }
 
-
-        export class StaticDataSource {
-            constructor(jsGridData: IGridData, optFnGetPropType?: Function);
-            AddColumn(gridField: SP.JsGrid.GridField, values: IValue[]):void;
-            RemoveColumn(fieldKey: string):void;
+        class StaticDataSource {
+            constructor(jsGridData: IGridData, optFnGetPropType?: (recordKey: string, key: string, dataPropMap: { [name: string]: any }) => any);
+            AddColumn(gridField: SP.JsGrid.GridField, values: IValue[]): void;
+            RemoveColumn(fieldKey: string): void;
             InitJsGridParams(optGridParams?: JsGridControl.Parameters): JsGridControl.Parameters;
         }
 
-        export interface IGridData {
-            MetaData: IGridMetadata
+        // tslint:disable-next-line: interface-name
+        interface IGridData {
+            MetaData: IGridMetadata;
 
             Fields: IFieldInfo[];
             Columns: IColumnInfo[];
@@ -11084,7 +11009,8 @@ declare namespace SP {
             ViewDepKeys?: any[];
         }
 
-        export interface IColumnInfo {
+        // tslint:disable-next-line: interface-name
+        interface IColumnInfo {
             /** Column title */
             name: string;
             /** Column image URL.
@@ -11113,7 +11039,8 @@ declare namespace SP {
             isFooter?: boolean;
         }
 
-        export interface IGridMetadata {
+        // tslint:disable-next-line: interface-name
+        interface IGridMetadata {
             KeyColumnName: string;
             IsGanttEnabled?: boolean;
             IsHierarchyEnabled?: boolean;
@@ -11123,10 +11050,10 @@ declare namespace SP {
             RecordKeyHash?: string;
             RecordKeyOrderChanged?: any;
             GridOperationalConstantsFieldKeyMap?: { [index: number]: string };
-
         }
 
-        export interface IFieldInfo {
+        // tslint:disable-next-line: interface-name
+        interface IFieldInfo {
             fieldKey: string;
             propertyTypeId: string;
             editMode?: EditMode;
@@ -11136,27 +11063,28 @@ declare namespace SP {
             textDirection?: TextDirection;
             dateOnly?: boolean;
             defaultCellStyleId?: any;
-
         }
 
-        export interface ILookupTableInfo {
+        // tslint:disable-next-line: interface-name
+        interface ILookupTableInfo {
             id: string;
             showImage?: boolean;
             showText?: boolean;
             limitToList?: boolean;
             lookup: ILookupInfo[];
         }
-        export interface ILookupInfo {
+
+        // tslint:disable-next-line: interface-name
+        interface ILookupInfo {
             localString: string;
             value: number;
         }
-
-
     }
 
-    export module Utilities {
-        export class Set {
+    namespace Utilities {
+        class Set {
             constructor(items?: { [item: string]: number });
+            // tslint:disable-next-line: unified-signatures
             constructor(items?: { [item: number]: number });
             /** Returns true if the set is empty */
             IsEmpty(): boolean;
@@ -11194,66 +11122,55 @@ declare namespace SP {
     }
 }
 
-
-
-
-
 declare namespace SP {
-    export class GanttControl {
+    class GanttControl {
         static WaitForGanttCreation(callack: (control: GanttControl) => void): void;
         static Instances: GanttControl[];
-        static FnGanttCreationCallback: { (control: GanttControl): void }[];
+        static FnGanttCreationCallback: Array<(control: GanttControl) => void>;
 
         get_Columns(): SP.JsGrid.ColumnInfo[];
     }
 }
 
-
 // ------- Srch namespace -------
 
-declare namespace Srch
-{
-    export enum EventType
-    {
-        none, 
-        queryReady, 
-        queryIssuing, 
-        batchQueryIssuing, 
-        resultReady, 
-        batchResultReady, 
-        queryStateChanged, 
-        resultRendered, 
-        preLoad, 
-        load, 
+declare namespace Srch {
+    enum EventType {
+        none,
+        queryReady,
+        queryIssuing,
+        batchQueryIssuing,
+        resultReady,
+        batchResultReady,
+        queryStateChanged,
+        resultRendered,
+        preLoad,
+        load,
         postLoad
     }
 
-    export enum MessageLevel
-    {
-        information, 
-        warning, 
-        error        
+    enum MessageLevel {
+        information,
+        warning,
+        error
     }
 
-    export enum UserActionType
-    {
-        search, 
-        pageNext, 
-        pagePrev, 
-        refine, 
-        sort, 
+    enum UserActionType {
+        search,
+        pageNext,
+        pagePrev,
+        refine,
+        sort,
         filterLanguage
     }
 
-    export enum DateTimeKind
-    {
-        unspecified, 
-        utc, 
+    enum DateTimeKind {
+        unspecified,
+        utc,
         local
     }
 
-    export class ClientControl extends Sys.UI.Control
-    {
+    class ClientControl extends Sys.UI.Control {
         constructor(elem: Element);
 
         /** toggles visibility of children controls of the messageContainer */
@@ -11273,7 +11190,7 @@ declare namespace Srch
         /** If set to true, control will load scripts defined by the serverTemplateScriptsToLoad field after control load. True by default. */
         set_delayLoadTemplateScripts(value: boolean): boolean;
         get_states(): any;
-        set_states(value: any): any; 
+        set_states(value: any): any;
         get_messages(): any[];
         set_messages(value: any[]): any[];
         get_showDataErrors(): boolean;
@@ -11290,7 +11207,7 @@ declare namespace Srch
         scriptApplication_PreLoad(sender: any, e: any): void;
         scriptApplication_Load(sender: any, e: any): void;
         scriptApplication_PostLoad(sender: any, e: any): void;
-        loadServerTemplateScripts():void;
+        loadServerTemplateScripts(): void;
         serverTemplateScriptsToLoad: any[];
         serverTemplateScriptsCallback(): void;
         loadRenderTemplateScripts(scriptReferences: any, success: any, failure: any, timeout: any, loadStandAloneCustomScripts: any): boolean;
@@ -11305,8 +11222,7 @@ declare namespace Srch
         clickHandler(e: Event): any;
     }
 
-    export class DataProvider extends ClientControl
-    {
+    class DataProvider extends ClientControl {
         constructor(elem: Element);
         get_currentQueryState(): any;
         get_sourceID(): string;
@@ -11436,8 +11352,7 @@ declare namespace Srch
         getSortName(): string;
     }
 
-    export class DisplayControl extends ClientControl
-    {
+    class DisplayControl extends ClientControl {
         get_queryGroupName(): string;
         set_queryGroupName(value: string): string;
         get_dataProvider(): DataProvider;
@@ -11469,8 +11384,7 @@ declare namespace Srch
         render(): void;
     }
 
-    export class Refinement extends DisplayControl
-    {
+    class Refinement extends DisplayControl {
         static createRefinementTextbox(name: string): Element;
         static submitMultiRefinement(name: string, control: Refinement, useContains: boolean, useKQL: boolean): void;
         static ensureUserSpecifiedRefinerValueHasWhiteSpaceQuotes(inputText: string): string;
@@ -11481,7 +11395,7 @@ declare namespace Srch
         /** Save expanded state of the specified filter to cookie */
         static setExpanded(filterName: string, value: string): void;
         static multiRefinerSpecifyOtherFilterValue(refinerName: string, clientControl: Refinement, useContains: boolean, useKQL: boolean): void;
-        
+
         constructor(elem: Element);
 
         get_selectedRefinementControls(): RefinementControl[];
@@ -11490,7 +11404,7 @@ declare namespace Srch
         set_useManagedNavigationRefiners(value: boolean): boolean;
         get_emptyRefinementMessageId(): string;
         set_emptyRefinementMessageId(value: string): string;
-        
+
         scriptApplication_PreLoad(sender: any, e: any): void;
         render(): void;
         addRefinementFilter(filterName: string, filterToken: any): void;
@@ -11517,8 +11431,7 @@ declare namespace Srch
         updateRefinementControls(newControls: RefinementControl[]): void;
     }
 
-    export class RefinementControl
-    {
+    class RefinementControl {
         constructor(propertyName: string, spec: string, renderTemplateId: string);
 
         propertyName: string;
@@ -11533,8 +11446,7 @@ declare namespace Srch
         deepHits: number;
     }
 
-    export class Result extends DisplayControl
-    {
+    class Result extends DisplayControl {
         static parsePropertyMappingWithSlotDisplayNames(mappings: any): { [key: string]: any };
         static parsePropertyMappingsString(mappings: any): { [key: string]: any };
         static getSelectedPropertiesFromMappingDictionary(propMappings: any): any[];
@@ -11607,8 +11519,7 @@ declare namespace Srch
     }
 
     /** Represents the search box control */
-    export class SearchBox extends ClientControl
-    {
+    class SearchBox extends ClientControl {
         constructor(elem: Element);
 
         /** Returns the current search term */
@@ -11621,7 +11532,7 @@ declare namespace Srch
 
         get_queryGroupNames(): string[];
         set_queryGroupNames(value: any): string[];
-        
+
         /** Gets the results page address, e.g. '~site/_layouts/15/osssearchresults.aspx?u={contexturl}' */
         get_resultsPageAddress(): string;
         /** Sets the results page address, e.g. '~site/_layouts/15/osssearchresults.aspx?u={contexturl}'
@@ -11629,19 +11540,19 @@ declare namespace Srch
           * e.g. specified site are returned. Omit this parameter if you want to search everywhere.
           */
         set_resultsPageAddress(value: string): string;
-        
+
         get_showAdvancedLink(): boolean;
         set_showAdvancedLink(value: boolean): boolean;
-        
+
         get_showQuerySuggestions(): boolean;
         set_showQuerySuggestions(value: boolean): boolean;
-        
+
         get_showNavigation(): boolean;
         set_showNavigation(value: boolean): boolean;
-        
+
         get_showPeopleNameSuggestions(): boolean;
         set_showPeopleNameSuggestions(value: boolean): boolean;
-        
+
         /** Gets the interval in milliseconds, if user is idle during this interval, suggestions retrieval will be initiated.
          * Default value is 250.
          */
@@ -11650,57 +11561,57 @@ declare namespace Srch
          * Default value is 250.
          */
         set_querySuggestionCompletionInterval(value: number): number;
-        
+
         /** Gets minimum length of the search term for suggestions to be retrieved. Default is 2 letters. */
         get_querySuggestionMinimumPrefixLength(): number;
         /** Sets minimum length of the search term for suggestions to be retrieved. Default is 2 letters. */
         set_querySuggestionMinimumPrefixLength(value: number): number;
-        
+
         /** Gets number of suggestions to display. Default is 5. */
         get_querySuggestionCount(): number;
         /** Sets number of suggestions to display. Default is 5. */
         set_querySuggestionCount(value: number): number;
-        
+
         get_personalResultCount(): number;
         set_personalResultCount(value: number): number;
-        
+
         get_advancedSearchPageAddress(): string;
         set_advancedSearchPageAddress(value: string): string;
-        
+
         get_showPreferencesLink(): boolean;
         set_showPreferencesLink(value: boolean): boolean;
-        
+
         get_serverInitialRender(): boolean;
         set_serverInitialRender(value: boolean): boolean;
-        
+
         get_setFocusOnPageLoad(): boolean;
         set_setFocusOnPageLoad(value: boolean): boolean;
-        
+
         get_allowEmptySearch(): boolean;
         set_allowEmptySearch(value: boolean): boolean;
-        
+
         get_updatePageTitle(): boolean;
         set_updatePageTitle(value: boolean): boolean;
-        
+
         get_pageTitlePrefix(): string;
         set_pageTitlePrefix(value: string): string;
-        
+
         /** Gets the search input placeholder text */
         get_currentPrompt(): string;
         /** Sets the search input placeholder text */
         set_currentPrompt(value: string): string;
-        
+
         get_initialPrompt(): string;
         set_initialPrompt(value: string): string;
-        
+
         /** Gets the css class/classes of the placeholder text. Default is 'ms-srch-sb-prompt ms-helperText' */
         get_promptCssClass(): string;
         /** Sets the css class/classes of the placeholder text. Default is 'ms-srch-sb-prompt ms-helperText' */
         set_promptCssClass(value: string): string;
-        
+
         get_tryInplaceQuery(): boolean;
         set_tryInplaceQuery(value: boolean): boolean;
-        
+
         /** Gets the id of the search box input element */
         get_searchBoxInputId(): string;
         /** Sets the id of the search box input element */
@@ -11708,40 +11619,40 @@ declare namespace Srch
 
         get_searchBoxContainerId(): string;
         set_searchBoxContainerId(value: string): string;
-        
+
         get_navigationButtonId(): string;
         set_navigationButtonId(value: string): string;
-        
+
         get_suggestionsListId(): string;
         set_suggestionsListId(value: string): string;
-        
+
         get_navigationListId(): string;
         set_navigationListId(value: string): string;
-        
+
         get_searchBoxInputElement(): Element;
-        
+
         get_searchBoxProgressClass(): string;
         set_searchBoxProgressClass(value: string): string;
-        
+
         get_searchBoxContainerElement(): Element;
-        
+
         get_searchBoxLinkId(): string;
         set_searchBoxLinkId(value: string): string;
-        
+
         get_searchBoxLinkElement(): Element;
-        
+
         get_navigationNodes(): any;
         set_navigationNodes(value: any): any;
-        
+
         get_msBeforeShowingProgress(): number;
         set_msBeforeShowingProgress(value: number): number;
-        
+
         get_maintainQueryState(): boolean;
         set_maintainQueryState(value: boolean): boolean;
-        
+
         get_querySuggestionsSourceID(): string;
         set_querySuggestionsSourceID(value: string): string;
-        
+
         scriptApplication_PreLoad(sender: any, e: any): void;
         scriptApplication_PostLoad(sender: any, e: any): void;
         serverTemplateScriptsCallback(): any;
@@ -11771,22 +11682,22 @@ declare namespace Srch
         activate(prompt: string, searchBoxInputId: string, searchBoxContainerId: string, navigationButtonId: string, suggestionsListId: string, navigationListId: string, searchBoxLinkId: string, searchBoxProgressClass: string, searchBoxPromptClass: string): void;
         activateDefaultNavigationBehavior(): void;
         activateDefaultQuerySuggestionBehavior(): void;
-
     }
 
-    export class U
-    {
+    type RenderFunction = (ctx: any) => string;
+
+    class U {
         /** Returns true if the value parameter is null or empty string */
         static e(value: string): boolean;
         /** Returns true if the value parameter is empty string */
-        static w(value: any): boolean; 
+        static w(value: any): boolean;
         /** Returns true if the value parameter is null or undefined */
         static n(value: any): boolean;
         /** Returns true if current page is in edit mode */
         static isPageInEditMode(): boolean;
         /** Returns true if current page is displayed in the Minimal Download Strategy (MDS) mode */
         static isPageInMdsMode(): boolean;
-        
+
         static isPagePartialLoad(): boolean;
         /** Returns true if the current page uses right-to-left mode (RTL) */
         static isRTL(): boolean;
@@ -11834,9 +11745,9 @@ declare namespace Srch
         static traceFormatted(c: Srch.ClientControl, method: string, format: string, ...values: string[]): void;
 
         /** Same as $addHandler with safety checks */
-        static addHandler(element: Element, eventName: string, handler: Function): void;
+        static addHandler(element: Element, eventName: string, handler: (instance: any, eventArgs: any) => void): void;
         /** Same as $removeHandler with safety checks */
-        static removeHandler(element: Element, eventName: string, handler: Function): void
+        static removeHandler(element: Element, eventName: string, handler: (instance: any, eventArgs: any) => void): void;
 
         /** Returns true if the specified element is a descendant of the container element */
         static isDescendant(element: Element, container: Element): boolean;
@@ -11854,13 +11765,13 @@ declare namespace Srch
         static findResultObjectFromDOM(e: Element, type: string): any;
 
         /** Appends specified parameter key and value string to the specified URL */
-        static appendUrlParameter(url: string, keyAndValue: string): string
+        static appendUrlParameter(url: string, keyAndValue: string): string;
 
         /** Ensures that the given URL protocol value is allowed. Returns the specified URL value if the protocol is allowed; empty string otherwise. */
         static ensureAllowedProtocol(value: string): string;
         /** Indicates whether the specified protocol is allowed. */
         static isProtocolAllowed(value: string, allowRelativeUrl: boolean): boolean;
-        
+
         /** Returns true if the URL is a relative URL */
         static isUrlRelative(url: string): boolean;
         /** Returns true if the URL is a server-relative URL (i.e. starts with '/') */
@@ -11870,7 +11781,7 @@ declare namespace Srch
 
         static logClick(e: any, clickType: any): void;
         static fillKeywordQuery(query: any, dp: any): void;
-        
+
         /** Parses username out from SharePoint user field value */
         static getUsernameFromAuthorField(authorField: string): string;
         /** Parses user display name out from SharePoint user field value */
@@ -11904,14 +11815,14 @@ declare namespace Srch
 
         /** Copies the specified string to clipboard, if possible */
         static copyLink(link: string): void;
-        
+
         /** Registers display template function in the system.
          *  @param name Identifier of the template. Usually template is registered twice: by URL and by name.
          *  @param template The display template. It can be either string, or function, that gets the CSR context object and returns HTML string
           */
-        static registerRenderTemplateByName(name: string, templateFunction: string | { (ctx: any): string }): void;
+        static registerRenderTemplateByName(name: string, templateFunction: string | RenderFunction): void;
         /** Returns display template registered (can be either string or function) */
-        static getRenderTemplateByName(name: string, renderCtx: any): string | { (ctx: any): string };
+        static getRenderTemplateByName(name: string, renderCtx: any): string | RenderFunction;
 
         static addRenderContextCallback(renderCtx: any, callbackType: any, callbackFunction: any, enforceUnique: any, templateFunction: any): void;
         static setItemRenderWrapper(renderCtx: any, itemRenderWrapperFunction: any, templateFunction: any): any;
@@ -11920,7 +11831,7 @@ declare namespace Srch
         static getTemplateUrlFromFunctionOrRenderCtx(templateFunctionOrRenderCtx: any): string;
         static createErrorObjectWithExecContext(messageText: any, operationName: any, templateFuncOrRenderCtx: any): any;
         /** Returns the CSR template that was previously registered using 'registerRenderTemplateByName' based on CSR template level */
-        static resolveRenderTemplate(renderCtx: any, component: ClientControl, level: 'Item' | 'Group' | 'View' | 'Body'): string | { (ctx: any): string };
+        static resolveRenderTemplate(renderCtx: any, component: ClientControl, level: 'Item' | 'Group' | 'View' | 'Body'): string | RenderFunction;
 
         /** Returns formatted time string from seconds string, which contains a number that represents amount of seconds passed since 00:00:00 today */
         static getFormattedTimeFromSeconds(secondsStr: string): string;
@@ -11941,14 +11852,14 @@ declare namespace Srch
         static getFolderIconUrl(): string;
         /** Returns URL of the appropriate file image based on the file type identifier (see getFriendlyNameForFileExtension) */
         static getIconUrlByFileExtension(item: string, defaultIconPath?: string): string;
-        
+
         /** Returns string that contains safe call to HP.Show, passing over the itemId, hpContainerId and templateUrl parameters, and supplying true for wide parameter. */
         static getShowHoverPanelCallbackWide(itemId: string, hpContainerId: string, templateUrl: string): string;
         /** Returns string that contains safe call to HP.Show, passing over the itemId, hpContainerId and templateUrl parameters, and supplying false for wide parameter. */
         static getShowHoverPanelCallback(itemId: string, hpContainerId: string, templateUrl: string): string;
         /** Returns string that contains safe call to HP.Hide */
         static getHideHoverPanelCallback(): string;
-        
+
         static getHighlightedProperty(key: string, result: any, property: string): any;
         static processHHXML(pre: string): string;
         static createXMLDocument(xml: string): XMLDocument;
@@ -11966,7 +11877,7 @@ declare namespace Srch
         static isFirstRankedBlock(resultTable: Microsoft.SharePoint.Client.Search.Query.ResultTable): boolean;
         static isIntentTable(resultTable: Microsoft.SharePoint.Client.Search.Query.ResultTable): boolean;
         static createBehavior(id: string, type: any, properties: any, targetElementId: string): any;
-        
+
         /** Uses SPAnimation to animate an element */
         static animate(element: Element, animationID: any, finishFunc: any): void;
         static hideElement(element: Element): void;
@@ -11975,11 +11886,11 @@ declare namespace Srch
         static resetElement(element: Element): void;
         static shouldAnimate(dp: any): boolean;
         static animateResults(result: Result, userAction: any): void;
-        
+
         static loadScripts(scriptReferences: string[], success: any, failure: any, timeout: number): void;
         static appendScriptsToLoad(scripts: string[], script: string): void;
         static registerLoadedScripts(scripts: string[]): void;
-        
+
         /** Returns HTML for collapsible refiner title */
         static collapsibleRefinerTitle(propertyName: string, idPrefix: string, title: string, iconClass: string, customOnClick: string): string;
         /** Returns true if current page is osssearchresults.aspx */
@@ -11988,7 +11899,7 @@ declare namespace Srch
         static replaceUrlTokens(url: string): string;
         /** Adds ctag parameter to the URL and replaces URL tokens */
         static urlTokenExpansion(jsLink: string): string;
-        
+
         static includeCSS(templateLink: string, relativeLink: string): void;
         static includeScript(templateLink: string, scriptLink: string): void;
         static includeLanguageScript(templateLink: string, scriptLink: string): void;
@@ -11997,9 +11908,9 @@ declare namespace Srch
         /** Retrieves localized string with the specified id */
         static loadResource(id: string): string;
         /** Retrieves localized string with the specified id */
-        static loadResourceForTemplate(id: string, templateFunc: {(ctx: any): string}): string;
+        static loadResourceForTemplate(id: string, templateFunc: (ctx: any) => string): string;
         /** Registers in system resources defined by the dictionary object */
-        static registerResourceDictionary(locale:string, dict: {[key: string]: string}): void;
+        static registerResourceDictionary(locale: string, dict: { [key: string]: string }): void;
 
         static restorePath(el: Element, originalText: string, selectText: string): void;
         static selectPath(text: string, el: Element): void;
@@ -12031,9 +11942,8 @@ declare namespace Srch
         static contentFixedWidthLength: number;
     }
 
-    export module U {
-        export class PropNames
-        {
+    namespace U {
+        class PropNames {
             static renderTemplates: 'RenderTemplates';
             static renderTemplateId: 'RenderTemplateId';
             static tableType: 'TableType';
@@ -12051,8 +11961,7 @@ declare namespace Srch
             static isFirstRankedBlock: 'IsFirstRankedResultBlock';
         }
 
-        export class Ids
-        {
+        class Ids {
             static group: '_group';
             static groupTitle: '_groupTitle';
             static groupLink: '_groupLink';
@@ -12075,23 +11984,20 @@ declare namespace Srch
             static postInfo: '_postInfo';
         }
 
-        export class LoadScriptsState
-        {
+        class LoadScriptsState {
             scriptsToLoad: any;
             progress: number;
             timeoutHandle: any;
         }
 
-        export enum LoadScriptsProgress
-        {
+        enum LoadScriptsProgress {
             loading,
             success,
             failure
         }
     }
 
-    export class ScriptApplicationManager
-    {
+    class ScriptApplicationManager {
         static get_current(): ScriptApplicationManager;
         static get_clientRuntimeContext(): SP.ClientRuntimeContext;
         /** Returns server-relative link to _layouts/EditUserPref.aspx */
@@ -12108,23 +12014,23 @@ declare namespace Srch
         get_pagePath(): string;
 
         /** Adds handler for the preload event */
-        add_preLoad(handlerFunction: Function): void;
+        add_preLoad(handlerFunction: (instance: any, eventArgs: any) => void): void;
         /** Removes handler for the preload event */
-        remove_preLoad(handlerFunction: Function): void;
+        remove_preLoad(handlerFunction: (instance: any, eventArgs: any) => void): void;
         /** Raises the preload event */
         raisePreLoadEvent(): void;
 
         /** Adds handler for the load event */
-        add_load(handlerFunction: Function): void;
+        add_load(handlerFunction: (instance: any, eventArgs: any) => void): void;
         /** Removes handler for the load event */
-        remove_load(handlerFunction: Function): void;
+        remove_load(handlerFunction: (instance: any, eventArgs: any) => void): void;
         /** Raises the load event */
         raiseLoadEvent(): void;
 
         /** Adds handler for the postload event */
-        add_postLoad(handlerFunction: Function): void;
+        add_postLoad(handlerFunction: (instance: any, eventArgs: any) => void): void;
         /** Removes handler for the postload event */
-        remove_postLoad(handlerFunction: Function): void;
+        remove_postLoad(handlerFunction: (instance: any, eventArgs: any) => void): void;
         /** Raises the postload event */
         raisePostLoadEvent(): void;
 
@@ -12135,7 +12041,7 @@ declare namespace Srch
          * After registration the controls will be correctly processed in the page search context.
          */
         registerClientControl(clientControl: DisplayControl | DataProvider | SearchBox): void;
-        
+
         /** Puts specified hash-key address into the current page location.
          * @param url The hash-key, e.g. '#k=test'
          */
@@ -12145,8 +12051,7 @@ declare namespace Srch
         get_searchSessionID(): void;
     }
 
-    export class Res
-    {
+    class Res {
         static sb_ResultsPageTitle: string;
         static sb_EmptyQueryWarning: string;
         static sb_InvalidResultPageURL: string;
@@ -12779,9 +12684,8 @@ declare namespace Srch
         static rs_PartialResultWarning_Line1: string;
         static rs_PartialResultWarning_Line2: string;
         static rs_HasParseExceptionWarning_Line1: string;
-        static rs_HasParseExceptionWarning_Line2: string;        
+        static rs_HasParseExceptionWarning_Line2: string;
     }
-
 }
 
 /** Returns true if the value parameter is null or empty string */
@@ -12828,11 +12732,10 @@ declare function $includeScript(templateLink: string, relativeLink: string): voi
 declare function $includeCSS(templateLink: string, scriptLink: string): void;
 declare function $includeLanguageScript(templateLink: string, scriptLink: string): any;
 /** Registers in system resources defined by the dictionary object (alias for Srch.U.registerResourceDictionary) */
-declare function $registerResourceDictionary(locale:string, dict: {[key: string]: string}): void;
+declare function $registerResourceDictionary(locale: string, dict: { [key: string]: string }): void;
 /** Retrieves localized string with the specified id */
 declare function $resource(id: string): string;
 /** (calls Srch.U.setItemRenderWrapper) */
 declare function $setItemWrapperCallback(renderCtx: any, itemWrapperFunction: any): void;
 /** (calls Srch.U.addRenderContextCallback) */
 declare function $addRenderContextCallback(renderCtx: any, itemWrapperFunction: any): void;
-

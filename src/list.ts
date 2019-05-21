@@ -9,9 +9,14 @@ export default class List {
     private fluent = null as Fluent;
     private listHelper = null as ListHelper;
     private readonly _helperName: string = "list";
-    public create(web: SP.Web, listName: string, template: string): Fluent {
+    /**
+    * Create new list 
+    * Example: create(context.get_web(), "My Task List", 107)
+    * templateId - See: https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-csom/ee541191(v%3Doffice.15)
+    */
+    public create(web: SP.Web, listName: string, templateId: number): Fluent {
         this.fluent.chainAction(`${this._helperName}.create`, () => {
-            return this.listHelper.createList(web, listName, template);
+            return this.listHelper.createList(web, listName, templateId);
         });
         return this.fluent;
     }
@@ -45,6 +50,17 @@ export default class List {
     public setDefaultValueOnList(web: SP.Web, listName: string, fieldInternalName: string, defaultValue: any): Fluent {
         this.fluent.chainAction(`${this._helperName}.setDefaultValueOnList`, () => {
             return this.listHelper.setDefaultValueOnList(web, listName, fieldInternalName, defaultValue);
+        });
+        return this.fluent;
+    }
+     /**
+    * Enable email alerts on a list 
+    * Example: setAlerts(context.get_web(), "My Task List", true)
+    * Note: will not work for 2010/2013
+    */
+    public setAlerts(web: SP.Web, listName: string, enabled: boolean): Fluent {
+        this.fluent.chainAction(`${this._helperName}.setAlerts`, () => {
+            return this.listHelper.setAlerts(web, listName, enabled);
         });
         return this.fluent;
     }
