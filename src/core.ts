@@ -21,6 +21,10 @@ export enum Dependency {
     UserProfile,
     Taxonomy
 }
+export enum NavigationLocation {
+    TopNavigation,
+    Quicklaunch
+}
 //export interface IFluentInternal extends IFluent {
 //    chainAction(name: string, action: any);
 //    registerDependency(dependency: Dependency);

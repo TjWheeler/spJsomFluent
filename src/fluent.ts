@@ -6,6 +6,7 @@ import List from "./list"
 import ListItem from "./listitem"
 import File from "./file"
 import User from "./web"
+import Navigation from "./navigation"
 import PublishingPage from "./publishingpage"
 import * as core from "./core"
 import common from "./common"
@@ -55,6 +56,9 @@ export class Fluent  {
     }
     get user(): User{
         return new User(this);
+    }
+    get navigation(): Navigation {
+        return new Navigation(this);
     }
 
     public execute(): JQueryPromise<Array<core.ActionResult>> {
