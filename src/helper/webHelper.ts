@@ -19,12 +19,13 @@ export default class WebHelper {
                 });
             return deferred.promise();
     }
-    public createWeb(name: string, parentWeb: SP.Web, title: string, template: string): JQueryPromise<any> {
+    public createWeb(name: string, parentWeb: SP.Web, title: string, template: string, useSamePermissionsAsParent:boolean = true): JQueryPromise<any> {
             var deferred = $.Deferred();
             var info = new SP.WebCreationInformation();
             info.set_url(name);
             info.set_title(title);
             info.set_webTemplate(template);
+            info.set_useSamePermissionsAsParentSite(useSamePermissionsAsParent);
             var newWeb = parentWeb.get_webs().add(info);
             this.context.load(newWeb);
             common.executeQuery(this.context)

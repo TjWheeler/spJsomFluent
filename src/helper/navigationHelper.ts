@@ -1,4 +1,5 @@
 import common from "../common"
+import { NavigationType } from "../core";
 
 export default class NavigationHelper {
     constructor(context: SP.ClientContext) {
@@ -17,6 +18,51 @@ export default class NavigationHelper {
     public deleteTopQuicklaunchNode(web: SP.Web, title: string): JQueryPromise<any> {
         return this.deleteNode(web.get_navigation().get_topNavigationBar(), title);
     }
+    public setCurrentNavigation(web: SP.Web, navigationType: NavigationType): JQueryPromise<any> {
+        var deferred = $.Deferred();
+        const propertyName = "__NavigationShowSiblings";
+        var allProperties = web.get_allProperties();
+        this.context.load(web);
+        this.context.load(allProperties);
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                var nav = new SP.Publishing.Navigation.WebNavigationSettings(this.context, web);
+                let property = allProperties.get_item(propertyName);
+                switch (navigationType) {
+                    case NavigationType.Inherit:
+                        nav.get_currentNavigation().set_source(SP.Publishing.Navigation.StandardNavigationSource.inheritFromParentWeb);
+                        break;
+                    case NavigationType.Managed:
+                        common.reject(deferred, "Not implemented");
+                        break;
+                    case NavigationType.StructuralWithSiblings:
+                        nav.get_currentNavigation().set_source(SP.Publishing.Navigation.StandardNavigationSource.portalProvider);
+                        if (property !== "True") {
+                            allProperties.set_item(propertyName, "True");
+                            web.update();
+                        }
+                        break;
+                    case NavigationType.StructuralChildrenOnly:
+                        nav.get_currentNavigation().set_source(SP.Publishing.Navigation.StandardNavigationSource.portalProvider);
+                        if (property !== "False") {
+                            allProperties.set_item(propertyName, "False");
+                            web.update();
+                        }
+                        break;
+                    default:
+                        common.reject(deferred, "Unknown Navigation Type");
+                }   
+                nav.update(null);
+                common.executeQuery(this.context)
+                    .fail((sender, args) => { deferred.reject(sender, args); })
+                    .done(() => {
+                        deferred.resolve();
+                    });
+            });
+        return deferred.promise() as JQueryPromise<any>;
+    }
+
     private deleteNodes(nav: SP.NavigationNodeCollection): JQueryPromise<any> {
         var deferred = $.Deferred();
         this.context.load(nav);

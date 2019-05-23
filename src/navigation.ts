@@ -1,7 +1,8 @@
 import common from "./common"
+import * as core from "./core"
 import NavigationHelper from "./helper/navigationHelper";
 import { Fluent } from "./fluent"
-import { NavigationLocation } from "./core"
+import { NavigationLocation, NavigationType } from "./core"
 export default class Navigation {
     constructor(fluent: Fluent) {
         this.fluent = fluent;
@@ -61,6 +62,14 @@ export default class Navigation {
             } else {
                 throw "Unknown location " + location;
             }
+        });
+        return this.fluent;
+    }
+
+    public setCurrentNavigation(web: SP.Web, type: NavigationType): Fluent {
+        this.fluent.registerDependency(core.Dependency.Publishing);
+        this.fluent.chainAction(`${this._helperName}.setCurrentNavigation`, () => {
+            return this.navigationHelper.setCurrentNavigation(web, type);
         });
         return this.fluent;
     }

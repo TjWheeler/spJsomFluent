@@ -25,6 +25,12 @@ export enum NavigationLocation {
     TopNavigation,
     Quicklaunch
 }
+export enum NavigationType {
+    Inherit,
+    Managed,
+    StructuralWithSiblings,
+    StructuralChildrenOnly
+}
 //export interface IFluentInternal extends IFluent {
 //    chainAction(name: string, action: any);
 //    registerDependency(dependency: Dependency);

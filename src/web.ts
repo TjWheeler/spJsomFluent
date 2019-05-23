@@ -29,9 +29,9 @@ export default class Web {
       * @remarks
       * For templates See: https://blogs.technet.microsoft.com/praveenh/2010/10/21/sharepoint-templates-and-their-ids/
       */
-    public create(name: string, parentWeb: SP.Web, title: string, template: string): Fluent {
+    public create(name: string, parentWeb: SP.Web, title: string, template: string, useSamePermissionsAsParent: boolean = true): Fluent {
         this._fluent.chainAction(`${this._helperName}.create`, () => {
-            return this.webHelper.createWeb(name, parentWeb, title, template);
+            return this.webHelper.createWeb(name, parentWeb, title, template, useSamePermissionsAsParent);
         });
         return this._fluent;
     }
