@@ -111,11 +111,14 @@ export default class ListHelper {
             });
         return deferred.promise() as JQueryPromise<SP.ListItem>;
     }
-    public getFileListItem(serverRelativeUrl: string): JQueryPromise<SP.ListItem> {
+   
+    private loadListItem(listItem: SP.ListItem, viewFields: Array<string> = null): JQueryPromise<SP.ListItem> {
         var deferred = $.Deferred();
-        var file = this.context.get_site().get_rootWeb().getFileByServerRelativeUrl(serverRelativeUrl);
-        var listItem = file.get_listItemAllFields();
-        this.context.load(listItem);
+        if (viewFields && viewFields.length) {
+            this.context.load(listItem, viewFields as any);
+        } else {
+            this.context.load(listItem);
+        }
         common.executeQuery(this.context)
             .fail((sender, args) => { deferred.reject(sender, args); })
             .done(() => {
@@ -147,7 +150,6 @@ export default class ListHelper {
         return deferred.promise() as JQueryPromise<SP.File>;
     }
     public getList(web: SP.Web, listName: string): JQueryPromise<SP.List> {
-        //TODO: test
         var deferred = $.Deferred();
         var list = web.get_lists().getByTitle(listName);
         this.context.load(list);
@@ -158,25 +160,21 @@ export default class ListHelper {
             });
         return deferred.promise() as JQueryPromise<SP.List>;
     }
-    public getListItemById(web: SP.Web, listName: string, id: number): JQueryPromise<SP.ListItem> {
-        //TODO: test
-        var deferred = $.Deferred();
+    public getFileListItem(serverRelativeUrl: string, viewFields: Array<string> = null): JQueryPromise<SP.ListItem> {
+        var file = this.context.get_site().get_rootWeb().getFileByServerRelativeUrl(serverRelativeUrl);
+        var listItem = file.get_listItemAllFields();
+        return this.loadListItem(listItem);
+    }
+    public getListItemById(web: SP.Web, listName: string, id: number, viewFields: Array<string> = null): JQueryPromise<SP.ListItem> {
         var listItem = web.get_lists().getByTitle(listName).getItemById(id);
-        this.context.load(listItem);
-        common.executeQuery(this.context)
-            .fail((sender, args) => { deferred.reject(sender, args); })
-            .done(() => {
-                deferred.resolve(listItem);
-            });
-        return deferred.promise() as JQueryPromise<SP.ListItem>;
+        return this.loadListItem(listItem, viewFields);
     }
 
     public deleteListItemById(web: SP.Web, listName: string, id: number): JQueryPromise<any> {
-        //TODO: test
         var deferred = $.Deferred();
         var listItem = web.get_lists().getByTitle(listName).getItemById(id);
         this.context.load(listItem);
-        listItem.deleteObject(); //TODO: verify this works before executeQuery
+        listItem.deleteObject(); 
         common.executeQuery(this.context)
             .fail((sender, args) => { deferred.reject(sender, args); })
             .done(() => {
@@ -185,10 +183,12 @@ export default class ListHelper {
         return deferred.promise();
     }
     public getListItems(web: SP.Web, listName: string, viewXml: string): JQueryPromise<SP.ListItemCollection> {
-        //TODO: test
         var deferred = $.Deferred();
         var list = web.get_lists().getByTitle(listName);
         var query = new SP.CamlQuery();
+        if (!viewXml) {
+            viewXml = "<View><Query></Query></Where>";
+        }
         query.set_viewXml(viewXml);
         var listItems = list.getItems(query);
         this.context.load(listItems);
@@ -199,12 +199,7 @@ export default class ListHelper {
             });
         return deferred.promise() as JQueryPromise<SP.ListItemCollection>;
     }
-    public getListItemCount(web: SP.Web, listName: string, viewXml: string): JQueryPromise<any> {
-        var deferred = $.Deferred();
-        //TODO:
-        common.reject(deferred, "Not implemented");
-        return deferred.promise();
-    }
+    
     public addContentTypeListAssociation(web: SP.Web, listName: string, contentTypeName: string): JQueryPromise<SP.ContentType> {
         var deferred = $.Deferred();
         var list = web.get_lists().getByTitle(listName);

@@ -16,40 +16,4 @@ export interface KeyValuePair {
     value: any;
 }
 export class WhenCommand extends FluentCommand { }
-export enum Dependency {
-    Publishing,
-    UserProfile,
-    Taxonomy
-}
-export enum NavigationLocation {
-    TopNavigation,
-    Quicklaunch
-}
-export enum NavigationType {
-    Inherit,
-    Managed,
-    StructuralWithSiblings,
-    StructuralChildrenOnly
-}
-//export interface IFluentInternal extends IFluent {
-//    chainAction(name: string, action: any);
-//    registerDependency(dependency: Dependency);
-//}
-//export interface IFluent {
-//    context: SP.ClientContext;
-//    withContext(context: SP.ClientContext): IFluent;
-//    withSettings(settings: ISettings): IFluent;
-//    settings: ISettings;
-//    promise: JQueryPromise<any>;
-//    execute(): JQueryPromise<Array<ActionResult>>;
-//    onActionExecuted(onExecuted: any): IFluent;
-//    onActionExecuting(onExecuting: any): IFluent;
-//    when(predicate: any);
-//    whenAll(predicate: any);
-//    whenTrue(): IFluent;
-//    whenFalse(): IFluent;
-//}
-export interface ISettings {
-    timeoutMilliseconds?: number,
-    enableDependencyTimeout?: boolean
-}
+

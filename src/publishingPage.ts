@@ -1,5 +1,5 @@
 import * as core from "./core"
-import { Fluent } from "./fluent"
+import { Fluent, Dependency } from "./fluent"
 import PageHelper from "./helper/pageHelper"
 
 export default class PublishingPage {
@@ -11,7 +11,7 @@ export default class PublishingPage {
     private readonly _helperName: string = "publishingPage";
     private pageHelper: PageHelper;
     public create(web: SP.Web, name: string, layoutUrl: string): Fluent {
-        this.fluent.registerDependency(core.Dependency.Publishing);
+        this.fluent.registerDependency(Dependency.Publishing);
         this.fluent.chainAction(`${this._helperName}.create`, () => {
             return this.pageHelper.createPublishingPage(web, name, layoutUrl);
         });

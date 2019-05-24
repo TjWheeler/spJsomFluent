@@ -5,10 +5,49 @@ export default class UserHelper {
         this.context = context;
     }
     private context: SP.ClientContext;
+    
+    //public getUserPrincipal(web:SP.Web, email: string): JQueryPromise<SP.User> {
+    //    SP.Utilities.Utility.resolvePrincipal(this.context, web,)
+    //}
+    public getUserByEmail(email: string): JQueryPromise<SP.User> {
+        return this.loadUser(this.context.get_web().ensureUser(email));
+    }
+    public getUserById(id: number): JQueryPromise<SP.User> {
+        return this.loadUser(this.context.get_web().get_siteUsers().getById(id));
+    }
+    private loadUser(user: SP.User): JQueryPromise<SP.User> {
+        var deferred = $.Deferred();
+        this.context.load(user);
+        this.context.executeQueryAsync(
+            (sender, args) => {
+                deferred.resolve(user);
+            },
+            (sender, args) => {
+                console.error(args.get_message());
+                deferred.reject(sender, args);
+            }
+        );
+        return deferred.promise() as JQueryPromise<SP.User>;
+    }
+    public getCurrentUser(): JQueryPromise<SP.UserProfiles.PersonProperties> {
+        var deferred = $.Deferred();
+        var user = this.context.get_web().get_currentUser();
+        this.context.load(user);
+        this.context.executeQueryAsync(
+            (sender, args) => {
+                deferred.resolve(user);
+            },
+            (sender, args) => {
+                console.error(args.get_message());
+                deferred.reject(sender, args);
+            }
+        );
+        return deferred.promise() as JQueryPromise<SP.UserProfiles.PersonProperties>;
+    }
     public getCurrentUserProfileProperties(): JQueryPromise<SP.UserProfiles.PersonProperties> {
             var deferred = $.Deferred();
             SP.SOD.executeFunc('userprofile', 'SP.UserProfiles.PeopleManager', () => {
-                var clientContext = SP.ClientContext.get_current();
+                var clientContext = this.context;
                 var currentUser = clientContext.get_web().get_currentUser();
                 var peopleManager = new SP.UserProfiles.PeopleManager(clientContext);
                 var profile = peopleManager.getMyProperties();

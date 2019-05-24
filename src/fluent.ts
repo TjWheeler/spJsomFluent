@@ -5,12 +5,11 @@ import Permission from "./permission"
 import List from "./list"
 import ListItem from "./listitem"
 import File from "./file"
-import User from "./web"
+import User from "./user"
 import Navigation from "./navigation"
 import PublishingPage from "./publishingpage"
 import * as core from "./core"
 import common from "./common"
-
 
 export class Fluent  {
     public context: SP.ClientContext;
@@ -19,13 +18,13 @@ export class Fluent  {
     private resultPromise: JQueryDeferred<any>;
     private onExecuting: any;
     private onExecuted: any;
-    private dependencies: Array<core.Dependency> = [];
-    public settings: core.ISettings = { timeoutMilliseconds: 5000, enableDependencyTimeout: true };
+    private dependencies: Array<Dependency> = [];
+    public settings: ISettings = { timeoutMilliseconds: 5000, enableDependencyTimeout: true };
     withContext(context: SP.ClientContext): Fluent {
         this.context = context;
         return this;
     }
-    withSettings(settings: core.ISettings): Fluent {
+    withSettings(settings: ISettings): Fluent {
         for (var setting in settings) {
             if (typeof (this.settings[setting]) !== typeof (undefined)) {
                 this.settings[setting] = settings[setting];
@@ -192,13 +191,13 @@ export class Fluent  {
         this.commands.push(command);
         return this;
     }
-    chainAction(name: string, action: any) {
+    public chainAction(name: string, action: any) {
         var command = new core.ActionCommand();
         command.name = name;
         command.action = action;
         this.commands.push(command);
     }
-    registerDependency(dependency: core.Dependency) {
+    public registerDependency(dependency: Dependency) {
         if (this.dependencies.indexOf(dependency) === -1) {
             this.dependencies.push(dependency);
         }
@@ -284,15 +283,15 @@ export class Fluent  {
         let spDependencies = ["SP.js", "SP.Runtime.js"];
         for (let i = 0; i < this.dependencies.length; i++) {
             switch (this.dependencies[i]) {
-                case core.Dependency.UserProfile:
+                case Dependency.UserProfile:
                     (<any>window).LoadSodByKey("userprofile");
                     spDependencies.push("userprofile");
                     break;
-                case core.Dependency.Publishing:
+                case Dependency.Publishing:
                     SP.SOD.registerSod('SP.Publishing.js', SP.Utilities.Utility.getLayoutsPageUrl('sp.publishing.js'));
                     spDependencies.push("SP.Publishing.js");
                     break;
-                case core.Dependency.Taxonomy:
+                case Dependency.Taxonomy:
                     SP.SOD.registerSod('sp.taxonomy.js', SP.Utilities.Utility.getLayoutsPageUrl('sp.taxonomy.js'));
                     spDependencies.push("sp.taxonomy.js");
                     break;
@@ -317,4 +316,23 @@ export class Fluent  {
         }
         return null;
     }
+}
+export enum NavigationLocation {
+    TopNavigation,
+    Quicklaunch
+}
+export enum NavigationType {
+    Inherit,
+    Managed,
+    StructuralWithSiblings,
+    StructuralChildrenOnly
+}
+export enum Dependency {
+    Publishing,
+    UserProfile,
+    Taxonomy
+}
+export interface ISettings {
+    timeoutMilliseconds?: number,
+    enableDependencyTimeout?: boolean
 }
