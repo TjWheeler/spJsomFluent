@@ -109,7 +109,7 @@ Coming soon
 
 ## Publishing Page Commands
 
-| Fluent API | .publishingpages |
+Fluent API `spJsom.publishingpages`
 
 | Command        | Example  |
 | ------------- |:-------------:|
