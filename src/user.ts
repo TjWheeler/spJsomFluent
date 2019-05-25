@@ -1,4 +1,3 @@
-import * as core from "./core"
 import UserHelper from "./helper/userHelper";
 import { Fluent, Dependency } from "./fluent"
 import common from "./common";

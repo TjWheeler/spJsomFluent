@@ -1,5 +1,4 @@
 import common from "./common"
-import * as core from "./core"
 import NavigationHelper from "./helper/navigationHelper";
 import { Fluent, NavigationLocation, NavigationType, Dependency } from "./fluent"
 export default class Navigation {

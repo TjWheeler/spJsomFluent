@@ -8,18 +8,18 @@ import File from "./file"
 import User from "./user"
 import Navigation from "./navigation"
 import PublishingPage from "./publishingpage"
-import * as core from "./core"
 import common from "./common"
 
 export class Fluent  {
     public context: SP.ClientContext;
-    private commands: Array<core.FluentCommand> = [];
-    private results: Array<core.ActionResult> = [];
+    private commands: Array<FluentCommand> = [];
+    private results: Array<ActionResult> = [];
     private resultPromise: JQueryDeferred<any>;
     private onExecuting: any;
     private onExecuted: any;
     private dependencies: Array<Dependency> = [];
     public settings: ISettings = { timeoutMilliseconds: 5000, enableDependencyTimeout: true };
+    private totalCommands = 0;
     withContext(context: SP.ClientContext): Fluent {
         this.context = context;
         return this;
@@ -60,13 +60,16 @@ export class Fluent  {
         return new Navigation(this);
     }
 
-    public execute(): JQueryPromise<Array<core.ActionResult>> {
+    public execute(): JQueryPromise<Array<ActionResult>> {
         this.resultPromise = $.Deferred();
+        //The dependency timeout is fired if it takes too long to load to avoid promise never completing.
         if (this.settings.enableDependencyTimeout) {
             var expiry = setTimeout(() => {
                 common.reject(this.resultPromise, "Timeout waiting for dependencies to load");
             }, this.settings.timeoutMilliseconds);
         }
+        //To track progress
+        this.totalCommands = this.getAvailableActionCommandCount();
         this.loadDependencies()
             .done(() => {
                 this.continue();
@@ -76,7 +79,7 @@ export class Fluent  {
                     clearTimeout(expiry);
                 }
             });
-        return this.resultPromise.promise() as JQueryPromise<Array<core.ActionResult>>;
+        return this.resultPromise.promise() as JQueryPromise<Array<ActionResult>>;
     }
     public onActionExecuted(onExecuted: any): Fluent {
         this.onExecuted = onExecuted;
@@ -87,10 +90,10 @@ export class Fluent  {
         return this;
     }
     public when(predicate: any) {
-        if (this.peekLastCommand() && this.peekLastCommand().constructor !== core.ActionCommand) {
+        if (this.peekLastCommand() && this.peekLastCommand().constructor !== ActionCommand) {
             throw "Illegal operation: The last command must be an ActionCommand";
         }
-        var command = new core.WhenCommand();
+        var command = new WhenCommand();
         command.action = () => {
             var deferred = $.Deferred();
             var command = this.peekLastResult();
@@ -114,10 +117,10 @@ export class Fluent  {
     }
     //Similar to when, but all previous results are passed into the predicate
     public whenAll(predicate: any) : Fluent {
-        if (this.peekLastCommand() && this.peekLastCommand().constructor !== core.ActionCommand) {
+        if (this.peekLastCommand() && this.peekLastCommand().constructor !== ActionCommand) {
             throw "Illegal operation: The last command must be an ActionCommand";
         }
-        var command = new core.WhenCommand();
+        var command = new WhenCommand();
         command.action = () => {
             var deferred = $.Deferred();
             var command = this.peekLastResult();
@@ -140,10 +143,10 @@ export class Fluent  {
         return this;
     }
     public whenTrue(): Fluent {
-        if (this.peekLastCommand() && this.peekLastCommand().constructor !== core.ActionCommand) {
+        if (this.peekLastCommand() && this.peekLastCommand().constructor !== ActionCommand) {
             throw "Illegal operation: The last command must be an ActionCommand";
         }
-        var command = new core.WhenCommand();
+        var command = new WhenCommand();
         command.action = () => {
             var deferred = $.Deferred();
             var command = this.peekLastResult();
@@ -166,10 +169,10 @@ export class Fluent  {
         return this;
     }
     public whenFalse(): Fluent {
-        if (this.peekLastCommand() && this.peekLastCommand().constructor !== core.ActionCommand) {
+        if (this.peekLastCommand() && this.peekLastCommand().constructor !== ActionCommand) {
             throw "Illegal operation: The last command must be an ActionCommand";
         }
-        var command = new core.WhenCommand();
+        var command = new WhenCommand();
         command.action = () => {
             var deferred = $.Deferred();
             var command = this.peekLastResult();
@@ -192,7 +195,7 @@ export class Fluent  {
         return this;
     }
     public chainAction(name: string, action: any) {
-        var command = new core.ActionCommand();
+        var command = new ActionCommand();
         command.name = name;
         command.action = action;
         this.commands.push(command);
@@ -208,14 +211,15 @@ export class Fluent  {
         }
         var command = this.commands.shift();
         if (command && command.action) {
-            if (command.constructor === core.ActionCommand) {
+            if (command.constructor === ActionCommand) {
                 if (this.onExecuting) {
-                    this.onExecuting((command as core.ActionCommand).name);
+                    let step = this.totalCommands - (this.getAvailableActionCommandCount());
+                    this.onExecuting((command as ActionCommand).name, step, this.totalCommands);
                 }
             }
             var promise = command.action() as JQueryPromise<any>;
             promise.done((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => {
-                if (command.constructor === core.ActionCommand) {
+                if (command.constructor === ActionCommand) {
                     let results = [];
                     this.storeResult(arg1, results);
                     this.storeResult(arg2, results);
@@ -224,9 +228,9 @@ export class Fluent  {
                     this.storeResult(arg5, results);
                     this.storeResult(arg6, results);
                     this.storeResult(arg7, results);
-                    this.addResult(command as core.ActionCommand, true, results);
+                    this.addResult(command as ActionCommand, true, results);
                     if (this.onExecuted) {
-                        this.onExecuted((command as core.ActionCommand).name, true, results);
+                        this.onExecuted((command as ActionCommand).name, true, results);
                     }
                 }
                 if (this.commands.length) {
@@ -237,11 +241,11 @@ export class Fluent  {
                 }
             })
                 .fail((sender, args) => {
-                    if (command.constructor === core.ActionCommand) {
+                    if (command.constructor === ActionCommand) {
                         let results = [];
                         this.storeResult(sender, results);
                         this.storeResult(args, results);
-                        this.addResult(command as core.ActionCommand, false, results);
+                        this.addResult(command as ActionCommand, false, results);
                         this.failChain(sender, args);
                         return;
                     }
@@ -271,8 +275,8 @@ export class Fluent  {
         }
         deferred.reject(sender, args);
     }
-    private addResult(command: core.ActionCommand, success: boolean, results: Array<any>) {
-        var result = new core.ActionResult();
+    private addResult(command: ActionCommand, success: boolean, results: Array<any>) {
+        var result = new ActionResult();
         result.name = command.name;
         result.success = success;
         result.result = results;
@@ -316,6 +320,15 @@ export class Fluent  {
         }
         return null;
     }
+    private getAvailableActionCommandCount(): number {
+        var count = 0;
+        for (var i = 0; i < this.commands.length; i++) {
+            if (this.commands[i].constructor === ActionCommand) {
+                count++;
+            }
+        }
+        return count;
+    }
 }
 export enum NavigationLocation {
     TopNavigation,
@@ -336,3 +349,20 @@ export interface ISettings {
     timeoutMilliseconds?: number,
     enableDependencyTimeout?: boolean
 }
+export class FluentCommand {
+    action: any;
+}
+export class ActionCommand extends FluentCommand {
+    name: string;
+}
+export class ActionResult {
+    name: string;
+    success: boolean;
+    result: Array<any>;
+}
+export interface KeyValuePair {
+    key: string;
+    value: any;
+}
+export class WhenCommand extends FluentCommand { }
+

@@ -16,7 +16,7 @@ export default class Permission {
         return this._fluent;
     }
     public hasListPermission(permission: SP.PermissionKind, list: SP.List): Fluent {
-        this._fluent.chainAction(`${this._helperName}.hasSitePermission`, () => {
+        this._fluent.chainAction(`${this._helperName}.hasListPermission`, () => {
             return this.permissionHelper.hasListPermission(permission, list);
         });
         return this._fluent;

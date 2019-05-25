@@ -50,6 +50,23 @@ export default class ListHelper {
             });
         return deferred.promise() as JQueryPromise<SP.ListItem>;
     }
+    public exists(web: SP.Web, listName: string): JQueryPromise<SP.ListItem> {
+        var deferred = $.Deferred();
+        var lists = web.get_lists();
+        this.context.load(lists);
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                for (var i = 0; i < lists.get_count(); i++) {
+                    if (lists.getItemAtIndex(i).get_title().toLowerCase() === listName.toLowerCase()) {
+                        deferred.resolve(true);
+                        return;
+                    }
+                }
+                deferred.resolve(false);
+            });
+        return deferred.promise() as JQueryPromise<SP.ListItem>;
+    }
     public createListItemWithContentTypeName(web: SP.Web, listName: string, contentTypeName: string, properties: any): JQueryPromise<SP.ListItem> {
         var deferred = $.Deferred();
         var clientContext = this.context;

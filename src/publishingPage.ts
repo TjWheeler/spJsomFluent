@@ -1,4 +1,3 @@
-import * as core from "./core"
 import { Fluent, Dependency } from "./fluent"
 import PageHelper from "./helper/pageHelper"
 

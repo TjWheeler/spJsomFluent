@@ -12,11 +12,17 @@ export default class List {
     /**
     * Create new list 
     * Example: create(context.get_web(), "My Task List", 107)
-    * templateId - See: https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-csom/ee541191(v%3Doffice.15)
+    * templateId - See: https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-csom/ee541191(v%3Doffice.15)#remarks
     */
     public create(web: SP.Web, listName: string, templateId: number): Fluent {
         this.fluent.chainAction(`${this._helperName}.create`, () => {
             return this.listHelper.createList(web, listName, templateId);
+        });
+        return this.fluent;
+    }
+    public exists(web: SP.Web, listName: string): Fluent {
+        this.fluent.chainAction(`${this._helperName}.exists`, () => {
+            return this.listHelper.exists(web, listName);
         });
         return this.fluent;
     }

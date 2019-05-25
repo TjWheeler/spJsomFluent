@@ -1,9 +1,9 @@
 const path = require('path');
 const webpack = require('webpack');
-const version = 'v0.1.0';
+const version = 'v0.1.1';
 var banner = 'spJsomFluent ' + version + ' - https://github.com/TjWheeler/spJsomFluent';
 module.exports = {
-    entry: { spJsomFluent: './src/fluent.ts'},
+    entry: { spJsomFluent: './src/fluent.ts', spJsomExamples: './examples/spJsomExamples-typescript.ts'},
     devtool: 'source-map',
     module: {
         rules: [

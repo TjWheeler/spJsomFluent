@@ -6,9 +6,6 @@ export default class UserHelper {
     }
     private context: SP.ClientContext;
     
-    //public getUserPrincipal(web:SP.Web, email: string): JQueryPromise<SP.User> {
-    //    SP.Utilities.Utility.resolvePrincipal(this.context, web,)
-    //}
     public getUserByEmail(email: string): JQueryPromise<SP.User> {
         return this.loadUser(this.context.get_web().ensureUser(email));
     }
