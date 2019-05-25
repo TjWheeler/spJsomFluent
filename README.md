@@ -35,7 +35,7 @@ new spJsom.Fluent()
 
 ## TypeScript Examples
 For more examples, including more complex scenarios with multiple commands, 
-see [TypeScript examples](https://github.com/TjWheeler/spJsomFluent/examples/spJsomExamples-typescript.ts)
+see [TypeScript examples](https://github.com/TjWheeler/spJsomFluent/blob/master/examples/spJsomExamples-typescript.ts)
 
 ## JavaScript Examples
 
@@ -57,7 +57,7 @@ For example:
 ```
 Note that the when commands do not reject a promise even when their condition is not met.  The chain of execution simply stops at that point.
 
-# when
+## when
 
 You can supply your own predicate to determine if execution of the chain should continue.  
 For example:
@@ -72,7 +72,7 @@ For example:
 ```
 The result of the previous step is passed into the *when* predicate allowing you the opportunity to evaluate the result and continue or stop.
 
-# whenAll
+## whenAll
 
 Similar to *when*, but instead of the previous steps result being passed in, an array with all previous steps are passed to the predicate.
 ```javascript
@@ -86,6 +86,35 @@ Similar to *when*, but instead of the previous steps result being passed in, an 
 	return false; //the chain execution will stop
 })
 ```
+
+## List Commands
+
+Coming soon
+
+## Permission Commands
+
+Coming soon
+
+## Web Commands
+
+Coming soon
+
+## ListItem Commands
+
+Coming soon
+
+## Navigation Commands
+
+Coming soon
+
+## Publishing Page Commands
+
+Fluent API | .publishingpages
+
+| Command        | Example  |
+| ------------- |:-------------:|
+| col 3 is      | right-aligned |
+
 
 # Events
 
