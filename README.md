@@ -19,34 +19,107 @@ Repository: https://github.com/TjWheeler/spJsomFluent
 In this example, we want to create a list, then add a list item.  We also want to check to make sure the list doesn't already exist and the user has permission.
 Each command is one *link* in the chain.  The *when* commands will stop execution of the chain if they fail to meet their criteria.
 ```javascript
+
 	var context = SP.ClientContext.get_current();
-    var listName = "MyList1";
     new spJsom.Fluent()
         .withContext(context)
-        .list.exists(context.get_web(), listName)
-        .whenFalse()  //stops here if the list exists
-        .permission.hasListPermission(SP.PermissionKind.addListItems, context.get_web().get_lists().getByTitle("MyList"))
-        .whenTrue() //stops here if the user doesn't have permission
-        .list.create(context.get_web(), listName, 100)
-        .listItem.create(context.get_web(), listName, { Title: "Created by spJsom" })
+        .user.getCurrentUserProfileProperties()
         .execute()
-			.fail((sender, args) => {
-				console.error(args.get_message());
-			})
-			.done((results) => {
-				console.log(results);
-			});
+        .fail(function(sender, args) {
+            console.error(args.get_message());
+        })
+        .done(function(results) {
+            console.log(results);
+            console.log("Your profile properties", results[0].result[0]);
+        });
 ```
 
 ## TypeScript Examples
 
-See [https://github.com/TjWheeler/spJsomFluent/examples/spJsomExamples-typescript.ts](TypeScript examples)
+See [TypeScript examples](https://github.com/TjWheeler/spJsomFluent/examples/spJsomExamples-typescript.ts)
 
 ## JavaScript Examples
 
 Coming soon!
 
-#Usage 
+# Dependencies
+
+jQuery must be loaded as the library uses jQuery Promises.
+
+# Commands
+
+## whenTrue & whenFalse
+
+These commands .whenTrue() and .whenFalse() are a conditional check.  They take the value from the previous step then compare it with True/False to determine if execution of the chain should continue.
+For example:
+```
+	.permission.hasWebPermission(SP.PermissionKind.createSSCSite, context.get_web())
+    .whenTrue() //stops executing the chain if the user doesn't have permission
+```
+Note that the when commands do not reject a promise even when their condition is not met.  The chain of execution simply stops at that point.
+
+# when
+
+You can supply your own predicate to determine if execution of the chain should continue.  
+For example:
+```javascript
+	.listItem.get(context.get_web(), "MyList", 1)
+	.when(function(listItem) {
+		if(listItem.get_item("Title") === "My Title") {
+			return true; //the chain execution will continue
+		} 
+		return false; //the chain execution will stop
+	})
+```
+The result of the previous step is passed into the *when* predicate allowing you the opportunity to evaluate the result and continue or stop.
+
+# whenAll
+
+Similar to *when*, but instead of the previous steps result being passed in, an array with all previous steps are passed to the predicate.
+```javascript
+	...
+	.listItem.get(context.get_web(), "MyList", 1)
+	.whenAll(function(results) {
+		var listItem = results[0];
+		if(listItem.get_item("Title") === "My Title") {
+			return true; //the chain execution will continue
+		} 
+		return false; //the chain execution will stop
+	})
+```
+
+# Events
+
+To monitor activity there are 2 events you can wire up to.  These are:
+1. onExecuting(commandName, step, totalSteps)
+2. onExecuted(commandName, success, results)
+
+## onExecuting
+To show progress, this method will give you the details you need.
+```typescript
+
+	.onActionExecuting((actionName:string, current:number, total:number) => {
+        let progress = Math.ceil(100 * current / total);
+        console.log(`Executing: ${actionName}, we are ${progress}% through.`);
+    })
+            
+```
+
+## onExecuted
+```typescript
+
+	.onActionExecuted((actionName:string, success:boolean, results: Array<any>) => {
+        console.log(`Executed: ${actionName}:${success}`);
+        if (!success) {
+            console.error(actionName, results);
+        }
+    })
+
+```
+
+
+
+# Usage 
 
 ## Install - npm
 `npm i spjsomfluent --save`

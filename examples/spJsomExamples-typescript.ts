@@ -53,12 +53,11 @@ var examples = {
             .onActionExecuted((actionName, success, results: Array<any>) => {
                 console.log(`Executed: ${actionName}:${success}`);
                 if (!success) {
-                    console.error(actionName);
-                    console.error(results);
+                    console.error(actionName, results);
                 }
             })
             .permission.hasWebPermission(SP.PermissionKind.createSSCSite, context.get_web())
-            .whenTrue() //cstops executing the chain if the user doesn't have permission
+            .whenTrue() //stops executing the chain if the user doesn't have permission
             .web.exists(url)
             .whenFalse() //stops executing the chain if the web already exists
             .web.create(subSitePath, context.get_web(), "Test Site", "CMSPUBLISHING#0") //Create a sub site

@@ -246,6 +246,9 @@ export class Fluent  {
                         this.storeResult(sender, results);
                         this.storeResult(args, results);
                         this.addResult(command as ActionCommand, false, results);
+                        if (this.onExecuted) {
+                            this.onExecuted((command as ActionCommand).name, false, {sender:sender, args:args});
+                        }
                         this.failChain(sender, args);
                         return;
                     }
