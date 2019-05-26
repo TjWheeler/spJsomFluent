@@ -109,12 +109,12 @@ Coming soon
 
 ## Publishing Page Commands
 
-Fluent API `spJsom.publishingpages`
+Fluent API `spJsom.publishingPage`
 
-| Command        | Example  |
-| ------------- |:-------------:|
-| col 3 is      | right-aligned |
-
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- |
+| create(web: SP.Web, name: string, layoutUrl: string) | SP.Publishing.PublishingPage |Creates a new publishing page.   |  .publishingPage.create(SP.ClientContext.GetCurrent().get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx") |
+| getLayout(serverRelativeUrl:string)		| SP.ListItem | Gets a page layout | |
 
 # Events
 
