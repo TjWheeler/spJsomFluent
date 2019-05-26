@@ -9,12 +9,33 @@ export default class File {
     private listHelper = null as ListHelper;
     private readonly _helperName: string = "file";
 
-    public getFile(serverRelativeUrl: string): Fluent {
-        this.fluent.chainAction(`${this._helperName}.getFile`, () => {
+    /**
+    * Get a file from a document library
+    * Result: SP.File
+    * Example: get(_spPageContextInfo.siteServerRelativeUrl + "/documents/doc.docx")
+    */
+    public get(serverRelativeUrl: string): Fluent {
+        this.fluent.chainAction(`${this._helperName}.getListItem`, () => {
+            return this.listHelper.getFile(serverRelativeUrl);
+        });
+        return this.fluent;
+    }
+    /**
+    * Get the list item for the file
+    * Result: SP.ListItem
+    * Example: getListItem(_spPageContextInfo.siteServerRelativeUrl + "/documents/doc.docx")
+    */
+    public getListItem(serverRelativeUrl: string): Fluent {
+        this.fluent.chainAction(`${this._helperName}.getListItem`, () => {
             return this.listHelper.getFileListItem(serverRelativeUrl);
         });
         return this.fluent;
     }
+    /**
+    * Check in a file
+    * Result: SP.File
+    * Example: checkIn(SP.ClientContext.get_current().get_web(), _spPageContextInfo.webServerRelativeUrl + '/pages/mypage.aspx', "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
+    */
     public checkIn(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): Fluent {
         this.fluent.chainAction(`${this._helperName}.checkInFile`, () => {
             return this.listHelper.checkInFile(web, serverRelativeUrl, comment, checkInType);

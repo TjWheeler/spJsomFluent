@@ -8,12 +8,22 @@ export default class ListItem {
     private fluent = null as Fluent;
     private listHelper = null as ListHelper;
     private readonly _helperName: string = "listItem";
+    /**
+    * Update a list item with properties
+    * Result: SP.ListItem
+    * Example: update(listItem, { 'Title': 'Title value here', ClientId: 123 })
+    */
     public update(listItem: SP.ListItem, properties: any): Fluent {
         this.fluent.chainAction(`${this._helperName}.update`, () => {
             return this.listHelper.setListItemProperties(listItem, properties);
         });
         return this.fluent;
     }
+    /**
+    * Create a list item, specifying the Content Type
+    * Result: SP.ListItem
+    * Example: createWithContentType(context.get_web(), "My list", "My Content Type Name", { 'Title': 'Title value here', ClientId: 123 })
+    */
     public createWithContentType(web: SP.Web, listName: string, contentTypeName: string, properties: any): Fluent {
         this.fluent.chainAction(`${this._helperName}.createWithContentType`, () => {
             return this.listHelper.createListItemWithContentTypeName(web, listName, contentTypeName, properties);
@@ -45,6 +55,7 @@ export default class ListItem {
     
     /**
     * Get the listitem using the ID with optional view fields
+    * Result: SP.ListItem
     * Example: get(context.get_web(), "MyList", 1, ["ID", "Title"])
     */
     public get(web: SP.Web, listName: string, id: number, viewFields: Array<string> = null): Fluent {
@@ -55,6 +66,7 @@ export default class ListItem {
     }
     /**
     * Get the listitem for a File using the ID with optional view fields
+    * Result: SP.ListItem
     * Example: getFileListItem("/sites/site/documents/mydoc.docx", ["ID", "Title", "FileLeafRef"])
     */
     public getFileListItem(serverRelativeUrl: string, viewFields: Array<string> = null): Fluent {
@@ -66,6 +78,7 @@ export default class ListItem {
     
     /**
     * Delete List Item
+    * Result: void
     * Example: deleteById(context.get_web(), "MyList", 7)
     */
     public deleteById(web: SP.Web, listName: string, id: number): Fluent {

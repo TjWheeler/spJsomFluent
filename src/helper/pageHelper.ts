@@ -5,7 +5,7 @@ export default class PageHelper {
         this.context = context;
     }
     private context: SP.ClientContext;
-    public createPublishingPage(web: SP.Web, name: string, layoutUrl: string): JQueryPromise<SP.ListItem> {
+    public createPublishingPage(web: SP.Web, name: string, layoutUrl: string): JQueryPromise<SP.Publishing.PublishingPage> {
         var deferred = $.Deferred();
         var file = this.context.get_site().get_rootWeb().getFileByServerRelativeUrl(layoutUrl);
         var listItem = file.get_listItemAllFields();
@@ -22,7 +22,7 @@ export default class PageHelper {
             .done(() => {
                 deferred.resolve(publishingPage);
             });
-        return deferred.promise() as JQueryPromise<SP.ListItem>;
+        return deferred.promise() as JQueryPromise<SP.Publishing.PublishingPage>;
     }
     public getPublishingLayout(serverRelativeUrl: string): JQueryPromise<SP.ListItem> {
         var deferred = $.Deferred();
