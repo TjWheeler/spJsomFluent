@@ -86,26 +86,60 @@ Similar to *when*, but instead of the previous steps result being passed in, an 
 	return false; //the chain execution will stop
 })
 ```
+## File Commands
+
+Fluent API `spJsom.file`
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+| get(serverRelativeUrl: string)	| SP.File	| Get a file from a document library	| get(_spPageContextInfo.siteServerRelativeUrl + "/documents/doc.docx")	|
+| getListItem(serverRelativeUrl: string)	| SP.ListItem | Get the list item for the file | getListItem(_spPageContextInfo.siteServerRelativeUrl + "/documents/doc.docx") |
+| checkIn(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType) | SP.File | Check in a file | checkIn(SP.ClientContext.get_current().get_web(), _spPageContextInfo.webServerRelativeUrl + '/pages/mypage.aspx', "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)	|
 
 ## List Commands
 
-Coming soon
+Fluent API `spJsom.list`
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+|||||
+|||||
 
 ## Permission Commands
 
-Coming soon
+Fluent API `spJsom.permission`
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+|||||
+|||||
+
+Fluent API `spJsom.web`
 
 ## Web Commands
 
-Coming soon
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+|||||
+|||||
 
 ## ListItem Commands
 
-Coming soon
+Fluent API `spJsom.listItem`
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+|||||
+|||||
 
 ## Navigation Commands
 
-Coming soon
+Fluent API `spJsom.navigation`
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+|||||
+|||||
 
 ## Publishing Page Commands
 

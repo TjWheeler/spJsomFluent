@@ -12,7 +12,7 @@ export default class PublishingPage {
     /**
     * Creates a new publishing page.
     * Result: SP.Publishing.PublishingPage
-    * Example: .publishingPage.create(SP.ClientContext.GetCurrent().get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx")
+    * Example: .publishingPage.create(SP.ClientContext.get_current().get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx")
     */
     public create(web: SP.Web, name: string, layoutUrl: string): Fluent {
         this.fluent.registerDependency(Dependency.Publishing);

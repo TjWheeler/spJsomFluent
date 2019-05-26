@@ -20,19 +20,33 @@ export default class List {
         });
         return this.fluent;
     }
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public exists(web: SP.Web, listName: string): Fluent {
         this.fluent.chainAction(`${this._helperName}.exists`, () => {
             return this.listHelper.exists(web, listName);
         });
         return this.fluent;
     }
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public delete(web: SP.Web, listName: string, template: string): Fluent {
         this.fluent.chainAction(`${this._helperName}.delete`, () => {
             return common.notImplementedPromise();
         });
         return this.fluent;
     }
-    
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public get(web: SP.Web, listName: string): Fluent {
         //TODO: test
         this.fluent.chainAction(`${this._helperName}.get`, () => {
@@ -40,19 +54,33 @@ export default class List {
         });
         return this.fluent;
     }
-    
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public addContentTypeListAssociation(web: SP.Web, listName: string, contentTypeName: string): Fluent {
         this.fluent.chainAction(`${this._helperName}.addContentTypeListAssociation`, () => {
             return this.listHelper.addContentTypeListAssociation(web, listName, contentTypeName);
         });
         return this.fluent;
     }
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public removeContentTypeListAssociation(web: SP.Web, listName: string, contentTypeName: string): Fluent {
         this.fluent.chainAction(`${this._helperName}.removeContentTypeListAssociation`, () => {
             return this.listHelper.removeContentTypeListAssociation(web, listName, contentTypeName);
         });
         return this.fluent;
     }
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public setDefaultValueOnList(web: SP.Web, listName: string, fieldInternalName: string, defaultValue: any): Fluent {
         this.fluent.chainAction(`${this._helperName}.setDefaultValueOnList`, () => {
             return this.listHelper.setDefaultValueOnList(web, listName, fieldInternalName, defaultValue);

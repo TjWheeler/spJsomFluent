@@ -21,18 +21,33 @@ export default class User {
         });
         return this._fluent;
     }
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public getById(id: number): Fluent {
         this._fluent.chainAction(`${this._helperName}.getById`, () => {
             return this.userHelper.getUserById(id);
         });
         return this._fluent;
     }
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public getCurrentUser(): Fluent {
         this._fluent.chainAction(`${this._helperName}.getCurrentUser`, () => {
             return this.userHelper.getCurrentUser();
         });
         return this._fluent;
     }
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public getCurrentUserProfileProperties(): Fluent {
         this._fluent.registerDependency(Dependency.UserProfile);
         this._fluent.chainAction(`${this._helperName}.getCurrentUserProfileProperties`, () => {
@@ -40,6 +55,11 @@ export default class User {
         });
         return this._fluent;
     }
+    /**
+    * 
+    * Result: 
+    * Example: 
+    */
     public getCurrentUserManager(): Fluent {
         this._fluent.registerDependency(Dependency.UserProfile);
         this._fluent.chainAction(`${this._helperName}.getCurrentUserManager`, () => {
