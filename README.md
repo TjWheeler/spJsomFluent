@@ -112,7 +112,7 @@ Coming soon
 Fluent API `spJsom.publishingPage`
 
 | Command        | Result        | Description | Example |
-| ------------- | ------------- | ------------- |
+| ------------- | ------------- | ------------- | ------------- |
 | create(web: SP.Web, name: string, layoutUrl: string) | SP.Publishing.PublishingPage |Creates a new publishing page.   |  .publishingPage.create(SP.ClientContext.GetCurrent().get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx") |
 | getLayout(serverRelativeUrl:string)		| SP.ListItem | Gets a page layout | |
 
