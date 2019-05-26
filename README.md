@@ -74,9 +74,9 @@ import * as spJsom from "./node_modules/spjsomfluent/src/fluent"
 1. Clone the repository and copy the sampleApp folder to your own location. `git clone https://github.com/TjWheeler/spJsomFluent`
 2. run `npm install` from the same folder using a Node Shell
 3. run `npm run debug` to build the sample app. (The development commands listed above are valid for this app too.)
-4. Upload the resulting .js and .js.map to SharePoint or use Fiddlers autoresponder.  
-5. Add a script reference in a Script Editor web part: ​​​`<script src="https://yoursharepoint.sharepoint.com/sites/yoursite/myApp.js"></script>`
-6. Modify the app as needed
+4. Upload the resulting .js and .js.map to SharePoint or use Fiddlers autoresponder to a location of your chosing. eg;  /style library/myApp
+5. Add a script reference in a Script Editor web part: ​​​`<script src="https://yoursharepoint.sharepoint.com/sites/yoursite/style library/myApp/myApp.js"></script>`
+6. Modify the app as needed (use `npm run dev` to watch the file updates you make and immediately rebuild)
 
 Note: The default sample app is designed to create a List called MyList1 and a single list item.  
 Once the script is loaded, it will execute as soon as SP.js is loaded.
