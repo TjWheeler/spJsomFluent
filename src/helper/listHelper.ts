@@ -177,6 +177,18 @@ export default class ListHelper {
             });
         return deferred.promise() as JQueryPromise<SP.List>;
     }
+    public deleteList(web: SP.Web, listName: string): JQueryPromise<SP.List> {
+        var deferred = $.Deferred();
+        var list = web.get_lists().getByTitle(listName);
+        this.context.load(list);
+        list.deleteObject();
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                deferred.resolve();
+            });
+        return deferred.promise() as JQueryPromise<SP.List>;
+    }
     public getFileListItem(serverRelativeUrl: string, viewFields: Array<string> = null): JQueryPromise<SP.ListItem> {
         var file = this.context.get_site().get_rootWeb().getFileByServerRelativeUrl(serverRelativeUrl);
         var listItem = file.get_listItemAllFields();

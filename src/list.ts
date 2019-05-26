@@ -20,19 +20,33 @@ export default class List {
         });
         return this.fluent;
     }
+    /**
+    * Check if the list exists
+    * Result: boolean
+    * Example: exists(context.get_web(), "My List")
+    */
     public exists(web: SP.Web, listName: string): Fluent {
         this.fluent.chainAction(`${this._helperName}.exists`, () => {
             return this.listHelper.exists(web, listName);
         });
         return this.fluent;
     }
-    public delete(web: SP.Web, listName: string, template: string): Fluent {
+    /**
+    * Delete a list
+    * Result: void
+    * Example: delete(context.get_web(), "My List")
+    */
+    public delete(web: SP.Web, listName: string): Fluent {
         this.fluent.chainAction(`${this._helperName}.delete`, () => {
-            return common.notImplementedPromise();
+            return this.listHelper.deleteList(web, listName);
         });
         return this.fluent;
     }
-    
+    /**
+    * Get a list
+    * Result: SP.List
+    * Example: get(context.get_web(), "My List")
+    */
     public get(web: SP.Web, listName: string): Fluent {
         //TODO: test
         this.fluent.chainAction(`${this._helperName}.get`, () => {
@@ -40,19 +54,33 @@ export default class List {
         });
         return this.fluent;
     }
-    
+    /**
+    * Adds a Content Type to a List.  Resolves the new associated list content type.
+    * Result: SP.ContentType
+    * Example: addContentTypeListAssociation(context.get_web(), "My List", "My Content Type Name")
+    */
     public addContentTypeListAssociation(web: SP.Web, listName: string, contentTypeName: string): Fluent {
         this.fluent.chainAction(`${this._helperName}.addContentTypeListAssociation`, () => {
             return this.listHelper.addContentTypeListAssociation(web, listName, contentTypeName);
         });
         return this.fluent;
     }
+    /**
+    * Removes a Content Type associated from a list.
+    * Result: void
+    * Example: removeContentTypeListAssociation(context.get_web(), "My List", "My Content Type Name")
+    */
     public removeContentTypeListAssociation(web: SP.Web, listName: string, contentTypeName: string): Fluent {
         this.fluent.chainAction(`${this._helperName}.removeContentTypeListAssociation`, () => {
             return this.listHelper.removeContentTypeListAssociation(web, listName, contentTypeName);
         });
         return this.fluent;
     }
+    /**
+    * Sets a default value on a field in a list
+    * Result: void
+    * Example: setDefaultValueOnList(context.get_web(), "My Task List", "ClientId", 123)
+    */
     public setDefaultValueOnList(web: SP.Web, listName: string, fieldInternalName: string, defaultValue: any): Fluent {
         this.fluent.chainAction(`${this._helperName}.setDefaultValueOnList`, () => {
             return this.listHelper.setDefaultValueOnList(web, listName, fieldInternalName, defaultValue);
@@ -61,6 +89,7 @@ export default class List {
     }
      /**
     * Enable email alerts on a list 
+    * Result: void
     * Example: setAlerts(context.get_web(), "My Task List", true)
     * Note: will not work for 2010/2013
     */

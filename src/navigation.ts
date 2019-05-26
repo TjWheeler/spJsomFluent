@@ -12,6 +12,7 @@ export default class Navigation {
 
     /**
     * Create new navigation node
+    * Result: SP.NavigationNode
     * Example: createNode(context.get_web(), NavigationLocation.Quicklaunch, "Test Node", "/sites/mysite/pages/default.aspx")
     */
     public createNode(web: SP.Web, location: NavigationLocation, title: string, url: string, asLastNode: boolean = true): Fluent {
@@ -29,6 +30,7 @@ export default class Navigation {
     }
     /**
     * Delete all navigation nodes for the web
+    * Result: void
     * Example: deleteAllNodes(context.get_web(), NavigationLocation.Quicklaunch)
     */
     public deleteAllNodes(web: SP.Web, location: NavigationLocation): Fluent {
@@ -48,6 +50,7 @@ export default class Navigation {
     }
     /**
     * Delete all navigation nodes that match the supplied title for the web
+    * Result: void
     * Example: deleteNode(context.get_web(), NavigationLocation.Quicklaunch, "My link title")
     */
     public deleteNode(web: SP.Web, location: NavigationLocation, title:string ): Fluent {
@@ -65,6 +68,7 @@ export default class Navigation {
     }
     /**
     * Set navigation for the web
+    * Result: void
     * Example: setCurrentNavigation(context.get_web(), 3, true, true)
     * Note: showSubsites and showPages is only applicable for NavigationType.StructuralChildrenOnly (3)
     */
