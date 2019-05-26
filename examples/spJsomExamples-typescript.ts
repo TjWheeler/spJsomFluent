@@ -129,6 +129,22 @@ var examples = {
                 console.log(results);
             });
     },
+    deleteList: () => {
+        var context = SP.ClientContext.get_current();
+        var listName = "MyList1";
+        new spJsom.Fluent()
+            .withContext(context)
+            .list.exists(context.get_web(), listName)
+            .whenTrue()  //stops here if the list doesn't exist
+            .list.delete(context.get_web(), listName)
+            .execute()
+            .fail((sender, args) => {
+                console.error(args.get_message());
+            })
+            .done((results) => {
+                console.log(results);
+            });
+    },
     getUser: () => {
         var context = SP.ClientContext.get_current();
         new spJsom.Fluent()

@@ -102,8 +102,28 @@ Fluent API `spJsom.list`
 
 | Command        | Result        | Description | Example |
 | ------------- | ------------- | ------------- | ------------- |
-|||||
-|||||
+| create(web: SP.Web, listName: string, templateId: number)	| SP.List | Create new list | create(context.get_web(), "My Task List", 107) |
+| exists(web: SP.Web, listName: string) | boolean | Check if the list exists | exists(context.get_web(), "My List") |
+| delete(web: SP.Web, listName: string)	| void | Delete a list | delete(context.get_web(), "My List") |
+| get(web: SP.Web, listName: string) | SP.List | Get a list | get(context.get_web(), "My List") |
+| addContentTypeListAssociation(web: SP.Web, listName: string, contentTypeName: string)| SP.ContentType | Adds a Content Type to a List.  Resolves the new associated list content type. | addContentTypeListAssociation(context.get_web(), "My List", "My Content Type Name") |
+| removeContentTypeListAssociation(web: SP.Web, listName: string, contentTypeName: string)	| void | Removes a Content Type associated from a list. | removeContentTypeListAssociation(context.get_web(), "My List", "My Content Type Name") |
+| setDefaultValueOnList(web: SP.Web, listName: string, fieldInternalName: string, defaultValue: any) | void | Sets a default value on a field in a list | setDefaultValueOnList(context.get_web(), "My Task List", "ClientId", 123)|
+| setAlerts(web: SP.Web, listName: string, enabled: boolean)| void | Enable email alerts on a list.  Note: will not work for 2010/2013.  | setAlerts(context.get_web(), "My Task List", true) |
+
+## ListItem Commands
+
+Fluent API `spJsom.listItem`
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+| update(listItem: SP.ListItem, properties: any) | SP.ListItem | Update a list item with properties| update(listItem, { 'Title': 'Title value here', ClientId: 123 }) |
+| createWithContentType(web: SP.Web, listName: string, contentTypeName: string, properties: any) | SP.ListItem | Create a list item, specifying the Content Type | createWithContentType(context.get_web(), "My list", "My Content Type Name", { 'Title': 'Title value here', ClientId: 123 })|
+| create(web:SP.Web, listName: string, properties: any) | SP.ListItem | Create a list item with properties| update(listItem, { 'Title': 'Title value here', ClientId: 123 }) |
+| get(web: SP.Web, listName: string, id: number, viewFields: Array<string> = null) | SP.ListItem | Get the listitem using the ID with optional view fields | get(context.get_web(), "MyList", 1, ["ID", "Title"]) |
+| getFileListItem(serverRelativeUrl: string, viewFields: Array<string> = null) | SP.ListItem | Get the listitem for a File using the ID with optional view fields | getFileListItem("/sites/site/documents/mydoc.docx", ["ID", "Title", "FileLeafRef"]) |
+| deleteById(web: SP.Web, listName: string, id: number) | void | Delete List Item | deleteById(context.get_web(), "MyList", 7) |
+| query(web: SP.Web, listName: string, viewXml: string) | SP.ListItemCollection | Execute a query using supplied CAML.| query(context.get_web(), "MyList", "<View><Query><Where><In><FieldRef Name='ID' /><Values><Value Type='Number'>1</Value><Value Type='Number'>2</Value></Values></In></View></Query></Where>") |
 
 ## Permission Commands
 
@@ -123,14 +143,7 @@ Fluent API `spJsom.web`
 |||||
 |||||
 
-## ListItem Commands
 
-Fluent API `spJsom.listItem`
-
-| Command        | Result        | Description | Example |
-| ------------- | ------------- | ------------- | ------------- |
-|||||
-|||||
 
 ## Navigation Commands
 
