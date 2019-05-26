@@ -12,6 +12,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+sampleApp/myApp.js
+sampleApp/myApp.js.map
+sampleApp/package-lock.json
 
 # Build results
 [Dd]ebug/

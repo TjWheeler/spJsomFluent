@@ -1,9 +1,10 @@
 {
-  "name": "spjsomfluent",
-  "version": "0.1.3",
-  "dependencies": {},
-  "private": false,
-  "homepage": "https://github.com/TjWheeler/spJsomFluent",
+  "name": "spjsomsampleapp",
+  "version": "0.0.1",
+  "dependencies": {
+    "spjsomfluent": "^0.*.*"
+  },
+  "private": true,
   "devDependencies": {
     "ts-loader": "^5.4.4",
     "typescript": "^3.4.5",

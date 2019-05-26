@@ -2,3 +2,7 @@
 .git/*
 .vs/
 .vs
+sampleApp/myApp.js
+sampleApp/myApp.js.map
+sampleApp/package-lock.json
+sampleApp/node_modules
