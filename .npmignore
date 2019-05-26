@@ -2,6 +2,7 @@
 .git/*
 .vs/
 .vs
+sampleApp
 sampleApp/myApp.js
 sampleApp/myApp.js.map
 sampleApp/package-lock.json

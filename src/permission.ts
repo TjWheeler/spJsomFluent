@@ -15,10 +15,10 @@ export default class Permission {
     * Example: hasWebPermission(SP.PermissionKind.createSSCSite, context.get_web())
     */
     public hasWebPermission(permission: SP.PermissionKind, web: SP.Web): Fluent {
-        this._fluent.chainAction(`${this._helperName}.hasWebPermission`, () => {
+        return this._fluent.chainAction(`${this._helperName}.hasWebPermission`, () => {
             return this.permissionHelper.hasWebPermission(permission, web);
         });
-        return this._fluent;
+        
     }
     /**
     * Check if the current user has specified List permission
@@ -26,10 +26,10 @@ export default class Permission {
     * Example: hasListPermission(SP.PermissionKind.addListItems, context.get_web().get_lists().getByTitle("MyList"))
     */
     public hasListPermission(permission: SP.PermissionKind, list: SP.List): Fluent {
-        this._fluent.chainAction(`${this._helperName}.hasListPermission`, () => {
+        return this._fluent.chainAction(`${this._helperName}.hasListPermission`, () => {
             return this.permissionHelper.hasListPermission(permission, list);
         });
-        return this._fluent;
+        
     }
     /**
     * Check if the current user has specified ListItem permission
@@ -37,9 +37,9 @@ export default class Permission {
     * Example: hasItemPermission(SP.PermissionKind.editListItems, context.get_web().get_lists().getByTitle("MyList").getItemById(0))
     */
     public hasItemPermission(permission: SP.PermissionKind, item: SP.ListItem): Fluent {
-        this._fluent.chainAction(`${this._helperName}.hasItemPermission`, () => {
+        return this._fluent.chainAction(`${this._helperName}.hasItemPermission`, () => {
             return this.permissionHelper.hasItemPermission(permission, item);
         });
-        return this._fluent;
+        
     }
 }

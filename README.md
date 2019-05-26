@@ -72,7 +72,7 @@ import * as spJsom from "./node_modules/spjsomfluent/src/fluent"
 ## Getting started using the sample app for TypeScript and WebPack
 
 1. Clone the repository and copy the sampleApp folder to your own location. `git clone https://github.com/TjWheeler/spJsomFluent`
-2. run `npm install` from the same folder using a Node Shell
+2. run `npm install` from the sampleApp folder you copied using a Node Shell
 3. run `npm run debug` to build the sample app. (The development commands listed above are valid for this app too.)
 4. Upload the resulting .js and .js.map to SharePoint or use Fiddlers autoresponder to a location of your chosing. eg;  /style library/myApp
 5. Add a script reference in a Script Editor web part: ​​​`<script src="https://yoursharepoint.sharepoint.com/sites/yoursite/style library/myApp/myApp.js"></script>`

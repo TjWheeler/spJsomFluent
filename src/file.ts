@@ -15,10 +15,10 @@ export default class File {
     * Example: get(_spPageContextInfo.siteServerRelativeUrl + "/documents/doc.docx")
     */
     public get(serverRelativeUrl: string): Fluent {
-        this.fluent.chainAction(`${this._helperName}.getListItem`, () => {
+        return this.fluent.chainAction(`${this._helperName}.getListItem`, () => {
             return this.listHelper.getFile(serverRelativeUrl);
         });
-        return this.fluent;
+        
     }
     /**
     * Get the list item for the file
@@ -26,10 +26,10 @@ export default class File {
     * Example: getListItem(_spPageContextInfo.siteServerRelativeUrl + "/documents/doc.docx")
     */
     public getListItem(serverRelativeUrl: string): Fluent {
-        this.fluent.chainAction(`${this._helperName}.getListItem`, () => {
+        return this.fluent.chainAction(`${this._helperName}.getListItem`, () => {
             return this.listHelper.getFileListItem(serverRelativeUrl);
         });
-        return this.fluent;
+        
     }
     /**
     * Check in a file
@@ -37,9 +37,9 @@ export default class File {
     * Example: checkIn(SP.ClientContext.get_current().get_web(), _spPageContextInfo.webServerRelativeUrl + '/pages/mypage.aspx', "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
     */
     public checkIn(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): Fluent {
-        this.fluent.chainAction(`${this._helperName}.checkInFile`, () => {
+        return this.fluent.chainAction(`${this._helperName}.checkInFile`, () => {
             return this.listHelper.checkInFile(web, serverRelativeUrl, comment, checkInType);
         });
-        return this.fluent;
+        
     }
 }

@@ -16,7 +16,7 @@ export default class Navigation {
     * Example: createNode(context.get_web(), NavigationLocation.Quicklaunch, "Test Node", "/sites/mysite/pages/default.aspx")
     */
     public createNode(web: SP.Web, location: NavigationLocation, title: string, url: string, asLastNode: boolean = true): Fluent {
-        this.fluent.chainAction(`${this._helperName}.createNode`, () => {
+        return this.fluent.chainAction(`${this._helperName}.createNode`, () => {
             if (location == NavigationLocation.Quicklaunch) {
                 return this.navigationHelper.createQuicklaunchNode(web, title, url, asLastNode);
             }
@@ -26,7 +26,7 @@ export default class Navigation {
                 throw "Unknown location " + location;
             }
         });
-        return this.fluent;
+        
     }
     /**
     * Delete all navigation nodes for the web
@@ -34,7 +34,7 @@ export default class Navigation {
     * Example: deleteAllNodes(context.get_web(), NavigationLocation.Quicklaunch)
     */
     public deleteAllNodes(web: SP.Web, location: NavigationLocation): Fluent {
-        this.fluent.chainAction(`${this._helperName}.deleteAllNodes`, () => {
+        return this.fluent.chainAction(`${this._helperName}.deleteAllNodes`, () => {
             if (location == NavigationLocation.Quicklaunch) {
                 return this.navigationHelper.deleteQuicklaunchNodes(web);
             }
@@ -46,7 +46,7 @@ export default class Navigation {
 
 
         });
-        return this.fluent;
+        
     }
     /**
     * Delete all navigation nodes that match the supplied title for the web
@@ -54,7 +54,7 @@ export default class Navigation {
     * Example: deleteNode(context.get_web(), NavigationLocation.Quicklaunch, "My link title")
     */
     public deleteNode(web: SP.Web, location: NavigationLocation, title:string ): Fluent {
-        this.fluent.chainAction(`${this._helperName}.deleteNode`, () => {
+        return this.fluent.chainAction(`${this._helperName}.deleteNode`, () => {
             if (location == NavigationLocation.Quicklaunch) {
                 return this.navigationHelper.deleteQuicklaunchNode(web, title);
             }
@@ -64,7 +64,7 @@ export default class Navigation {
                 throw "Unknown location " + location;
             }
         });
-        return this.fluent;
+        
     }
     /**
     * Set navigation for the web
@@ -74,9 +74,9 @@ export default class Navigation {
     */
     public setCurrentNavigation(web: SP.Web, type: NavigationType, showSubsites: boolean = false, showPages:boolean = false): Fluent {
         this.fluent.registerDependency(Dependency.Publishing);
-        this.fluent.chainAction(`${this._helperName}.setCurrentNavigation`, () => {
+        return this.fluent.chainAction(`${this._helperName}.setCurrentNavigation`, () => {
             return this.navigationHelper.setCurrentNavigation(web, type, showSubsites, showPages);
         });
-        return this.fluent;
+        
     }
 }

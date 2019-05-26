@@ -14,10 +14,10 @@ export default class ListItem {
     * Example: update(listItem, { 'Title': 'Title value here', ClientId: 123 })
     */
     public update(listItem: SP.ListItem, properties: any): Fluent {
-        this.fluent.chainAction(`${this._helperName}.update`, () => {
+        return this.fluent.chainAction(`${this._helperName}.update`, () => {
             return this.listHelper.setListItemProperties(listItem, properties);
         });
-        return this.fluent;
+        
     }
     /**
     * Create a list item, specifying the Content Type
@@ -25,10 +25,10 @@ export default class ListItem {
     * Example: createWithContentType(context.get_web(), "My list", "My Content Type Name", { 'Title': 'Title value here', ClientId: 123 })
     */
     public createWithContentType(web: SP.Web, listName: string, contentTypeName: string, properties: any): Fluent {
-        this.fluent.chainAction(`${this._helperName}.createWithContentType`, () => {
+        return this.fluent.chainAction(`${this._helperName}.createWithContentType`, () => {
             return this.listHelper.createListItemWithContentTypeName(web, listName, contentTypeName, properties);
         });
-        return this.fluent;
+        
     }
     /**
     * Create new list item with optional property values
@@ -47,10 +47,10 @@ export default class ListItem {
             personValue.set_lookupId(_spPageContextInfo.userId);
     */
     public create(web: SP.Web, listName: string, properties: any): Fluent {
-        this.fluent.chainAction(`${this._helperName}.create`, () => {
+        return this.fluent.chainAction(`${this._helperName}.create`, () => {
             return this.listHelper.createListItem(web, listName, properties);
         });
-        return this.fluent;
+        
     }
     
     /**
@@ -59,10 +59,10 @@ export default class ListItem {
     * Example: get(context.get_web(), "MyList", 1, ["ID", "Title"])
     */
     public get(web: SP.Web, listName: string, id: number, viewFields: Array<string> = null): Fluent {
-        this.fluent.chainAction(`${this._helperName}.get`, () => {
+        return this.fluent.chainAction(`${this._helperName}.get`, () => {
             return this.listHelper.getListItemById(web, listName, id, viewFields);
         });
-        return this.fluent;
+        
     }
     /**
     * Get the listitem for a File using the ID with optional view fields
@@ -70,10 +70,10 @@ export default class ListItem {
     * Example: getFileListItem("/sites/site/documents/mydoc.docx", ["ID", "Title", "FileLeafRef"])
     */
     public getFileListItem(serverRelativeUrl: string, viewFields: Array<string> = null): Fluent {
-        this.fluent.chainAction(`${this._helperName}.getFileListItem`, () => {
+        return this.fluent.chainAction(`${this._helperName}.getFileListItem`, () => {
             return this.listHelper.getFileListItem(serverRelativeUrl, viewFields);
         });
-        return this.fluent;
+        
     }
     
     /**
@@ -82,10 +82,10 @@ export default class ListItem {
     * Example: deleteById(context.get_web(), "MyList", 7)
     */
     public deleteById(web: SP.Web, listName: string, id: number): Fluent {
-        this.fluent.chainAction(`${this._helperName}.deleteById`, () => {
+        return this.fluent.chainAction(`${this._helperName}.deleteById`, () => {
             return this.listHelper.deleteListItemById(web, listName, id);
         });
-        return this.fluent;
+        
     }
     /**
     * Execute a query using supplied CAML.  
@@ -93,10 +93,9 @@ export default class ListItem {
     * Example: query(context.get_web(), "MyList", "<View><Query><Where><In><FieldRef Name='ID' /><Values><Value Type='Number'>1</Value><Value Type='Number'>2</Value></Values></In></View></Query></Where>")
     */
     public query(web: SP.Web, listName: string, viewXml: string): Fluent {
-        this.fluent.chainAction(`${this._helperName}.query`, () => {
+        return this.fluent.chainAction(`${this._helperName}.query`, () => {
             return this.listHelper.getListItems(web, listName, viewXml);
         });
-        return this.fluent;
     }
     
 }

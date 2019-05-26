@@ -17,10 +17,10 @@ export default class User {
     * Example: get("i:0#.f|membership|my@email.address")
     */
     public get(emailOrAccountName:string): Fluent {
-        this._fluent.chainAction(`${this._helperName}.get`, () => {
+        return this._fluent.chainAction(`${this._helperName}.get`, () => {
             return this.userHelper.getUserByEmail(emailOrAccountName);
         });
-        return this._fluent;
+        
     }
     /**
     * Get a user by their Id
@@ -28,10 +28,10 @@ export default class User {
     * Example: getById(15)
     */
     public getById(id: number): Fluent {
-        this._fluent.chainAction(`${this._helperName}.getById`, () => {
+        return this._fluent.chainAction(`${this._helperName}.getById`, () => {
             return this.userHelper.getUserById(id);
         });
-        return this._fluent;
+        
     }
     /**
     * Get the current user
@@ -39,10 +39,10 @@ export default class User {
     * Example: getCurrentUser()
     */
     public getCurrentUser(): Fluent {
-        this._fluent.chainAction(`${this._helperName}.getCurrentUser`, () => {
+        return this._fluent.chainAction(`${this._helperName}.getCurrentUser`, () => {
             return this.userHelper.getCurrentUser();
         });
-        return this._fluent;
+        
     }
     /**
     * Get the profile properties for the current user
@@ -51,10 +51,10 @@ export default class User {
     */
     public getCurrentUserProfileProperties(): Fluent {
         this._fluent.registerDependency(Dependency.UserProfile);
-        this._fluent.chainAction(`${this._helperName}.getCurrentUserProfileProperties`, () => {
+        return this._fluent.chainAction(`${this._helperName}.getCurrentUserProfileProperties`, () => {
             return this.userHelper.getCurrentUserProfileProperties();
         });
-        return this._fluent;
+        
     }
     /**
     * Get the manager for the current user
@@ -63,9 +63,9 @@ export default class User {
     */
     public getCurrentUserManager(): Fluent {
         this._fluent.registerDependency(Dependency.UserProfile);
-        this._fluent.chainAction(`${this._helperName}.getCurrentUserManager`, () => {
+        return this._fluent.chainAction(`${this._helperName}.getCurrentUserManager`, () => {
             return this.userHelper.getCurrentUserManager();
         });
-        return this._fluent;
+        
     }
 }

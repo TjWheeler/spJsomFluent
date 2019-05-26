@@ -11,6 +11,8 @@ var examples = {
         //examples.createListItem();
         //examples.setWelcomePage();
         //examples.createPublishingPage();
+        //examples.customActionCommands();
+        //examples.customActionCommandsChain();
     },
     deleteListItem: () => {
         var context = SP.ClientContext.get_current();
@@ -89,14 +91,14 @@ var examples = {
             });
     },
     createListAndItem: () => {
-        var context = SP.ClientContext.get_current();
         var listName = "MyList1";
+        var context = SP.ClientContext.get_current();
         new spJsom.Fluent()
             .withContext(context)
+            .permission.hasWebPermission(SP.PermissionKind.manageLists, context.get_web())
+            .whenTrue() 
             .list.exists(context.get_web(), listName)
-            .whenFalse()  //stops here if the list exists
-            .permission.hasListPermission(SP.PermissionKind.addListItems, context.get_web().get_lists().getByTitle("MyList"))
-            .whenTrue() //stops here if the user doesn't have permission
+            .whenFalse() 
             .list.create(context.get_web(), listName, 100)
             .listItem.create(context.get_web(), listName, { Title: "Created by spJsom" })
             .execute()
@@ -146,6 +148,7 @@ var examples = {
             });
     },
     getUser: () => {
+        //Shows various ways to get a user and the profile properties.
         var context = SP.ClientContext.get_current();
         new spJsom.Fluent()
             .withContext(context)
@@ -184,6 +187,60 @@ var examples = {
             .publishingPage.create(context.get_web(), filename, `${webUrl}/_catalogs/masterpage/blankwebpartpage.aspx`)
             .file.checkIn(context.get_web(), `${webUrl}/pages/${filename}`, "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
             .web.setWelcomePage(context.get_web(), `pages/${filename}`)
+            .execute()
+            .fail((sender, args) => {
+                console.error(args.get_message());
+            })
+            .done((results) => {
+                console.log(results);
+            });
+    },
+    customActionCommands: () => {
+        var context = SP.ClientContext.get_current();
+        new spJsom.Fluent()
+            .withContext(context)
+            .chainAction("myCustomCommand", () => {
+                var deferred = $.Deferred();
+                context.get_web().set_title("My new title");
+                context.get_web().update();
+                spJsom.Fluent.executeQuery(context)
+                    .fail((sender, args) => {
+                        deferred.reject(sender, args);
+                    })
+                    .done(() => {
+                        deferred.resolve();
+                    });
+                return deferred.promise();
+            })
+            .execute()
+            .fail((sender, args) => {
+                console.error(args.get_message());
+            })
+            .done((results) => {
+                console.log(results);
+            });
+    },
+    customActionCommandsChain: () => {
+        var context = SP.ClientContext.get_current();
+        var customAction = new spJsom.ActionCommand();
+        customAction.name = "myCustomCommand";
+        customAction.action = () => {
+            var deferred = $.Deferred();
+            context.get_web().set_title("My alternate title");
+            context.get_web().update();
+            spJsom.Fluent.executeQuery(context)
+                .fail((sender, args) => {
+                    deferred.reject(sender, args);
+                })
+                .done(() => {
+                    deferred.resolve();
+                });
+            return deferred.promise();
+        };
+
+        new spJsom.Fluent()
+            .withContext(context)
+            .chain(customAction)
             .execute()
             .fail((sender, args) => {
                 console.error(args.get_message());

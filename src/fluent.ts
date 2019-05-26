@@ -1,5 +1,4 @@
 // spJsom - Fluent
-/// <reference path="../typings/@types/all.ts" />
 import Web from "./web"
 import Permission from "./permission"
 import List from "./list"
@@ -194,11 +193,19 @@ export class Fluent  {
         this.commands.push(command);
         return this;
     }
-    public chainAction(name: string, action: any) {
+    public chainAction(name: string, action: any) : Fluent {
         var command = new ActionCommand();
         command.name = name;
         command.action = action;
         this.commands.push(command);
+        return this;
+    }
+    public chain(command: ActionCommand): Fluent {
+        this.commands.push(command);
+        return this;
+    }
+    public static executeQuery(context: SP.ClientContext) {
+        return common.executeQuery(context);
     }
     public registerDependency(dependency: Dependency) {
         if (this.dependencies.indexOf(dependency) === -1) {

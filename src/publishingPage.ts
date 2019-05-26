@@ -16,10 +16,10 @@ export default class PublishingPage {
     */
     public create(web: SP.Web, name: string, layoutUrl: string): Fluent {
         this.fluent.registerDependency(Dependency.Publishing);
-        this.fluent.chainAction(`${this._helperName}.create`, () => {
+        return this.fluent.chainAction(`${this._helperName}.create`, () => {
             return this.pageHelper.createPublishingPage(web, name, layoutUrl);
         });
-        return this.fluent;
+        
     }
     /**
     * Gets a page layout.
@@ -28,10 +28,10 @@ export default class PublishingPage {
     * 
     */
     public getLayout(serverRelativeUrl:string): Fluent {
-        this.fluent.chainAction(`${this._helperName}.getLayout`, () => {
+        return this.fluent.chainAction(`${this._helperName}.getLayout`, () => {
             return this.pageHelper.getPublishingLayout(serverRelativeUrl);
         });
-        return this.fluent;
+        
     }
 
 }

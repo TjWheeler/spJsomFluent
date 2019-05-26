@@ -1,4 +1,3 @@
-/// <reference path="../typings/@types/all.ts" />
 
 export default class common {
     public static reject(deferred: JQueryDeferred<any>, reason:string) {
