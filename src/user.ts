@@ -12,6 +12,7 @@ export default class User {
     private userHelper = null as UserHelper;
     /**
     * Get User by email or account name
+    * Result: SP.User
     * Example: get("my@email.address")
     * Example: get("i:0#.f|membership|my@email.address")
     */
@@ -22,9 +23,9 @@ export default class User {
         return this._fluent;
     }
     /**
-    * 
-    * Result: 
-    * Example: 
+    * Get a user by their Id
+    * Result: SP.User
+    * Example: getById(15)
     */
     public getById(id: number): Fluent {
         this._fluent.chainAction(`${this._helperName}.getById`, () => {
@@ -33,9 +34,9 @@ export default class User {
         return this._fluent;
     }
     /**
-    * 
-    * Result: 
-    * Example: 
+    * Get the current user
+    * Result: SP.User
+    * Example: getCurrentUser()
     */
     public getCurrentUser(): Fluent {
         this._fluent.chainAction(`${this._helperName}.getCurrentUser`, () => {
@@ -44,9 +45,9 @@ export default class User {
         return this._fluent;
     }
     /**
-    * 
-    * Result: 
-    * Example: 
+    * Get the profile properties for the current user
+    * Result: SP.UserProfiles.PersonProperties
+    * Example: getCurrentUserProfileProperties()
     */
     public getCurrentUserProfileProperties(): Fluent {
         this._fluent.registerDependency(Dependency.UserProfile);
@@ -56,9 +57,9 @@ export default class User {
         return this._fluent;
     }
     /**
-    * 
-    * Result: 
-    * Example: 
+    * Get the manager for the current user
+    * Result: SP.User
+    * Example: getCurrentUserManager()
     */
     public getCurrentUserManager(): Fluent {
         this._fluent.registerDependency(Dependency.UserProfile);

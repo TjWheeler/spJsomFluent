@@ -125,34 +125,30 @@ Fluent API `spJsom.listItem`
 | deleteById(web: SP.Web, listName: string, id: number) | void | Delete List Item | deleteById(context.get_web(), "MyList", 7) |
 | query(web: SP.Web, listName: string, viewXml: string) | SP.ListItemCollection | Execute a query using supplied CAML.| query(context.get_web(), "MyList", "<View><Query><Where><In><FieldRef Name='ID' /><Values><Value Type='Number'>1</Value><Value Type='Number'>2</Value></Values></In></View></Query></Where>") |
 
-## Permission Commands
-
-Fluent API `spJsom.permission`
-
-| Command        | Result        | Description | Example |
-| ------------- | ------------- | ------------- | ------------- |
-|||||
-|||||
-
-Fluent API `spJsom.web`
-
-## Web Commands
-
-| Command        | Result        | Description | Example |
-| ------------- | ------------- | ------------- | ------------- |
-|||||
-|||||
-
-
-
 ## Navigation Commands
 
 Fluent API `spJsom.navigation`
 
 | Command        | Result        | Description | Example |
 | ------------- | ------------- | ------------- | ------------- |
-|||||
-|||||
+| createNode(web: SP.Web, location: NavigationLocation, title: string, url: string, asLastNode: boolean = true) | SP.NavigationNode | Create new navigation node | createNode(context.get_web(), NavigationLocation.Quicklaunch, "Test Node", "/sites/mysite/pages/default.aspx") |
+| deleteAllNodes(web: SP.Web, location: NavigationLocation) | void | Delete all navigation nodes for the web | deleteAllNodes(context.get_web(), NavigationLocation.Quicklaunch) |
+| deleteNode(web: SP.Web, location: NavigationLocation, title:string ) | void|Delete all navigation nodes that match the supplied title for the web|deleteNode(context.get_web(), NavigationLocation.Quicklaunch, "My link title")|
+| setCurrentNavigation(web: SP.Web, type: NavigationType, showSubsites: boolean = false, showPages:boolean = false)|void| Set navigation for the web | setCurrentNavigation(context.get_web(), 3, true, true) |
+
+Note: Taxonomy based navigation is not currently supported
+
+## Permission Commands
+
+Fluent API `spJsom.permission`
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+| hasWebPermission(permission: SP.PermissionKind, web: SP.Web) | boolean| Check if the current user has specified Web permission| hasWebPermission(SP.PermissionKind.createSSCSite, context.get_web()) |
+| hasListPermission(permission: SP.PermissionKind, list: SP.List)|boolean|Check if the current user has specified List permission| hasListPermission(SP.PermissionKind.addListItems, context.get_web().get_lists().getByTitle("MyList")) |
+| hasItemPermission(permission: SP.PermissionKind, item: SP.ListItem) |boolean|Check if the current user has specified ListItem permission | hasItemPermission(SP.PermissionKind.editListItems, context.get_web().get_lists().getByTitle("MyList").getItemById(0)) |
+
+Fluent API `spJsom.web`
 
 ## Publishing Page Commands
 
@@ -162,6 +158,29 @@ Fluent API `spJsom.publishingPage`
 | ------------- | ------------- | ------------- | ------------- |
 | create(web: SP.Web, name: string, layoutUrl: string) | SP.Publishing.PublishingPage |Creates a new publishing page.   |  .publishingPage.create(SP.ClientContext.GetCurrent().get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx") |
 | getLayout(serverRelativeUrl:string)		| SP.ListItem | Gets a page layout | |
+
+## User Commands
+
+Fluent API `spJsom.user`
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+| get(emailOrAccountName:string) |SP.User | Get User by email or account name| get("my@email.address") |
+| getById(id: number) | SP.User|Get a user by their Id|getById(15)|
+| getCurrentUser() |SP.User| Get the current user | getCurrentUser() |
+| getCurrentUserProfileProperties() |SP.UserProfiles.PersonProperties|Get the profile properties for the current user| getCurrentUserProfileProperties() |
+| getCurrentUserManager() |SP.USer | Get the manager for the current user | getCurrentUserManager() |
+
+## Web Commands
+
+| Command        | Result        | Description | Example |
+| ------------- | ------------- | ------------- | ------------- |
+| setWelcomePage(web: SP.Web, url: string) | SP.Folder | Set the web welcome page.  The url should be relative to the root folder of the web. | setWelcomePage(context.get_web(), "pages/default.aspx") |
+| create(name: string, parentWeb: SP.Web, title: string, template: string, useSamePermissionsAsParent: boolean = true) | SP.Web | Create a new sub web. | create("SubWebName", SP.ClientContext.get_current().get_rootWeb(), "My Web Title", "CMSPUBLISHING#0") |
+| exists(url: string) | boolean |  Check if a web exists | exists("/sites/myweb/mysubweb")|
+| getWebs(fromWeb: SP.Web) | Array<SP.Web> | Get and load all webs starting from a web and its children | getWebs(SP.ClientContext.get_current().get_rootWeb())) |
+
+Note: for template ids check out: See: https://blogs.technet.microsoft.com/praveenh/2010/10/21/sharepoint-templates-and-their-ids/
 
 # Events
 
@@ -188,8 +207,6 @@ To show progress, this method will give you the details you need.
     }
 })
 ```
-
-
 
 # Usage 
 

@@ -12,6 +12,7 @@ export default class Web {
     private webHelper = null as WebHelper;
     /**
       * Set the web welcome page.  The url should be relative to the root folder of the web. 
+      * Result: SP.Folder
       * Example: setWelcomePage(context.get_web(), "pages/default.aspx")
       */
     public setWelcomePage(web: SP.Web, url: string): Fluent {
@@ -22,6 +23,7 @@ export default class Web {
     }
     /**
       * Create a new sub web.
+      * Result: SP.Web
       * name: Forms part of the URL, don't include slash
       * template: template id and configuration value
       * Example: create("SubWebName", SP.ClientContext.get_current().get_rootWeb(), "My Web Name", "CMSPUBLISHING#0")
@@ -37,6 +39,7 @@ export default class Web {
     }
     /**
       * Check if a web exists
+      * Result: boolean
       * url: server relative url
       * Example: .exists("/sites/mysubweb")
       */
@@ -47,7 +50,8 @@ export default class Web {
         return this._fluent;
     }
     /**
-      * Get and load all webs starting from a web
+      * Get and load all webs starting from a web and its children
+      * Result: Array<SP.Web>
       * Example: getWebs(SP.ClientContext.get_current().get_rootWeb()))
       */
     public getWebs(fromWeb: SP.Web): Fluent {

@@ -5,7 +5,7 @@ export default class WebHelper {
         this.context = context;
     }
     private context: SP.ClientContext;
-    public setWelcomePage(web: SP.Web, url: string): JQueryPromise<any> {
+    public setWelcomePage(web: SP.Web, url: string): JQueryPromise<SP.Folder> {
             var deferred = $.Deferred();
             var rootFolder = web.get_rootFolder();
             this.context.load(web);
@@ -17,9 +17,9 @@ export default class WebHelper {
                 .done(() => {
                     deferred.resolve(rootFolder);
                 });
-            return deferred.promise();
+        return deferred.promise() as JQueryPromise<SP.Folder>;
     }
-    public createWeb(name: string, parentWeb: SP.Web, title: string, template: string, useSamePermissionsAsParent:boolean = true): JQueryPromise<any> {
+    public createWeb(name: string, parentWeb: SP.Web, title: string, template: string, useSamePermissionsAsParent:boolean = true): JQueryPromise<SP.Web> {
             var deferred = $.Deferred();
             var info = new SP.WebCreationInformation();
             info.set_url(name);
@@ -33,7 +33,7 @@ export default class WebHelper {
                 .done(() => {
                     deferred.resolve(newWeb);
                 });
-            return deferred.promise();
+        return deferred.promise() as JQueryPromise<SP.Web>;
     }
     public doesWebExist(url: string): JQueryPromise<any> {
             var deferred = $.Deferred();
@@ -51,7 +51,7 @@ export default class WebHelper {
                 });
             return deferred.promise() as JQueryPromise<any>;
     }
-    public getWebs(fromWeb: SP.Web): JQueryPromise<any> {
+    public getWebs(fromWeb: SP.Web): JQueryPromise<Array<SP.Web>> {
             var deferred = $.Deferred();
             var output = [] as Array<SP.Web>;
             this.getAllWebs(this.context, fromWeb, output)
@@ -59,7 +59,7 @@ export default class WebHelper {
                 .done(() => {
                     deferred.resolve(output);
                 });
-            return deferred.promise();
+        return deferred.promise() as JQueryPromise<Array<SP.Web>>;
     }
     private getAllWebs(context: SP.ClientContext, web: SP.Web, output: Array<SP.Web>): JQueryPromise<Array<SP.Web>> {
         var deferred = $.Deferred();
