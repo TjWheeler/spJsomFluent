@@ -45,6 +45,56 @@ Coming soon!
 
 jQuery must be loaded as the library uses jQuery Promises.
 
+# Usage 
+
+## Install - npm
+`npm i spjsomfluent --save`
+
+## Importing spJsom
+```
+import * as spJsom from "./node_modules/spjsomfluent/src/fluent"
+```
+
+## Development commands - NodeJs
+
+### Install modules
+`npm install`
+
+### Run the dev build
+`npm run debug`
+
+### Run the production build
+`npm run release`
+
+### Watch the dev configuration, and recompile as files change
+`npm run dev`
+
+# Events
+
+To monitor activity there are 2 events you can wire up to.  These are:
+1. onExecuting(commandName, step, totalSteps)
+2. onExecuted(commandName, success, results)
+
+## onExecuting
+To show progress, this method will give you the details you need.
+```typescript
+.onActionExecuting((actionName:string, current:number, total:number) => {
+    let progress = Math.ceil(100 * current / total);
+    console.log(`Executing: ${actionName}, we are ${progress}% through.`);
+})
+            
+```
+
+## onExecuted
+```typescript
+.onActionExecuted((actionName:string, success:boolean, results: Array<any>) => {
+    console.log(`Executed: ${actionName}:${success}`);
+    if (!success) {
+        console.error(actionName, results);
+    }
+})
+```
+
 # Commands
 
 ## whenTrue & whenFalse
@@ -181,55 +231,4 @@ Fluent API `spJsom.user`
 | getWebs(fromWeb: SP.Web) | Array<SP.Web> | Get and load all webs starting from a web and its children | getWebs(SP.ClientContext.get_current().get_rootWeb())) |
 
 Note: for template ids check out: See: https://blogs.technet.microsoft.com/praveenh/2010/10/21/sharepoint-templates-and-their-ids/
-
-# Events
-
-To monitor activity there are 2 events you can wire up to.  These are:
-1. onExecuting(commandName, step, totalSteps)
-2. onExecuted(commandName, success, results)
-
-## onExecuting
-To show progress, this method will give you the details you need.
-```typescript
-.onActionExecuting((actionName:string, current:number, total:number) => {
-    let progress = Math.ceil(100 * current / total);
-    console.log(`Executing: ${actionName}, we are ${progress}% through.`);
-})
-            
-```
-
-## onExecuted
-```typescript
-.onActionExecuted((actionName:string, success:boolean, results: Array<any>) => {
-    console.log(`Executed: ${actionName}:${success}`);
-    if (!success) {
-        console.error(actionName, results);
-    }
-})
-```
-
-# Usage 
-
-## Install - npm
-`npm i spjsomfluent --save`
-
-## Importing spJsom
-```
-import * as spJsom from "./node_modules/spjsomfluent/src/fluent"
-```
-
-## Development commands - NodeJs
-
-### Install modules
-`npm install`
-
-### Run the dev build
-`npm run debug`
-
-### Run the production build
-`npm run release`
-
-### Watch the dev configuration, and recompile as files change
-`npm run dev`
-
 
