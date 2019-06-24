@@ -1,4 +1,4 @@
-import * as spJsom from "./node_modules/spjsomfluent/src/fluent"
+import * as spJsom from "spjsomfluent"
 export class myApp {
     public run() {
         this.createListAndItem();

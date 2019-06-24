@@ -2,11 +2,12 @@
   "name": "spjsomsampleapp",
   "version": "0.0.1",
   "dependencies": {
-    "spjsomfluent": "^0.*.*"
+    "spjsomfluent": "^0.1.9"
   },
   "private": true,
   "devDependencies": {
     "@types/jquery": "^3.3.29",
+    "@types/moment": "^2.13.0",
     "@types/sharepoint": "^2016.1.2",
     "ts-loader": "^5.4.4",
     "typescript": "^3.4.5",
@@ -15,7 +16,7 @@
     "webpack-concat-plugin": "^3.*.*"
   },
   "scripts": {
-    "debug": "webpack --config webpack.config.js --mode development",
+    "debug": "webpack --config webpack.config.js --mode development --verbose",
     "release": "webpack --config webpack.config.js --mode production",
     "dev": "webpack --config webpack.config.js --mode development --watch"
   },

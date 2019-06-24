@@ -52,7 +52,7 @@ jQuery must be loaded as the library uses jQuery Promises.
 
 ## Importing spJsom
 ```
-import * as spJsom from "./node_modules/spjsomfluent/src/fluent"
+import * as spJsom from "spjsomfluent"
 ```
 
 ## Development commands - NodeJs

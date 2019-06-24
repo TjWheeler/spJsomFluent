@@ -10,12 +10,12 @@
     "strictNullChecks": false,
     "removeComments": false,
     "preserveConstEnums": true,
-    "typeRoots": [ "./node_modules/@types" ],
-    "types": [ "jquery", "sharepoint" ],
-    "allowJs": true
+    "moduleResolution": "Node",
+    "types": [ "jquery", "sharepoint", "spjsomfluent" ],
+    "allowJs": false
   },
   "exclude": [
-  //  "./node_modules"
+      "./node_modules"
   ]
 }
   

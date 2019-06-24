@@ -7,3 +7,5 @@ sampleApp/myApp.js
 sampleApp/myApp.js.map
 sampleApp/package-lock.json
 sampleApp/node_modules
+dist/examples
+dist/src

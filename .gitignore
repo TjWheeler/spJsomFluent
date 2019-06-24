@@ -16,6 +16,9 @@ sampleApp/myApp.js
 sampleApp/myApp.js.map
 sampleApp/package-lock.json
 
+dist/src
+dist/examples
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
