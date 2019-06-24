@@ -18,6 +18,7 @@ sampleApp/package-lock.json
 
 dist/src
 dist/examples
+build
 
 # Build results
 [Dd]ebug/

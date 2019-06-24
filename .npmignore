@@ -9,3 +9,4 @@ sampleApp/package-lock.json
 sampleApp/node_modules
 dist/examples
 dist/src
+build

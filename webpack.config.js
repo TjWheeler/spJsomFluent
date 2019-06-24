@@ -8,8 +8,8 @@ DtsBundlePlugin.prototype.apply = function (compiler) {
 
         dts.bundle({
             name: 'spJsomFluent',
-            main: './dist/src/**/*.d.ts',
-            out: '../index.d.ts',
+            main: './build/**/*.d.ts',
+            out: '../dist/index.d.ts',
             removeSource: true,
             outputAsModuleFolder: true
         });
