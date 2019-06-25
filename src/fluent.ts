@@ -19,16 +19,20 @@ export class Fluent  {
     private dependencies: Array<Dependency> = [];
     public settings: ISettings = { timeoutMilliseconds: 5000, enableDependencyTimeout: true };
     private totalCommands = 0;
-    withContext(context: SP.ClientContext): Fluent {
+    public withContext(context: SP.ClientContext): Fluent {
         this.context = context;
         return this;
     }
-    withSettings(settings: ISettings): Fluent {
+    public withSettings(settings: ISettings): Fluent {
         for (var setting in settings) {
             if (typeof (this.settings[setting]) !== typeof (undefined)) {
                 this.settings[setting] = settings[setting];
             }
         }
+        return this;
+    }
+    public withDependency(dependency: Dependency): Fluent {
+        this.registerDependency(dependency);
         return this;
     }
     get promise(): JQueryPromise<any> {

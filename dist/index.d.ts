@@ -36,6 +36,7 @@ export class Fluent {
     settings: ISettings;
     withContext(context: SP.ClientContext): Fluent;
     withSettings(settings: ISettings): Fluent;
+    withDependency(dependency: Dependency): Fluent;
     readonly promise: JQueryPromise<any>;
     readonly permission: Permission;
     readonly list: List;

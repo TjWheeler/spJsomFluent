@@ -1,6 +1,6 @@
 {
   "name": "spjsomfluent",
-  "version": "0.1.9",
+  "version": "0.1.12",
   "dependencies": {},
   "private": false,
   "homepage": "https://github.com/TjWheeler/spJsomFluent",
@@ -22,7 +22,7 @@
   "keywords": [],
   "author": "Tim Wheeler (http://timwheeler.io)",
   "license": "MIT",
-  "main": "./dist/spJsomFluent.js",
+  "main": "./dist/spJsomFluent.umd.js",
   "types": "./dist/index.d.ts",
   "description": ""
 }

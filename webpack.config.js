@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const version = 'v0.1.6';
+const version = 'v0.1.12';
 function DtsBundlePlugin() { }
 DtsBundlePlugin.prototype.apply = function (compiler) {
     compiler.plugin('done', function () {
@@ -16,8 +16,8 @@ DtsBundlePlugin.prototype.apply = function (compiler) {
     });
 };
 var banner = 'spJsomFluent ' + version + ' - https://github.com/TjWheeler/spJsomFluent';
-module.exports = {
-    entry: { spJsomFluent: './src/fluent.ts', spJsomExamples: './examples/spJsomExamples-typescript.ts'},
+var baseConfiguration = {
+    entry: { spJsomFluent: './src/fluent.ts', spJsomExamples: './examples/spJsomExamples-typescript.ts' },
     devtool: 'source-map',
     module: {
         rules: [
@@ -32,10 +32,28 @@ module.exports = {
         extensions: ['.ts']
     },
     plugins: [new webpack.BannerPlugin(banner), new DtsBundlePlugin()],
-    output: {
-        filename: '[name].js',
-        path: path.resolve(__dirname, './dist'),
-        libraryTarget: 'var',
-        library: 'spJsom'
+};
+
+var libraryConfig = {
+    ...baseConfiguration, ...
+    {
+        output: {
+            filename: '[name].js',
+            path: path.resolve(__dirname, './dist'),
+            libraryTarget: 'var',
+            library: 'spJsom'
+        }
     }
 };
+var umdConfig = {
+    ...baseConfiguration, ...
+    {
+        output: {
+            filename: '[name].umd.js',
+            path: path.resolve(__dirname, './dist'),
+            libraryTarget: 'umd',
+            library: 'spJsom'
+        }
+    }
+};
+module.exports = [libraryConfig,umdConfig];
