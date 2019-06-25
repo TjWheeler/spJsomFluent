@@ -1,6 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
-const version = 'v0.1.12';
+new webpack.DefinePlugin({
+    VERSION: JSON.stringify(require("./package.json").version)
+});
+var version = JSON.stringify(require("./package.json").version);
+var banner = 'spJsomFluent ' + version + ' - https://github.com/TjWheeler/spJsomFluent';
 function DtsBundlePlugin() { }
 DtsBundlePlugin.prototype.apply = function (compiler) {
     compiler.plugin('done', function () {
@@ -15,7 +19,6 @@ DtsBundlePlugin.prototype.apply = function (compiler) {
         });
     });
 };
-var banner = 'spJsomFluent ' + version + ' - https://github.com/TjWheeler/spJsomFluent';
 var baseConfiguration = {
     entry: { spJsomFluent: './src/fluent.ts', spJsomExamples: './examples/spJsomExamples-typescript.ts' },
     devtool: 'source-map',
@@ -31,7 +34,9 @@ var baseConfiguration = {
     resolve: {
         extensions: ['.ts']
     },
-    plugins: [new webpack.BannerPlugin(banner), new DtsBundlePlugin()],
+    plugins: [
+        new webpack.BannerPlugin(banner),
+        new DtsBundlePlugin()]
 };
 
 var libraryConfig = {
@@ -56,4 +61,4 @@ var umdConfig = {
         }
     }
 };
-module.exports = [libraryConfig,umdConfig];
+module.exports = [libraryConfig, umdConfig];
