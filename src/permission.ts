@@ -1,7 +1,7 @@
 import { Fluent } from "./fluent"
-import PermissionHelper from "./helper/permissionHelper";
+import { PermissionHelper } from "./helper/permissionHelper";
 
-export default class Permission {
+export class Permission {
     constructor(fluent: Fluent) {
         this._fluent = fluent;
         this.permissionHelper = new PermissionHelper(fluent.context);

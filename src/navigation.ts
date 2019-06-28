@@ -1,7 +1,6 @@
-import common from "./common"
-import NavigationHelper from "./helper/navigationHelper";
+import { NavigationHelper } from "./helper/navigationHelper";
 import { Fluent, NavigationLocation, NavigationType, Dependency } from "./fluent"
-export default class Navigation {
+export class Navigation {
     constructor(fluent: Fluent) {
         this.fluent = fluent;
         this.navigationHelper = new NavigationHelper(fluent.context);

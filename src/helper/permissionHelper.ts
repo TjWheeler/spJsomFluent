@@ -1,6 +1,6 @@
-import common from "../common"
+import { common } from "../common"
 
-export default class PermissionHelper {
+export class PermissionHelper {
     constructor(context: SP.ClientContext) {
         this.context = context;
     }

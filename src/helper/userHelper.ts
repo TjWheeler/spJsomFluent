@@ -1,6 +1,6 @@
-import common from "../common"
+import { common } from "../common"
 
-export default class UserHelper {
+export class UserHelper {
     constructor(context: SP.ClientContext) {
         this.context = context;
     }

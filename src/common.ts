@@ -1,5 +1,5 @@
 
-export default class common {
+export class common {
     public static reject(deferred: JQueryDeferred<any>, reason:string) {
         deferred.reject(this, { get_message: function () { return reason; } } );
     }

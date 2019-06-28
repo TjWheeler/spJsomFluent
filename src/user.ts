@@ -1,8 +1,8 @@
-import UserHelper from "./helper/userHelper";
+import { UserHelper } from "./helper/userHelper";
 import { Fluent, Dependency } from "./fluent"
-import common from "./common";
+import { common } from "./common";
 
-export default class User {
+export class User {
     constructor(fluent: Fluent) {
         this._fluent = fluent;
         this.userHelper = new UserHelper(fluent.context);

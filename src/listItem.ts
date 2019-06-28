@@ -1,6 +1,6 @@
-import ListHelper from "./helper/listHelper";
+import { ListHelper } from "./helper/listHelper";
 import { Fluent } from "./fluent"
-export default class ListItem {
+export class ListItem {
     constructor(fluent: Fluent) {
         this.fluent = fluent;
         this.listHelper = new ListHelper(fluent.context);

@@ -1,7 +1,7 @@
-import common from "../common"
+import { common } from "../common"
 import { NavigationType } from "../fluent";
 
-export default class NavigationHelper {
+export class NavigationHelper {
     constructor(context: SP.ClientContext) {
         this.context = context;
     }

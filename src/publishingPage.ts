@@ -1,7 +1,7 @@
 import { Fluent, Dependency } from "./fluent"
-import PageHelper from "./helper/pageHelper"
+import { PageHelper } from "./helper/pageHelper"
 
-export default class PublishingPage {
+export class PublishingPage {
     constructor(fluent: Fluent) {
         this.fluent = fluent;
         this.pageHelper = new PageHelper(fluent.context);

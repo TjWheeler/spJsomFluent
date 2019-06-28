@@ -1,13 +1,13 @@
 // spJsom - Fluent
-import Web from "./web"
-import Permission from "./permission"
-import List from "./list"
-import ListItem from "./listitem"
-import File from "./file"
-import User from "./user"
-import Navigation from "./navigation"
-import PublishingPage from "./publishingpage"
-import common from "./common"
+import { Web } from "./web"
+import { Permission } from "./permission"
+import { List } from "./list"
+import { ListItem } from "./listitem"
+import { File } from "./file"
+import { User } from "./user"
+import { Navigation } from "./navigation"
+import { PublishingPage } from "./publishingpage"
+import { common } from "./common"
 
 export class Fluent  {
     public context: SP.ClientContext;

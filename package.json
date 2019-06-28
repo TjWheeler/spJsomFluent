@@ -16,6 +16,7 @@
   },
   "scripts": {
     "debug": "webpack --config webpack.config.js --mode development",
+    "prepare": "webpack --config webpack.config.js --mode production",
     "release": "npm version patch && webpack --config webpack.config.js --mode production",
     "dev": "webpack --config webpack.config.js --mode development --watch"
   },

@@ -1,7 +1,7 @@
-import WebHelper from "./helper/webHelper";
+import { WebHelper } from "./helper/webHelper";
 import { Fluent } from "./fluent"
 
-export default class Web {
+export class Web {
     constructor(fluent: Fluent) {
         this._fluent = fluent;
         this.webHelper = new WebHelper(fluent.context);
