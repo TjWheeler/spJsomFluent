@@ -229,6 +229,7 @@ export default class ListHelper {
         return deferred.promise() as JQueryPromise<SP.ListItemCollection>;
     }
     
+    
     public addContentTypeListAssociation(web: SP.Web, listName: string, contentTypeName: string): JQueryPromise<SP.ContentType> {
         var deferred = $.Deferred();
         var list = web.get_lists().getByTitle(listName);

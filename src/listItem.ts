@@ -97,5 +97,15 @@ export default class ListItem {
             return this.listHelper.getListItems(web, listName, viewXml);
         });
     }
+    /**
+    * Get all list items in a list
+    * Returns: SP.ListItemCollection
+    * Example: getAll(context.get_web(), "MyList")
+    */
+    public getAll(web: SP.Web, listName: string, viewXml: string): Fluent {
+        return this.fluent.chainAction(`${this._helperName}.query`, () => {
+            return this.listHelper.getListItems(web, listName, "<View></View>");
+        });
+    }
     
 }

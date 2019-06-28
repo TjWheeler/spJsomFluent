@@ -1,8 +1,5 @@
-const path = require('path');
-const webpack = require('webpack');
-new webpack.DefinePlugin({
-    VERSION: JSON.stringify(require("./package.json").version)
-});
+var path = require('path');
+var webpack = require('webpack');
 var version = JSON.stringify(require("./package.json").version);
 var banner = 'spJsomFluent ' + version + ' - https://github.com/TjWheeler/spJsomFluent';
 function DtsBundlePlugin() { }

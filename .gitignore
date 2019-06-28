@@ -15,6 +15,7 @@
 sampleApp/myApp.js
 sampleApp/myApp.js.map
 sampleApp/package-lock.json
+package-lock.json
 
 dist/src
 dist/examples
