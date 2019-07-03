@@ -6,7 +6,6 @@ function DtsBundlePlugin() { }
 DtsBundlePlugin.prototype.apply = function (compiler) {
     compiler.plugin('done', function () {
         var dts = require('dts-bundle');
-
         dts.bundle({
             name: 'spJsomFluent',
             main: './build/src/**/*.d.ts',

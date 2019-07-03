@@ -33,5 +33,15 @@ export class PublishingPage {
         });
         
     }
-
+    /**
+    * Changes layout for a publishing page.
+    * Result: void
+    * Example: .publishingPage.setLayout(SP.ClientContext.get_current().get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx")
+    */
+    public setLayout(web: SP.Web, name: string, layoutUrl: string): Fluent {
+        this.fluent.registerDependency(Dependency.Publishing);
+        return this.fluent.chainAction(`${this._helperName}.setLayout`, () => {
+            return this.pageHelper.setLayout(web, name, layoutUrl);
+        });
+    }
 }

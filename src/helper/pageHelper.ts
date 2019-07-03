@@ -1,5 +1,5 @@
 import { common } from "../common"
-
+import * as spData from "./Client.CamlBuilder"
 export class PageHelper {
     constructor(context: SP.ClientContext) {
         this.context = context;
@@ -36,6 +36,35 @@ export class PageHelper {
             });
         return deferred.promise() as JQueryPromise<SP.ListItem>;
     }
-    
+    public setLayout(web: SP.Web, name: string, layoutUrl: string): JQueryPromise<any> {
+        var deferred = $.Deferred();
+        var file = this.context.get_site().get_rootWeb().getFileByServerRelativeUrl(layoutUrl);
+        var listItem = file.get_listItemAllFields();
+        this.context.load(listItem);
+
+        var camlBuilder = new spData.CamlBuilder();
+        camlBuilder.addTextClause(spData.CamlOperator.Eq, "FileLeafRef", name);
+        var list = web.get_lists().getByTitle("Pages");
+        var query = new SP.CamlQuery();
+        query.set_viewXml(camlBuilder.viewXml);
+        var pages = list.getItems(query);
+        this.context.load(pages);
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                if (pages.get_count() === 0) {
+                    deferred.reject(this, { get_message: () => { return "Page not found" } });
+                }
+                var page = pages.getItemAtIndex(0);
+                page.set_item("PublishingPageLayout", layoutUrl);
+                page.update();
+                common.executeQuery(this.context)
+                    .fail((sender, args) => { deferred.reject(sender, args); })
+                    .done(() => {
+                        deferred.resolve();
+                    });
+            });
+        return deferred.promise() as JQueryPromise<any>;
+    }
 
 }
