@@ -1,4 +1,4 @@
-/*! spJsomFluent "0.1.17" - https://github.com/TjWheeler/spJsomFluent */
+/*! spJsomFluent "0.1.18" - https://github.com/TjWheeler/spJsomFluent */
 var spJsom =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache

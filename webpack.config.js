@@ -9,8 +9,8 @@ DtsBundlePlugin.prototype.apply = function (compiler) {
         dts.bundle({
             name: 'spJsomFluent',
             main: './build/src/**/*.d.ts',
-            out: '../dist/index.d.ts',
-            removeSource: false,
+            out: '../../dist/index.d.ts',
+            removeSource: true,
             outputAsModuleFolder: true
         });
     });
@@ -29,10 +29,7 @@ var baseConfiguration = {
     },
     resolve: {
         extensions: ['.ts']
-    },
-    plugins: [
-        new webpack.BannerPlugin(banner),
-        new DtsBundlePlugin()]
+    }
 };
 
 var libraryConfig = {
@@ -43,7 +40,11 @@ var libraryConfig = {
             path: path.resolve(__dirname, './dist'),
             libraryTarget: 'var',
             library: 'spJsom'
-        }
+        },
+        plugins: [
+            new webpack.BannerPlugin(banner)
+            ]
+        
     }
 };
 var umdConfig = {
@@ -54,7 +55,11 @@ var umdConfig = {
             path: path.resolve(__dirname, './dist'),
             libraryTarget: 'umd',
             library: 'spJsom'
-        }
+        },
+        plugins: [
+            new DtsBundlePlugin(),
+            new webpack.BannerPlugin(banner)
+            ]
     }
 };
 module.exports = [libraryConfig, umdConfig];

@@ -1,4 +1,4 @@
-/*! spJsomFluent "0.1.17" - https://github.com/TjWheeler/spJsomFluent */
+/*! spJsomFluent "0.1.18" - https://github.com/TjWheeler/spJsomFluent */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
