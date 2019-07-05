@@ -166,7 +166,7 @@ export class ListHelper {
             });
         return deferred.promise() as JQueryPromise<SP.File>;
     }
-    public checkOutFile(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): JQueryPromise<SP.File> {
+    public checkOutFile(web: SP.Web, serverRelativeUrl: string): JQueryPromise<SP.File> {
         var deferred = $.Deferred();
         var file = web.getFileByServerRelativeUrl(serverRelativeUrl);
         this.context.load(file);
