@@ -32,7 +32,7 @@ export class File {
      * Result: SP.File
      * Example: checkOut(SP.ClientContext.get_current().get_web(), _spPageContextInfo.webServerRelativeUrl + '/pages/mypage.aspx', "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
      */
-    checkOut(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): Fluent;
+    checkOut(web: SP.Web, serverRelativeUrl: string): Fluent;
 }
 
 export class Fluent {

@@ -5,8 +5,11 @@ export class PageHelper {
         this.context = context;
     }
     private context: SP.ClientContext;
-    public createPublishingPage(web: SP.Web, name: string, layoutUrl: string): JQueryPromise<SP.Publishing.PublishingPage> {
+    public createPublishingPage(web: SP.Web, name: string, layoutUrl: string, title:string): JQueryPromise<SP.Publishing.PublishingPage> {
         var deferred = $.Deferred();
+        if (!title) {
+            title = name.replace(".aspx","");
+        }
         var file = this.context.get_site().get_rootWeb().getFileByServerRelativeUrl(layoutUrl);
         var listItem = file.get_listItemAllFields();
         this.context.load(listItem);
@@ -17,10 +20,18 @@ export class PageHelper {
         this.context.load(publishingWeb);
         var publishingPage = publishingWeb.addPublishingPage(pageInfo);
         this.context.load(publishingPage);
+        var pageListItem = publishingPage.get_listItem();
+        this.context.load(pageListItem);
         common.executeQuery(this.context)
             .fail((sender, args) => { deferred.reject(sender, args); })
             .done(() => {
-                deferred.resolve(publishingPage);
+                pageListItem.set_item("Title", title);
+                pageListItem.update();
+                common.executeQuery(this.context)
+                    .fail((sender, args) => { deferred.reject(sender, args); })
+                    .done(() => {
+                        deferred.resolve(publishingPage);
+                    });
             });
         return deferred.promise() as JQueryPromise<SP.Publishing.PublishingPage>;
     }

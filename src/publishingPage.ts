@@ -14,10 +14,10 @@ export class PublishingPage {
     * Result: SP.Publishing.PublishingPage
     * Example: .publishingPage.create(SP.ClientContext.get_current().get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx")
     */
-    public create(web: SP.Web, name: string, layoutUrl: string): Fluent {
+    public create(web: SP.Web, name: string, layoutUrl: string, title:string): Fluent {
         this.fluent.registerDependency(Dependency.Publishing);
         return this.fluent.chainAction(`${this._helperName}.create`, () => {
-            return this.pageHelper.createPublishingPage(web, name, layoutUrl);
+            return this.pageHelper.createPublishingPage(web, name, layoutUrl, title);
         });
         
     }
