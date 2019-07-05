@@ -84,11 +84,11 @@ export class Fluent  {
             });
         return this.resultPromise.promise() as JQueryPromise<Array<ActionResult>>;
     }
-    public onActionExecuted(onExecuted: any): Fluent {
+    public onActionExecuted(onExecuted: OnExecuted): Fluent {
         this.onExecuted = onExecuted;
         return this;
     }
-    public onActionExecuting(onExecuting: any): Fluent {
+    public onActionExecuting(onExecuting: OnExecuting): Fluent {
         this.onExecuting = onExecuting;
         return this;
     }
@@ -379,4 +379,5 @@ export interface KeyValuePair {
     value: any;
 }
 export class WhenCommand extends FluentCommand { }
-
+export type OnExecuting = (commandName: string, step: number, total: number) => any;
+export type OnExecuted = (commandName: string, success: boolean, result: Array<any>) => any;

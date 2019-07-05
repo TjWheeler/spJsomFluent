@@ -51,8 +51,8 @@ export class Fluent {
     readonly user: User;
     readonly navigation: Navigation;
     execute(): JQueryPromise<Array<ActionResult>>;
-    onActionExecuted(onExecuted: any): Fluent;
-    onActionExecuting(onExecuting: any): Fluent;
+    onActionExecuted(onExecuted: OnExecuted): Fluent;
+    onActionExecuting(onExecuting: OnExecuting): Fluent;
     when(predicate: any): this;
     whenAll(predicate: any): Fluent;
     whenTrue(): Fluent;
@@ -98,6 +98,8 @@ export interface KeyValuePair {
 }
 export class WhenCommand extends FluentCommand {
 }
+export type OnExecuting = (commandName: string, step: number, total: number) => any;
+export type OnExecuted = (commandName: string, success: boolean, result: Array<any>) => any;
 
 export interface ICamlBuilder {
     query: string;
