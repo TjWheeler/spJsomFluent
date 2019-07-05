@@ -212,7 +212,7 @@ export class ListHelper {
     createListItem(web: SP.Web, listName: string, properties: any): JQueryPromise<SP.ListItem>;
     getFile(serverRelativeUrl: string): JQueryPromise<SP.File>;
     checkInFile(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): JQueryPromise<SP.File>;
-    checkOutFile(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): JQueryPromise<SP.File>;
+    checkOutFile(web: SP.Web, serverRelativeUrl: string): JQueryPromise<SP.File>;
     getList(web: SP.Web, listName: string): JQueryPromise<SP.List>;
     deleteList(web: SP.Web, listName: string): JQueryPromise<SP.List>;
     getFileListItem(serverRelativeUrl: string, viewFields?: Array<string>): JQueryPromise<SP.ListItem>;
