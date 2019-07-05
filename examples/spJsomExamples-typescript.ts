@@ -64,7 +64,7 @@ var examples = {
             .whenFalse() //stops executing the chain if the web already exists
             .web.create(subSitePath, context.get_web(), "Test Site", "CMSPUBLISHING#0") //Create a sub site
             .withContext(newSiteContext) //Switch to the new site context
-            .publishingPage.create(newSiteContext.get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx")
+            .publishingPage.create(newSiteContext.get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx", "My Title")
             .web.setWelcomePage(newSiteContext.get_web(), "pages/home.aspx")
             .execute().done((results: Array<spJsom.ActionResult>) => {
                 var lastAction = results[results.length - 1];
@@ -184,7 +184,7 @@ var examples = {
         var filename = "MyPage.aspx";
         new spJsom.Fluent()
             .withContext(context)
-            .publishingPage.create(context.get_web(), filename, `${webUrl}/_catalogs/masterpage/blankwebpartpage.aspx`)
+            .publishingPage.create(context.get_web(), filename, `${webUrl}/_catalogs/masterpage/blankwebpartpage.aspx`, "My Title")
             .file.checkIn(context.get_web(), `${webUrl}/pages/${filename}`, "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
             .web.setWelcomePage(context.get_web(), `pages/${filename}`)
             .execute()

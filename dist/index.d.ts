@@ -237,7 +237,7 @@ export class NavigationHelper {
 
 export class PageHelper {
     constructor(context: SP.ClientContext);
-    createPublishingPage(web: SP.Web, name: string, layoutUrl: string): JQueryPromise<SP.Publishing.PublishingPage>;
+    createPublishingPage(web: SP.Web, name: string, layoutUrl: string, title: string): JQueryPromise<SP.Publishing.PublishingPage>;
     getPublishingLayout(serverRelativeUrl: string): JQueryPromise<SP.ListItem>;
     setLayout(web: SP.Web, name: string, layoutUrl: string): JQueryPromise<any>;
 }
@@ -440,7 +440,7 @@ export class PublishingPage {
      * Result: SP.Publishing.PublishingPage
      * Example: .publishingPage.create(SP.ClientContext.get_current().get_web(), "Home.aspx", _spPageContextInfo.siteServerRelativeUrl + "/_catalogs/masterpage/BlankWebPartPage.aspx")
      */
-    create(web: SP.Web, name: string, layoutUrl: string): Fluent;
+    create(web: SP.Web, name: string, layoutUrl: string, title: string): Fluent;
     /**
      * Gets a page layout.
      * Result: SP.ListItem
