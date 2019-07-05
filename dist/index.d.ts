@@ -27,6 +27,12 @@ export class File {
      * Example: checkIn(SP.ClientContext.get_current().get_web(), _spPageContextInfo.webServerRelativeUrl + '/pages/mypage.aspx', "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
      */
     checkIn(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): Fluent;
+    /**
+     * Check out a file
+     * Result: SP.File
+     * Example: checkOut(SP.ClientContext.get_current().get_web(), _spPageContextInfo.webServerRelativeUrl + '/pages/mypage.aspx', "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
+     */
+    checkOut(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): Fluent;
 }
 
 export class Fluent {
@@ -206,6 +212,7 @@ export class ListHelper {
     createListItem(web: SP.Web, listName: string, properties: any): JQueryPromise<SP.ListItem>;
     getFile(serverRelativeUrl: string): JQueryPromise<SP.File>;
     checkInFile(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): JQueryPromise<SP.File>;
+    checkOutFile(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): JQueryPromise<SP.File>;
     getList(web: SP.Web, listName: string): JQueryPromise<SP.List>;
     deleteList(web: SP.Web, listName: string): JQueryPromise<SP.List>;
     getFileListItem(serverRelativeUrl: string, viewFields?: Array<string>): JQueryPromise<SP.ListItem>;

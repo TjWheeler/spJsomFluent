@@ -42,4 +42,15 @@ export class File {
         });
         
     }
+    /**
+    * Check out a file
+    * Result: SP.File
+    * Example: checkOut(SP.ClientContext.get_current().get_web(), _spPageContextInfo.webServerRelativeUrl + '/pages/mypage.aspx', "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
+    */
+    public checkOut(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): Fluent {
+        return this.fluent.chainAction(`${this._helperName}.checkOutFile`, () => {
+            return this.listHelper.checkOutFile(web, serverRelativeUrl, comment, checkInType);
+        });
+
+    }
 }
