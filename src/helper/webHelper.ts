@@ -19,6 +19,42 @@ export class WebHelper {
                 });
         return deferred.promise() as JQueryPromise<SP.Folder>;
     }
+    public setTitle(web: SP.Web, title: string): JQueryPromise<any> {
+        var deferred = $.Deferred();
+        this.context.load(web);
+        web.set_title(title);
+        web.update();
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                deferred.resolve();
+            });
+        return deferred.promise() as JQueryPromise<any>;
+    }
+    public setLogoUrl(web: SP.Web, url: string): JQueryPromise<any> {
+        var deferred = $.Deferred();
+        this.context.load(web);
+        (<any>web).set_siteLogoUrl(url); //TS definition missing here.
+        web.update();
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                deferred.resolve();
+            });
+        return deferred.promise() as JQueryPromise<any>;
+    }
+    public activateFeature(web: SP.Web, featureId: SP.Guid, force:boolean): JQueryPromise<any> {
+        var deferred = $.Deferred();
+        this.context.load(web);
+        web.get_features().add(featureId, force, SP.FeatureDefinitionScope.web);
+        web.update();
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                deferred.resolve();
+            });
+        return deferred.promise() as JQueryPromise<any>;
+    }
     public createWeb(name: string, parentWeb: SP.Web, title: string, template: string, useSamePermissionsAsParent:boolean = true): JQueryPromise<SP.Web> {
             var deferred = $.Deferred();
             var info = new SP.WebCreationInformation();

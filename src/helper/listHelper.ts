@@ -1,5 +1,5 @@
 import { common } from "../common"
-
+import * as FileUpload from "./SPRestFileHelper"
 export class ListHelper {
     constructor(context: SP.ClientContext) {
         this.context = context;
@@ -163,6 +163,35 @@ export class ListHelper {
             .fail((sender, args) => { deferred.reject(sender, args); })
             .done(() => {
                 deferred.resolve(file);
+            });
+        return deferred.promise() as JQueryPromise<SP.File>;
+    }
+    public uploadFile(web: SP.Web, listname: string, file: File, filename:string): JQueryPromise<SP.File> {
+        var deferred = $.Deferred();
+        if (!filename) {
+            filename = file.name;
+        }
+        this.context.load(web);
+        common.executeQuery(this.context)
+            .fail((sender, args) => { deferred.reject(sender, args); })
+            .done(() => {
+                var upload = new FileUpload.SPRestFileUploader();
+                upload.uploadFileAsArrayBuffer(file, web.get_url(), listname, filename)
+                    .fail((jqXHR, textStatus) => {
+                        deferred.reject(jqXHR, textStatus);
+                    })
+                    .done((data) => {
+                        var file = web.getFileByServerRelativeUrl(data);
+                        this.context.load(file);
+                        //var list = web.get_lists().getByTitle(listname);
+                        //var rootFolder = list.get_rootFolder();
+                        //this.context.load(rootFolder);
+                        common.executeQuery(this.context)
+                            .fail((sender, args) => { deferred.reject(sender, args); })
+                            .done(() => {
+                                deferred.resolve(file);
+                            });
+                    });        
             });
         return deferred.promise() as JQueryPromise<SP.File>;
     }

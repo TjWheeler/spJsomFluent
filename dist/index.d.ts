@@ -33,6 +33,12 @@ export class File {
      * Example: checkOut(SP.ClientContext.get_current().get_web(), _spPageContextInfo.webServerRelativeUrl + '/pages/mypage.aspx', "Checked in by spJsomFluent", SP.CheckinType.majorCheckIn)
      */
     checkOut(web: SP.Web, serverRelativeUrl: string): Fluent;
+    /**
+     * Upload a file to a library
+     * Result: SP.File
+     * Example: uploadFile(SP.ClientContext.get_current().get_web(), "Documents", file)
+     */
+    uploadFile(web: SP.Web, listName: string, file: any, filename?: string): Fluent;
 }
 
 export class Fluent {
@@ -214,6 +220,7 @@ export class ListHelper {
     createListItem(web: SP.Web, listName: string, properties: any): JQueryPromise<SP.ListItem>;
     getFile(serverRelativeUrl: string): JQueryPromise<SP.File>;
     checkInFile(web: SP.Web, serverRelativeUrl: string, comment: string, checkInType: SP.CheckinType): JQueryPromise<SP.File>;
+    uploadFile(web: SP.Web, listname: string, file: File, filename: string): JQueryPromise<SP.File>;
     checkOutFile(web: SP.Web, serverRelativeUrl: string): JQueryPromise<SP.File>;
     getList(web: SP.Web, listName: string): JQueryPromise<SP.List>;
     deleteList(web: SP.Web, listName: string): JQueryPromise<SP.List>;
@@ -251,6 +258,15 @@ export class PermissionHelper {
     hasItemPermission(permission: SP.PermissionKind, item: SP.ListItem): JQueryPromise<boolean>;
 }
 
+interface IProgressCallback {
+    (percentComplete: number): void;
+}
+export class SPRestFileUploader {
+    uploadFileAsArrayBuffer(file: File, webUrl: string, listname: string, filename: string, progressCallback?: IProgressCallback): JQueryPromise<any>;
+    updateListItem(webUrl: string, serverRelativeUrl: string, properties: any, etag?: string): JQuery.jqXHR<any>;
+}
+export {};
+
 export class UserHelper {
     constructor(context: SP.ClientContext);
     getUserByEmail(email: string): JQueryPromise<SP.User>;
@@ -263,6 +279,9 @@ export class UserHelper {
 export class WebHelper {
     constructor(context: SP.ClientContext);
     setWelcomePage(web: SP.Web, url: string): JQueryPromise<SP.Folder>;
+    setTitle(web: SP.Web, title: string): JQueryPromise<any>;
+    setLogoUrl(web: SP.Web, url: string): JQueryPromise<any>;
+    activateFeature(web: SP.Web, featureId: SP.Guid, force: boolean): JQueryPromise<any>;
     createWeb(name: string, parentWeb: SP.Web, title: string, template: string, useSamePermissionsAsParent?: boolean): JQueryPromise<SP.Web>;
     doesWebExist(url: string): JQueryPromise<any>;
     getWebs(fromWeb: SP.Web): JQueryPromise<Array<SP.Web>>;
@@ -522,8 +541,26 @@ export class Web {
         /**
              * Get and load all webs starting from a web and its children
              * Result: Array<SP.Web>
-             * Example: getWebs(SP.ClientContext.get_current().get_rootWeb()))
+             * Example: getWebs(SP.ClientContext.get_current().get_rootWeb())
              */
         getWebs(fromWeb: SP.Web): Fluent;
+        /**
+             * Set site title
+             * Result: void
+             * Example: setTitle(SP.ClientContext.get_current().get_web(), "My Title")
+             */
+        setTitle(web: SP.Web, title: string): Fluent;
+        /**
+             * Set site logo url
+             * Result: void
+             * Example: setLogoUrl(SP.ClientContext.get_current().get_web(), "/site/images/logo.jpg")
+             */
+        setLogoUrl(web: SP.Web, url: string): Fluent;
+        /**
+             * Activate feature
+             * Result: void
+             * Example: activateFeature(SP.ClientContext.get_current().get_web(), new SP.Guid('15a572c6-e545-4d32-897a-bab6f5846e18'))
+             */
+        activateFeature(web: SP.Web, featureId: SP.Guid, force?: boolean): Fluent;
 }
 

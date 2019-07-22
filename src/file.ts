@@ -53,4 +53,15 @@ export class File {
         });
 
     }
+    /**
+    * Upload a file to a library
+    * Result: SP.File
+    * Example: uploadFile(SP.ClientContext.get_current().get_web(), "Documents", file)
+    */
+    public uploadFile(web: SP.Web, listName: string, file: any, filename?:string): Fluent {
+        return this.fluent.chainAction(`${this._helperName}.uploadFile`, () => {
+            return this.listHelper.uploadFile(web, listName, file, filename);
+        });
+
+    }
 }
