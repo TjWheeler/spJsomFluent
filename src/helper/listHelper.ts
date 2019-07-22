@@ -181,11 +181,8 @@ export class ListHelper {
                         deferred.reject(jqXHR, textStatus);
                     })
                     .done((data) => {
-                        var file = web.getFileByServerRelativeUrl(data);
+                        var file = web.getFileByServerRelativeUrl(data.ServerRelativeUrl);
                         this.context.load(file);
-                        //var list = web.get_lists().getByTitle(listname);
-                        //var rootFolder = list.get_rootFolder();
-                        //this.context.load(rootFolder);
                         common.executeQuery(this.context)
                             .fail((sender, args) => { deferred.reject(sender, args); })
                             .done(() => {
