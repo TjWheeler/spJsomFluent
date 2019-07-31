@@ -13,6 +13,7 @@ var examples = {
         //examples.createPublishingPage();
         //examples.customActionCommands();
         //examples.customActionCommandsChain();
+        //examples.conditionalExample();
     },
     deleteListItem: () => {
         var context = SP.ClientContext.get_current();
@@ -242,6 +243,25 @@ var examples = {
             .withContext(context)
             .chain(customAction)
             .execute()
+            .fail((sender, args) => {
+                console.error(args.get_message());
+            })
+            .done((results) => {
+                console.log(results);
+            });
+    },
+    conditionalExample: () => {
+        var context = SP.ClientContext.get_current();
+        var fluent = new spJsom.Fluent();
+        fluent
+            .withContext(context)
+            .listItem.deleteById(context.get_web(), "MyList", 7);
+        if (false) {
+            //do conditional stuff here
+            fluent.web.exists("...");
+            //...
+        }
+        fluent.execute()
             .fail((sender, args) => {
                 console.error(args.get_message());
             })
