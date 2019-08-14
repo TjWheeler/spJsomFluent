@@ -109,6 +109,21 @@ To show progress, this method will give you the details you need.
 
 # Commands
 
+## update
+
+You can supply your own predicate and do additional work against the result of the previous step.  
+The current context will apply any changes made after the method has executed.
+For example:
+```javascript
+.listItem.get(context.get_web(), "MyList", 1) //get a list item
+.update(function(listItem) { //listitem is passed in from previous step.
+    item.set_item("Title", title);  
+    item.update();
+})
+```
+The result of the previous step is passed into the *update* method.
+
+
 ## whenTrue & whenFalse
 
 These commands .whenTrue() and .whenFalse() are a conditional check.  They take the value from the previous step then compare it with True/False to determine if execution of the chain should continue.
