@@ -59,6 +59,7 @@ export class Fluent {
     execute(): JQueryPromise<Array<ActionResult>>;
     onActionExecuted(onExecuted: OnExecuted): Fluent;
     onActionExecuting(onExecuting: OnExecuting): Fluent;
+    update(predicate: any): this;
     when(predicate: any): this;
     whenAll(predicate: any): Fluent;
     whenTrue(): Fluent;
