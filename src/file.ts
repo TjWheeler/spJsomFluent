@@ -25,11 +25,10 @@ export class File {
     * Result: SP.ListItem
     * Example: getListItem(_spPageContextInfo.siteServerRelativeUrl + "/documents/doc.docx")
     */
-    public getListItem(serverRelativeUrl: string): Fluent {
+    public getListItem(web: SP.Web, serverRelativeUrl: string): Fluent {
         return this.fluent.chainAction(`${this._helperName}.getListItem`, () => {
-            return this.listHelper.getFileListItem(serverRelativeUrl);
+            return this.listHelper.getFileListItem(web, serverRelativeUrl);
         });
-        
     }
     /**
     * Check in a file

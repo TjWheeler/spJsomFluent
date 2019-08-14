@@ -67,11 +67,11 @@ export class ListItem {
     /**
     * Get the listitem for a File using the ID with optional view fields
     * Result: SP.ListItem
-    * Example: getFileListItem("/sites/site/documents/mydoc.docx", ["ID", "Title", "FileLeafRef"])
+    * Example: getFileListItem(context.get_web(), "/sites/site/documents/mydoc.docx", ["ID", "Title", "FileLeafRef"])
     */
-    public getFileListItem(serverRelativeUrl: string, viewFields: Array<string> = null): Fluent {
+    public getFileListItem(web: SP.Web, serverRelativeUrl: string, viewFields: Array<string> = null): Fluent {
         return this.fluent.chainAction(`${this._helperName}.getFileListItem`, () => {
-            return this.listHelper.getFileListItem(serverRelativeUrl, viewFields);
+            return this.listHelper.getFileListItem(web, serverRelativeUrl, viewFields);
         });
         
     }

@@ -227,8 +227,8 @@ export class ListHelper {
             });
         return deferred.promise() as JQueryPromise<SP.List>;
     }
-    public getFileListItem(serverRelativeUrl: string, viewFields: Array<string> = null): JQueryPromise<SP.ListItem> {
-        var file = this.context.get_site().get_rootWeb().getFileByServerRelativeUrl(serverRelativeUrl);
+    public getFileListItem(web: SP.Web, serverRelativeUrl: string, viewFields: Array<string> = null): JQueryPromise<SP.ListItem> {
+        var file = web.getFileByServerRelativeUrl(serverRelativeUrl);
         var listItem = file.get_listItemAllFields();
         return this.loadListItem(listItem);
     }

@@ -20,7 +20,7 @@ export class File {
      * Result: SP.ListItem
      * Example: getListItem(_spPageContextInfo.siteServerRelativeUrl + "/documents/doc.docx")
      */
-    getListItem(serverRelativeUrl: string): Fluent;
+    getListItem(web: SP.Web, serverRelativeUrl: string): Fluent;
     /**
      * Check in a file
      * Result: SP.File
@@ -224,7 +224,7 @@ export class ListHelper {
     checkOutFile(web: SP.Web, serverRelativeUrl: string): JQueryPromise<SP.File>;
     getList(web: SP.Web, listName: string): JQueryPromise<SP.List>;
     deleteList(web: SP.Web, listName: string): JQueryPromise<SP.List>;
-    getFileListItem(serverRelativeUrl: string, viewFields?: Array<string>): JQueryPromise<SP.ListItem>;
+    getFileListItem(web: SP.Web, serverRelativeUrl: string, viewFields?: Array<string>): JQueryPromise<SP.ListItem>;
     getListItemById(web: SP.Web, listName: string, id: number, viewFields?: Array<string>): JQueryPromise<SP.ListItem>;
     deleteListItemById(web: SP.Web, listName: string, id: number): JQueryPromise<any>;
     getListItems(web: SP.Web, listName: string, viewXml: string): JQueryPromise<SP.ListItemCollection>;
@@ -380,9 +380,9 @@ export class ListItem {
     /**
      * Get the listitem for a File using the ID with optional view fields
      * Result: SP.ListItem
-     * Example: getFileListItem("/sites/site/documents/mydoc.docx", ["ID", "Title", "FileLeafRef"])
+     * Example: getFileListItem(context.get_web(), "/sites/site/documents/mydoc.docx", ["ID", "Title", "FileLeafRef"])
      */
-    getFileListItem(serverRelativeUrl: string, viewFields?: Array<string>): Fluent;
+    getFileListItem(web: SP.Web, serverRelativeUrl: string, viewFields?: Array<string>): Fluent;
     /**
      * Delete List Item
      * Result: void
