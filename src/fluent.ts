@@ -92,6 +92,29 @@ export class Fluent  {
         this.onExecuting = onExecuting;
         return this;
     }
+    public update(predicate: any) {
+        if (this.peekLastCommand() && this.peekLastCommand().constructor !== ActionCommand) {
+            throw "Illegal operation: The last command must be an ActionCommand";
+        }
+        var command = new WhenCommand();
+        command.action = () => {
+            var deferred = $.Deferred();
+            var command = this.peekLastResult();
+            if (command) {
+                predicate(...command.result);
+                common.executeQuery(this.context)
+                    .fail((sender, args) => { deferred.reject(sender, args); })
+                    .done(() => {
+                        deferred.resolve();
+                    });
+            } else {
+                this.failChain(this, "No action to process for update");
+            }
+            return deferred.promise();
+        };
+        this.commands.push(command);
+        return this;
+    }
     public when(predicate: any) {
         if (this.peekLastCommand() && this.peekLastCommand().constructor !== ActionCommand) {
             throw "Illegal operation: The last command must be an ActionCommand";
